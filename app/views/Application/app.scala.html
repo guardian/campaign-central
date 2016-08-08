@@ -1,9 +1,9 @@
-@(title: String)
+@(title: String, jsLocation: String)
 
 @layout(title) {
     <div id="react-mount" class="main">
         <h1>Loading...</h1>
     </div>
 
-    <script src="/assets/build/app.js"></script>
+    <script src="@jsLocation"></script>
 }
