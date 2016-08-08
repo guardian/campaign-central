@@ -35,8 +35,10 @@ class ReactApp extends React.Component {
   render () {
     return (
       <div className="wrapper">
+        <Header />
         {this.renderErrorBar()}
         <div className="main">
+          <div>React App Loaded</div>
           {this.props.children}
         </div>
       </div>

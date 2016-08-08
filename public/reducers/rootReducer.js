@@ -3,7 +3,7 @@ import {SHOW_ERROR} from '../actions/UIActions/showError';
 
 
 export default function tag(state = {
-  error: false,
+  error: undefined,
   config: {},
 }, action) {
   switch (action.type) {
@@ -19,7 +19,7 @@ export default function tag(state = {
 
   case CLEAR_ERROR:
     return Object.assign({}, state, {
-      error: false
+      error: undefined
     });
 
   case SHOW_ERROR:

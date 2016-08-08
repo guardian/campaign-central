@@ -12,19 +12,12 @@ export default class Header extends React.Component {
             <header className="top-toolbar">
 
                 <Link to="/" className="home-logo">
-                    <span className="home-logo__text-large">Tags</span>
-                    <span className="home-logo__text-small">home</span>
+                    <span className="home-logo__text-small">Home</span>
                 </Link>
 
                 <div className="header__children">
                     <nav className="links">
-                        <HeaderMenuItem to="/audit">Audit Logs</HeaderMenuItem>
-                        <HeaderMenuItem to="/microsite">Microsite Manager</HeaderMenuItem>
-                        <HeaderMenuItem to="/section">Section Editor</HeaderMenuItem>
-                        <HeaderMenuItem to="/mapping">Mapping Manager</HeaderMenuItem>
-                        <HeaderMenuItem to="/batch">Batch tag</HeaderMenuItem>
-                        <HeaderMenuItem to="/merge">Merge tag</HeaderMenuItem>
-                        <HeaderMenuItem to="/status">Job Status</HeaderMenuItem>
+                        <HeaderMenuItem to="/">TBC</HeaderMenuItem>
                     </nav>
                 </div>
             </header>
