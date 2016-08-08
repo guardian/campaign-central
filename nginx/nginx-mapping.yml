@@ -1,0 +1,7 @@
+name: campaign-central
+mappings:
+  - prefix: campaign-central
+    port: 2267
+  - prefix: campaign-central-assets
+    port: 2268
+    websocket: /sockjs-node
