@@ -1,0 +1,42 @@
+machine:
+  timezone: UTC
+  java:
+    version: oraclejdk8
+  node:
+    version: 5.2.0
+  environment:
+    NODE_ENV: production
+
+# Collect build artifacts
+general:
+  artifacts:
+    - target/riffraff
+
+dependencies:
+  # Cache the resolution-cache and build streams to speed things up
+  cache_directories:
+    - "~/.sbt"
+    - "target/resolution-cache"
+    - "target/streams"
+    - "project/target/resolution-cache"
+    - "project/target/streams"
+    - "node_modules"
+  # Compile all sources
+  override:
+    - npm install
+    - npm run build
+    - npm run build-icons
+    - sbt test:compile
+
+test:
+  override:
+    - sbt test
+  # Copy test reports to Circle test reports dir then package app for deploy
+  post:
+    - mkdir -p $CIRCLE_TEST_REPORTS/junit/
+    - find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+# deployment: ENABLE THIS 
+#   riffraff_upload:
+#     branch: /.*/
+#     commands:
+#       - sbt riffRaffUpload
