@@ -4,7 +4,7 @@ import {Router, Route, IndexRoute, browserHistory} from 'react-router';
 import {getStore} from './util/storeAccessor';
 import {hasPermission} from './util/verifyPermission';
 
-import ReactApp     from './components/ReactApp.react';
+import Main from './components/Main';
 
 function requirePermission(permissionName, nextState, replaceState) {
   if (!hasPermission(permissionName)) {
@@ -14,7 +14,7 @@ function requirePermission(permissionName, nextState, replaceState) {
 
 export const router = (
   <Router history={browserHistory}>
-    <Route path="/" component={ReactApp}>
+    <Route path="/" component={Main}>
     </Route>
   </Router>
 )

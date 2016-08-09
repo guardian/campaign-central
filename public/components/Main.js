@@ -1,16 +1,11 @@
 import React from 'react';
-import Header from './Header/Header.react';
+import Header from './Header/Header';
 
-class ReactApp extends React.Component {
+class Main extends React.Component {
 
   static propTypes = {
     error: React.PropTypes.string,
     children: React.PropTypes.element.isRequired
-  }
-
-  constructor(props) {
-    super(props);
-    this.renderErrorBar = this.renderErrorBar.bind(this);
   }
 
   clearError() {
@@ -34,10 +29,10 @@ class ReactApp extends React.Component {
 
   render () {
     return (
-      <div className="wrapper">
+      <div className="main">
         <Header />
         {this.renderErrorBar()}
-        <div className="main">
+        <div className="main__content">
           <div>React App Loaded</div>
           {this.props.children}
         </div>
@@ -63,4 +58,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReactApp);
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
