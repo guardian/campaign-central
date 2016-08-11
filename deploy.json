@@ -12,7 +12,7 @@
   },
   "recipes":{
     "default":{
-      "depends" : ["artifactUploadOnly", "campaignCentralCloudformation", "deployOnly"]
+      "depends" : ["artifactUploadOnly", "deployOnly"]
     },
     "deployOnly":{
       "actionsPerHost": ["campaign-central.deploy"]
