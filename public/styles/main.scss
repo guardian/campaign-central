@@ -10,3 +10,9 @@
 
 @import './components/main/main';
 @import './components/header/header';
+@import './components/campaigns/campaigns';
+
+
+body {
+    -webkit-font-smoothing: antialiased;
+}

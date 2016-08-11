@@ -33,7 +33,6 @@ class Main extends React.Component {
         <Header />
         {this.renderErrorBar()}
         <div className="main__content">
-          <div>React App Loaded</div>
           {this.props.children}
         </div>
       </div>
