@@ -17,6 +17,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
   .settings(Defaults.coreDefaultSettings: _*)
   .settings(
     playDefaultPort := 2267,
+    packageName in Universal := normalizedName.value,
     name in Universal := normalizedName.value,
     topLevelDirectory in Universal := Some(normalizedName.value),
     riffRaffPackageType := (packageZipTarball in config("universal")).value,
@@ -26,7 +27,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
     riffRaffPackageName := s"commercial-tools:${name.value}",
     riffRaffManifestProjectName := riffRaffPackageName.value,
     riffRaffArtifactResources := Seq(
-      riffRaffPackageType.value -> s"packages/${name.value}/${name.value}",
+      riffRaffPackageType.value -> s"packages/${name.value}/${riffRaffPackageType.value.getName}",
       baseDirectory.value / "deploy.json" -> "deploy.json"
     ),
     scalaVersion := "2.11.8",
