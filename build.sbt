@@ -17,6 +17,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
   .settings(Defaults.coreDefaultSettings: _*)
   .settings(
     playDefaultPort := 2267,
+    name in Universal := normalizedName.value,
+    topLevelDirectory in Universal := Some(normalizedName.value),
     riffRaffPackageType := (packageZipTarball in config("universal")).value,
     riffRaffBuildIdentifier := Option(System.getenv("CIRCLE_BUILD_NUM")).getOrElse("DEV"),
     riffRaffUploadArtifactBucket := Option("riffraff-artifact"),
