@@ -35,8 +35,8 @@ test:
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/target/test-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-# deployment: ENABLE THIS 
-#   riffraff_upload:
-#     branch: /.*/
-#     commands:
-#       - sbt riffRaffUpload
+deployment:
+  riffraff_upload:
+    branch: /.*/
+    commands:
+      - sbt riffRaffUpload

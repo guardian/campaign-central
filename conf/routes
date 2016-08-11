@@ -1,9 +1,12 @@
-GET	/		            controllers.App.index
-GET	/hello		        controllers.App.hello
+GET	/		                    controllers.App.index
+GET	/hello		                controllers.App.hello
 
 #Campaign Api
-GET /api/campaigns          controllers.CampaignApi.getAllCampaigns
-GET /api/campaigns/:id      controllers.CampaignApi.getCampaign(id: String)
+GET /api/campaigns              controllers.CampaignApi.getAllCampaigns
+GET /api/campaigns/:id          controllers.CampaignApi.getCampaign(id: String)
 
 
-GET /assets/*file       controllers.Assets.versioned(path="/public", file: Asset)
+GET /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+# Management
+GET /management/healthcheck     controllers.Management.healthCheck
