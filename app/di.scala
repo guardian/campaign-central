@@ -1,4 +1,4 @@
-import controllers.{App, Assets, CampaignApi}
+import controllers._
 import play.api.{Application, ApplicationLoader, BuiltInComponentsFromContext}
 import play.api.ApplicationLoader.Context
 import play.api.libs.ws.ahc.AhcWSComponents
@@ -19,12 +19,14 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
 
   val appController = new App(wsClient)
   val campaignApiController = new CampaignApi(wsClient)
+  val managementController = new Management()
   val assetsController = new Assets(httpErrorHandler)
 
   def router: Router = new Routes(
     httpErrorHandler,
     appController,
     campaignApiController,
-    assetsController
+    assetsController,
+    managementController
   )
 }
