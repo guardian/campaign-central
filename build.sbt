@@ -26,7 +26,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
     riffRaffPackageName := s"commercial-tools:${name.value}",
     riffRaffManifestProjectName := riffRaffPackageName.value,
     riffRaffArtifactResources := Seq(
-      riffRaffPackageType.value -> s"packages/${name.value}/${riffRaffPackageType.value.getName}",
+      riffRaffPackageType.value -> s"packages/${name.value}/${name.value}",
       baseDirectory.value / "deploy.json" -> "deploy.json"
     ),
     scalaVersion := "2.11.8",
