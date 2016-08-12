@@ -1,5 +1,8 @@
-GET	/		                    controllers.App.index
-GET	/hello		                controllers.App.hello
+#Client Side Routes
+GET	/		                        controllers.App.index
+GET	/campaigns		              controllers.App.index
+
+GET	/hello		                  controllers.App.hello
 
 #Campaign Api
 GET /api/campaigns              controllers.CampaignApi.getAllCampaigns

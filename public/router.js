@@ -16,7 +16,7 @@ function requirePermission(permissionName, nextState, replaceState) {
 export const router = (
   <Router history={browserHistory}>
     <Route path="/" component={Main}>
-      <IndexRoute component={Campaigns} />
+      <Route path="/campaigns" component={Campaigns} />
     </Route>
   </Router>
-)
+);
