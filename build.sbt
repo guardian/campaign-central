@@ -10,7 +10,9 @@ resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-to
 
 lazy val dependencies = Seq(
   "com.amazonaws" % "aws-java-sdk" % "1.10.33",
-  "ai.x" %% "play-json-extensions" % "0.8.0"
+  "ai.x" %% "play-json-extensions" % "0.8.0",
+  "com.gu" % "pan-domain-auth-play_2-5_2.11" % "0.4.0",
+  ws
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaffArtifact)
