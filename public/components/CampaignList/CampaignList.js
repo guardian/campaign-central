@@ -12,13 +12,17 @@ class CampaignList extends React.Component {
   }
 
   render () {
-    if (!this.props.campaigns && !this.props.campaigns.length) {
-      return false;
+    if (!this.props.campaigns.length) {
+      return (
+        <div className="campaign-list">
+          No matching campaigns found
+        </div>
+      );
     }
 
     return (
       <div className="campaign-list">
-        {this.props.campaigns.map((c) => <CampaignListItem campaign={c} />)}
+        {this.props.campaigns.map((c) => <CampaignListItem campaign={c} key={c.id} />)}
       </div>
     );
   }

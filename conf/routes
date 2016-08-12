@@ -1,6 +1,8 @@
 #Client Side Routes
-GET	/		                        controllers.App.index
-GET	/campaigns		              controllers.App.index
+GET	/		                      controllers.App.index(id = "")
+GET	/campaigns		              controllers.App.index(id = "")
+GET	/campaigns/:id		          controllers.App.index(id)
+
 
 GET	/hello		                  controllers.App.hello
 

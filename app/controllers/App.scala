@@ -8,7 +8,7 @@ class App extends Controller {
     Ok("hello world")
   }
 
-  def index = Action {
+  def index(id: String = "") = Action {
 
     val jsFileName = "build/app.js"
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from './Header/Header';
+import Sidebar from './Sidebar/Sidebar';
 
 class Main extends React.Component {
 
@@ -31,6 +32,9 @@ class Main extends React.Component {
       <div className="main">
         <Header />
         {this.renderErrorBar()}
+        <div className="main__sidebar">
+          <Sidebar />
+        </div>
         <div className="main__content">
           {this.props.children}
         </div>
