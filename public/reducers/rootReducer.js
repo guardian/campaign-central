@@ -1,33 +1,10 @@
-import {CLEAR_ERROR} from '../actions/UIActions/clearError';
-import {SHOW_ERROR} from '../actions/UIActions/showError';
+import { combineReducers } from 'redux';
+import error from './errorReducer';
+import config from './configReducer';
+import campaigns from './campaignsReducer';
 
-
-export default function tag(state = {
-  error: undefined,
-  config: {},
-}, action) {
-  switch (action.type) {
-
-// CONFIG
-
-  case 'CONFIG_RECEIVED':
-    return Object.assign({}, state, {
-      config: action.config
-    });
-
-// UI
-
-  case CLEAR_ERROR:
-    return Object.assign({}, state, {
-      error: undefined
-    });
-
-  case SHOW_ERROR:
-    return Object.assign({}, state, {
-      error: action.message
-    });
-
-  default:
-    return state;
-  }
-}
+export default combineReducers({
+  error,
+  config,
+  campaigns
+});

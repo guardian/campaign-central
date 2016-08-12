@@ -4,7 +4,6 @@ import Header from './Header/Header';
 class Main extends React.Component {
 
   static propTypes = {
-    error: React.PropTypes.string,
     children: React.PropTypes.element.isRequired
   }
 

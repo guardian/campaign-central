@@ -18,7 +18,7 @@
   width: $size-sidebar-width;
   background-color: $c-highlight-main;
   color: white;
-  
+
   font-weight: bold;
 
   text-align: center;
@@ -28,8 +28,21 @@
 .header__logo__text--large {
   line-height: 25px;
   font-size: 1.2em;
+  text-shadow: 1px 1px 1px rgba(50, 58, 71, 0.47);
 }
 
 .header__logo__text--small {
-  font-size: 0.9em;
+  font-size: 1em;
+  color: $c-highlight-secondary;
+}
+
+.header__title {
+  line-height: $size-header-height;
+  text-shadow: 1px 1px 1px black;
+  letter-spacing: 1px;
+  font-weight: 100;
+  color: white;
+  margin-left: 20px;
+  font-size: 18px;
+  text-transform: uppercase;
 }
