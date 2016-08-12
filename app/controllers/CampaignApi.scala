@@ -2,10 +2,12 @@ package controllers
 
 import model._
 import org.joda.time.DateTime
+import play.api.Configuration
 import play.api.libs.json._
+import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 
-class CampaignApi extends Controller {
+class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
   private val tempUser = User("Temp", "User", "temp@user.fake")
 
@@ -16,11 +18,11 @@ class CampaignApi extends Controller {
   )
 
 
-  def getAllCampaigns() = Action { req =>
+  def getAllCampaigns() = APIAuthAction { req =>
     Ok(Json.toJson(tempCampaignList))
   }
 
-  def getCampaign(id: String) = Action { req =>
+  def getCampaign(id: String) = APIAuthAction { req =>
     tempCampaignList.find(_.id == id) match {
       case Some(c) => Ok(Json.toJson(c))
       case None => NotFound

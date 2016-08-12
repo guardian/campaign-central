@@ -4,6 +4,10 @@ GET	/campaigns		              controllers.App.index
 
 GET	/hello		                  controllers.App.hello
 
+GET            /oauthCallback                                          controllers.App.oauthCallback
+GET            /logout                                                 controllers.App.logout
+GET            /reauth                                                 controllers.App.reauth
+
 #Campaign Api
 GET /api/campaigns              controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/:id          controllers.CampaignApi.getCampaign(id: String)
