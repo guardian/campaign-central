@@ -12,7 +12,9 @@ class CapaignListItem extends React.Component {
   render () {
     return (
       <div className="campaign-list__item">
-        {this.props.campaign.name}
+        <div className="campaign-list__item__name">
+          {this.props.campaign.name}
+        </div>
       </div>
     );
   }

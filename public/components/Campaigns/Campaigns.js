@@ -23,6 +23,7 @@ class Campaigns extends Component {
 
         </div>
         <div className="campaigns__body">
+          <h2 className="campaigns__header">Campaigns</h2>
           <CampaignList campaigns={this.props.campaigns} />
         </div>
       </div>
