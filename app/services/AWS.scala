@@ -3,9 +3,12 @@ package services
 import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.regions.{Region, Regions}
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
+import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.ec2.AmazonEC2Client
 import com.amazonaws.services.ec2.model.{DescribeTagsRequest, Filter}
 import com.amazonaws.util.EC2MetadataUtils
+
 import scala.collection.JavaConverters._
 
 
@@ -26,6 +29,7 @@ object AWS {
   def credentialsProvider = creds
 
   lazy val EC2Client = region.createClient(classOf[AmazonEC2Client], creds, null)
+  lazy val DynamoClient = AWS.region.createClient(classOf[AmazonDynamoDBClient], creds, null)
 
 }
 
@@ -44,4 +48,12 @@ trait AwsInstanceTags {
       tagsResult.getTags.asScala.find(_.getKey == tagName).map(_.getValue)
     }
   }
+}
+
+object Dynamo {
+  lazy val dynamoDb = new DynamoDB(AWS.DynamoClient)
+
+  lazy val campaignTable = dynamoDb.getTable(Config().campaignTableName)
+  lazy val campaignNotesTable = dynamoDb.getTable(Config().campaignNotesTableName)
+  lazy val campaignContentTable = dynamoDb.getTable(Config().campaignContentTableName)
 }
