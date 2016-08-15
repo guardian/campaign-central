@@ -13,7 +13,7 @@ GET            /reauth                                                 controlle
 #Campaign Api
 GET /api/campaigns              controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/:id          controllers.CampaignApi.getCampaign(id: String)
-
+GET /api/bootstrap              controllers.CampaignApi.bootstrapData
 
 GET /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 

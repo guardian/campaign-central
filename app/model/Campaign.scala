@@ -11,6 +11,7 @@ import scala.util.control.NonFatal
 case class Campaign(
                    id: String,
                    name: String,
+                   status: String,
                    client: Client,
                    created: DateTime,
                    createdBy: User,

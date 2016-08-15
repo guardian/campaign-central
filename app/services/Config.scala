@@ -19,9 +19,9 @@ sealed trait Config {
   def pandaDomain: String
   def pandaAuthCallback: String
 
-  def campaignTableName = s"campaign-content-$stage-campaigns"
-  def campaignNotesTableName = s"campaign-content-$stage-campaign-notes"
-  def campaignContentTableName = s"campaign-content-$stage-campaign-content"
+  def campaignTableName = s"campaign-central-$stage-campaigns"
+  def campaignNotesTableName = s"campaign-central-$stage-campaign-notes"
+  def campaignContentTableName = s"campaign-central-$stage-campaign-content"
 }
 
 class DevConfig extends Config {
