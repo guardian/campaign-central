@@ -13,6 +13,10 @@ object CampaignRepository {
     Option(Dynamo.campaignTable.getItem("id", campaignId)).map{ Campaign.fromItem }
   }
 
+  def getAllCampaigns() = {
+    Dynamo.campaignTable.scan().map{ Campaign.fromItem }.toList
+  }
+
   def getCampaignWithSubItems(campaignId: String) = {
     val campaign = Option(Dynamo.campaignTable.getItem("id", campaignId)).map{ Campaign.fromItem }
 
