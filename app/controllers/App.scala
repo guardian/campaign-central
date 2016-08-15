@@ -13,7 +13,7 @@ class App(override val wsClient: WSClient) extends Controller with PandaAuthActi
     Ok("hello world")
   }
 
-  def index = AuthAction {
+  def index(id: String = "") = AuthAction {
 
     val jsFileName = "build/app.js"
 

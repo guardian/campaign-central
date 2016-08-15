@@ -1,8 +1,18 @@
+.main {
+    margin-top: $size-header-height;
+    height: calc(100vh - #{$size-header-height});
+    width: 100%;
+
+    display: flex;
+}
+
 .main__content {
-  display: flex;
+    flex-grow: 1;
+    width: 100%;
+}
 
-  height: calc(100vh - #{$size-header-height});
-  width: 100%;
-
-  margin-top: $size-header-height;
+.main__sidebar {
+    width: $size-sidebar-width;
+    flex-shrink: 0;
+    background-color: $c-grey-main;
 }

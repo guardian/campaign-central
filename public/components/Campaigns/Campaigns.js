@@ -5,11 +5,34 @@ class Campaigns extends Component {
 
   static propTypes = {
     campaigns: PropTypes.array.isRequired,
-    activeFilters: PropTypes.object.isRequired
   }
 
-  filterCampaigns(campaigns) {
-    return [];
+  applyRouteBasedFiltering = (campaigns) => {
+    const filterName = this.props.routeParams.filterName;
+
+    switch (filterName) {
+
+      case 'prospects':
+        return campaigns.filter((c) => !c.isAgreed);
+
+      case 'production':
+        return campaigns.filter((c) => !c.isActive && c.isAgreed);
+
+      case 'active':
+        return campaigns.filter((c) => c.isActive);
+
+      default:
+        return campaigns;
+    }
+  }
+
+  applyCurrentFilters = (campaigns) => {
+    return campaigns;
+  }
+
+  filterCampaigns = (campaigns) => {
+    const routeFilteredCampaigns = this.applyRouteBasedFiltering(campaigns);
+    return this.applyCurrentFilters(routeFilteredCampaigns);
   }
 
   componentDidMount() {
@@ -17,15 +40,11 @@ class Campaigns extends Component {
   }
 
   render() {
+
     return (
       <div className="campaigns">
-        <div className="campaigns__sidebar">
-
-        </div>
-        <div className="campaigns__body">
-          <h2 className="campaigns__header">Campaigns</h2>
-          <CampaignList campaigns={this.props.campaigns} />
-        </div>
+        <h2 className="campaigns__header">Campaigns</h2>
+        <CampaignList campaigns={this.filterCampaigns(this.props.campaigns)} />
       </div>
     );
   }

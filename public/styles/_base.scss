@@ -1,6 +1,6 @@
 html, body {
   height: 100%;
-  color: $c-grey-700;
+  color: $c-grey-650;
 }
 
 body {
@@ -12,6 +12,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
   font-weight: normal;
+  color: $c-grey-700;
 }
 
 .wrapper {
@@ -20,10 +21,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: $c-grey-700;
+  color: $c-highlight-main;
   text-decoration: none;
   &:hover {
-    text-decoration: underline;
+    text-decoration: none;
   }
 }
 

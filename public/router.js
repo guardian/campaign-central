@@ -17,6 +17,7 @@ export const router = (
   <Router history={browserHistory}>
     <Route path="/" component={Main}>
       <Route path="/campaigns" component={Campaigns} />
+      <Route path="/campaigns/:filterName" component={Campaigns} />
     </Route>
   </Router>
 );

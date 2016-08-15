@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 
-class CapaignListItem extends React.Component {
+class CampaignListItem extends React.Component {
 
   static propTypes = {
     campaign: PropTypes.shape({
@@ -20,4 +20,4 @@ class CapaignListItem extends React.Component {
   }
 }
 
-export default CapaignListItem;
+export default CampaignListItem;

@@ -1,20 +1,7 @@
 .campaigns {
-    height: 100%;
-    width: 100%;
-    display: flex;
-}
-
-.campaigns__sidebar {
-    width: $size-sidebar-width;
-    background-color: $c-grey-main;
-}
-
-.campaigns__body {
-    flex-grow: 1;
-
     padding: 40px;
 }
 
 .campaigns__header {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
