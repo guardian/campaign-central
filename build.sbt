@@ -9,7 +9,7 @@ version := "1.0"
 resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-tools"
 
 lazy val dependencies = Seq(
-  "com.amazonaws" % "aws-java-sdk" % "1.10.33",
+  "com.amazonaws" % "aws-java-sdk" % "1.11.8",
   "ai.x" %% "play-json-extensions" % "0.8.0",
   "com.gu" % "pan-domain-auth-play_2-5_2.11" % "0.4.0",
   ws
