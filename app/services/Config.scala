@@ -1,8 +1,11 @@
 package services
 
+import java.io.InputStream
 import java.util.Properties
+
 import com.amazonaws.services.s3.model.GetObjectRequest
 import services.Config._
+
 import scala.collection.JavaConversions._
 
 object Config extends AwsInstanceTags {
@@ -30,9 +33,21 @@ sealed trait Config {
 
   // remote configuration is used for things we don't want to check in to version control
   // such as passwords, private urls, and gossip about other teams
+
+
+  private lazy val stack = readTag("Stack") getOrElse "flexible"
+  private lazy val app = readTag("App") getOrElse "campaign-central"
+  private lazy val remoteConfigBucket = s"guconf-${stack}"
+
   private val remoteConfiguration: Map[String, String] = loadRemoteConfiguration
 
+  lazy val googleAnalyticsViewId = getRequiredRemoteStringProperty("googleAnalytivsViewId")
 
+  def googleServiceAccountJsonInputStream: InputStream = {
+    val jsonLocation = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
+    val credentailsJson = AWS.S3Client.getObject(remoteConfigBucket, s"$app/$jsonLocation")
+    credentailsJson.getObjectContent
+  }
 
   private def getRequiredRemoteStringProperty(key: String): String = {
     remoteConfiguration.getOrElse(key, {
@@ -42,14 +57,10 @@ sealed trait Config {
 
   private def loadRemoteConfiguration = {
 
-    val stack = readTag("Stack") getOrElse "flexible"
-    val stage = readTag("Stage") getOrElse "DEV"
-    val app = readTag("App") getOrElse "tag-manager"
 
-    val bucketName = s"guconf-${stack}"
 
     def loadPropertiesFromS3(propertiesKey: String, props: Properties): Unit = {
-      val s3Properties = AWS.S3Client.getObject(new GetObjectRequest(bucketName, propertiesKey))
+      val s3Properties = AWS.S3Client.getObject(new GetObjectRequest(remoteConfigBucket, propertiesKey))
       val propertyInputStream = s3Properties.getObjectContent
       try {
         props.load(propertyInputStream)
