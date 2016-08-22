@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.services.analyticsreporting.v4.model._
 import com.google.api.services.analyticsreporting.v4.{AnalyticsReporting, AnalyticsReportingScopes}
 import org.joda.time.DateTime
+import org.joda.time.format.ISODateTimeFormat
 import services.{AWS, Config}
 
 import scala.collection.JavaConversions._
@@ -21,8 +22,8 @@ object GoogleAnalytics {
       gaFilter <- campaign.gaFilterExpression
     ) yield {
 
-      val endOfRange = campaign.endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("YYYY-MM-DD")) else None}.getOrElse("today")
-      val dateRange = new DateRange().setStartDate(startDate.toString("YYYY-MM-DD")).setEndDate(endOfRange)
+      val endOfRange = campaign.endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("today")
+      val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
 
       val pageViewMetric = new Metric().setExpression("ga:pageviews").setAlias("pageviews")
       val uniqueViewMetric = new Metric().setExpression("ga:uniquePageviews").setAlias("uniques")
@@ -47,14 +48,19 @@ object GoogleAnalytics {
         val header = report.getColumnHeader
         val dimensions = header.getDimensions
 
+        val dateDimIndex = dimensions.indexOf("ga:date")
+        val pathDimIndex = dimensions.indexOf("ga:pagePath")
+
         val metricHeaders = header.getMetricHeader.getMetricHeaderEntries
 
         val rows = report.getData.getRows
 
         rows.foreach{ row =>
-          val dims = row.getDimensions.mkString(", ")
-          val mets = row.getMetrics.map( t => t.getValues.mkString("/")).mkString(":")
-          println(s"$dims -- $mets")
+          val date = DateTime.parse(row.getDimensions.apply(dateDimIndex), ISODateTimeFormat.basicDate())
+          val path = row.getDimensions.apply(pathDimIndex)
+
+          val mets = row.getMetrics.map( t => t.getValues.zipWithIndex.map{case (data, idx) => s"${metricHeaders(idx).getName} -> $data"}.mkString(", ")).mkString(":")
+          println(s"$path on $date -- $mets")
         }
       }
       "check stdout"
