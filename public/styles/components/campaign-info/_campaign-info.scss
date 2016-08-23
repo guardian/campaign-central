@@ -1,0 +1,23 @@
+.campaign-info {
+  width: 100%;
+
+}
+
+.campaign-info__header {
+  background-color: $c-grey-light-main;
+  color: white;
+
+  font-size: 16px;
+  text-transform: uppercase;
+
+  padding: 10px 20px;
+
+  margin-top: 30px;
+}
+
+.campaign-info__body {
+  padding: 20px;
+
+  border: 1px solid $c-grey-300;
+  background-color: $c-grey-100;
+}

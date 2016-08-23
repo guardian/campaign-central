@@ -7,3 +7,11 @@ export function fetchCampaigns() {
     method: 'get'
   });
 }
+
+export function fetchCampaign(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id,
+    contentType: 'application/json',
+    method: 'get'
+  });
+}

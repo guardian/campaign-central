@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import {Link} from 'react-router';
 
 class CampaignListItem extends React.Component {
 
@@ -11,11 +12,11 @@ class CampaignListItem extends React.Component {
 
   render () {
     return (
-      <div className="campaign-list__item">
+      <Link className="campaign-list__item" to={"/campaign/" + this.props.campaign.id}>
         <div className="campaign-list__item__name">
           {this.props.campaign.name}
         </div>
-      </div>
+      </Link>
     );
   }
 }
