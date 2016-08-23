@@ -1,0 +1,38 @@
+.editable-text {
+  padding: 10px 0;
+
+  margin: 0 5px;
+
+  display: inline-block;
+}
+
+%editable-text__text {
+  border-bottom: 1px solid $c-grey-300;
+  padding: 5px 2px;
+}
+
+.editable-text__text {
+  @extend %editable-text__text;
+}
+
+.editable-text__text--empty {
+  @extend %editable-text__text;
+
+  font-style: italic;
+
+  color: $c-grey-400;
+
+}
+
+.editable-text__button {
+
+  display: inline-block;
+  padding: 2px 0;
+
+  border-radius: 4px;
+
+  i {
+    transform: scale(0.9);
+  }
+
+}

@@ -8,148 +8,162 @@
 
 .i-add-image {
 	@extend %svg-common;
-	background-position: 25.806451612903224% 0;
-	width: 16px;
-	height: 16px;
+	background-position: 25% 0;
+	width: 12px;
+	height: 12px;
 }
 
 .i-add-image-grey {
 	@extend %svg-common;
-	background-position: 77.41935483870968% 26.229508196721312%;
-	width: 16px;
-	height: 16px;
+	background-position: 75% 50%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-article {
 	@extend %svg-common;
-	background-position: 0 26.229508196721312%;
-	width: 16px;
-	height: 16px;
+	background-position: 0 25%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-clock {
 	@extend %svg-common;
-	background-position: 25.806451612903224% 26.229508196721312%;
-	width: 16px;
-	height: 16px;
+	background-position: 25% 25%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-cross {
 	@extend %svg-common;
-	background-position: 51.61290322580645% 0;
-	width: 16px;
-	height: 16px;
+	background-position: 50% 0;
+	width: 12px;
+	height: 12px;
+}
+
+.i-cross-grey {
+	@extend %svg-common;
+	background-position: 50% 25%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-cross-red {
 	@extend %svg-common;
-	background-position: 98.46153846153847% 64.0625%;
-	width: 13px;
-	height: 13px;
+	background-position: 0 50%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-cross-white {
 	@extend %svg-common;
-	background-position: 98.46153846153847% 43.75%;
-	width: 13px;
-	height: 13px;
+	background-position: 25% 50%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-delete {
 	@extend %svg-common;
-	background-position: 25.806451612903224% 52.459016393442624%;
-	width: 16px;
-	height: 16px;
+	background-position: 50% 50%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-delete-red {
 	@extend %svg-common;
-	background-position: 51.61290322580645% 52.459016393442624%;
-	width: 16px;
-	height: 16px;
+	background-position: 75% 0;
+	width: 12px;
+	height: 12px;
 }
 
 .i-down-arrow {
 	@extend %svg-common;
-	background-position: 100% 22.22222222222222%;
-	width: 14px;
-	height: 14px;
+	background-position: 75% 25%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-failed-face-red {
 	@extend %svg-common;
 	background-position: 0 0;
-	width: 16px;
-	height: 16px;
+	width: 12px;
+	height: 12px;
 }
 
 .i-info-grey {
 	@extend %svg-common;
-	background-position: 100% 0;
-	width: 14px;
-	height: 14px;
+	background-position: 0 75%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-pen {
+	@extend %svg-common;
+	background-position: 25% 75%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-plus {
 	@extend %svg-common;
-	background-position: 0 78.68852459016394%;
-	width: 16px;
-	height: 16px;
+	background-position: 50% 75%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-preview-eye {
 	@extend %svg-common;
-	background-position: 25.806451612903224% 78.68852459016394%;
-	width: 16px;
-	height: 16px;
+	background-position: 75% 75%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-publish {
 	@extend %svg-common;
-	background-position: 51.61290322580645% 78.68852459016394%;
-	width: 16px;
-	height: 16px;
+	background-position: 100% 0;
+	width: 12px;
+	height: 12px;
 }
 
 .i-publish-disabled {
 	@extend %svg-common;
-	background-position: 77.41935483870968% 52.459016393442624%;
-	width: 16px;
-	height: 16px;
+	background-position: 100% 25%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-rollback-grey {
 	@extend %svg-common;
-	background-position: 77.41935483870968% 0;
-	width: 16px;
-	height: 16px;
+	background-position: 100% 50%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-tag-white-30 {
 	@extend %svg-common;
-	background-position: 0 52.459016393442624%;
-	width: 16px;
-	height: 16px;
+	background-position: 100% 75%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-tick {
 	@extend %svg-common;
-	background-position: 51.61290322580645% 26.229508196721312%;
-	width: 16px;
-	height: 16px;
+	background-position: 0 100%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-tick-green {
 	@extend %svg-common;
-	background-position: 0 100%;
-	width: 13px;
-	height: 13px;
+	background-position: 25% 100%;
+	width: 12px;
+	height: 12px;
 }
 
 .i-tick-selected {
 	@extend %svg-common;
-	background-position: 77.41935483870968% 78.68852459016394%;
-	width: 16px;
-	height: 16px;
+	background-position: 50% 100%;
+	width: 12px;
+	height: 12px;
 }
 

@@ -1,0 +1,20 @@
+.error-bar {
+  position: absolute;
+  width: 100%;
+  background-color: $c-orange;
+
+  margin-left: $size-sidebar-width;
+
+  z-index: 10;
+
+  padding: 5px 20px 8px 20px;
+
+  font-size: 13px;
+
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.error-bar__dismiss {
+  margin-left: 5px;
+}

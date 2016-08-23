@@ -1,0 +1,40 @@
+%campaign__column {
+  display: inline-block;
+  padding: 10px;
+  vertical-align: top;
+}
+
+.campaign__column {
+  @extend %campaign__column;
+  width: 33%;
+
+}
+
+.campaign__column--double-width {
+  @extend %campaign__column;
+  width: 66%;
+}
+
+.campaign-box {
+  width: 100%;
+}
+
+.campaign-box__header {
+  background-color: $c-grey-light-main;
+  color: white;
+
+  font-size: 16px;
+  text-transform: uppercase;
+
+  padding: 10px 20px;
+
+  margin-top: 30px;
+}
+
+.campaign-box__body {
+  padding: 20px;
+
+  font-size: 14px;
+
+  border: 1px solid $c-grey-300;
+}
