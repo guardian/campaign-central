@@ -1,24 +1,34 @@
 import React, { PropTypes } from 'react'
-import LineChart from 'react-d3-basic'
+import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts'
 
 class CampaignDailyTrafficChart extends React.Component {
 
+  formatDate(millis) {
+    const date = new Date(millis);
+    return date.toLocaleDateString();
+  }
+
+  tooltipFormatDate(millis) {
+    var date = new Date(millis);
+    return date.toDateString();
+  }
+
   render () {
 
-    const chartSeries = [{field: 'count-total', name: 'Page Views'},{field: 'unique-total', name: 'Uniques'}];
-
-    const xAccessor = function(d) {
-      return d.date;
-    };
-
     return (
-      <LineChart
-        title='Daily traffic - all content'
-        data={this.props.pageCountStats}
-        chartSeries={chartSeries}
-        x={xAccessor}
-        xScale='time'
-      />
+      <div className="analytics-chart">
+        <label>Daily page views</label>
+        <ResponsiveContainer height="300" width="90%">
+          <LineChart data={this.props.pageCountStats}>
+            <XAxis dataKey="date" tickFormatter={this.formatDate} label="Date" />
+            <YAxis label="Views"/>
+            <Line type="linear" dataKey="count-total" stroke="#8884d8"  name="Page Views"/>
+            <Line type="linear" dataKey="unique-total" stroke="#82ca9d" name="Uniques"/>
+            <Tooltip labelFormatter={this.tooltipFormatDate} />
+            <Legend />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     );
   }
 }
