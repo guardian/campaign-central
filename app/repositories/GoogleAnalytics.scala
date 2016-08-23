@@ -14,7 +14,7 @@ import services.{AWS, Config}
 import scala.collection.JavaConversions._
 
 
-case class CampaignDailyCountsReport(seenPaths: Set[String], stats: List[Map[String, Long]])
+case class CampaignDailyCountsReport(seenPaths: Set[String], pageCountStats: List[Map[String, Long]])
 
 object CampaignDailyCountsReport{
   implicit val agencyFormat: Format[CampaignDailyCountsReport] = Jsonx.formatCaseClass[CampaignDailyCountsReport]
@@ -22,9 +22,10 @@ object CampaignDailyCountsReport{
   def apply(parsedDailyCountsReport: ParsedDailyCountsReport): CampaignDailyCountsReport = {
     CampaignDailyCountsReport(
       parsedDailyCountsReport.seenPaths,
-      parsedDailyCountsReport.dayStats.map{ case(dt, stats) =>
+      parsedDailyCountsReport.dayStats.keySet.toList.sortBy(_.getMillis).map{ dt =>
+        val stats = parsedDailyCountsReport.dayStats(dt)
         stats + ("date" -> dt.getMillis)
-      }.toList
+      }
     )
   }
 }
