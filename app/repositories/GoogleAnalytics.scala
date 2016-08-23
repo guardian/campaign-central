@@ -64,6 +64,7 @@ object GoogleAnalytics {
       val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
 
       val stats = parseDailyCountsReport(reportResponse)
+        .map(_.zeroMissingPaths)
         .map(_.calulateDailyTotals)
         .map(_.calulateCumalativeVales)
 
@@ -72,6 +73,13 @@ object GoogleAnalytics {
   }
 
   case class ParsedDailyCountsReport(seenPaths: Set[String], dayStats: Map[DateTime, Map[String, Long]]) {
+
+    def zeroMissingPaths = {
+      val zeroMap = seenPaths.flatMap{p => List(s"count$p" -> 0L, s"unique$p" -> 0L)}.toMap
+      val zerodDayStats = dayStats.mapValues( zeroMap ++ _)
+
+      ParsedDailyCountsReport(seenPaths, zerodDayStats)
+    }
 
     def calulateDailyTotals = {
       val totalisedDayStats = dayStats.map{ case(dt, dayStat) =>
@@ -143,7 +151,7 @@ object GoogleAnalytics {
 
         seenPaths = seenPaths + path
         val stat: Map[String, Long] = dayStats.get(date).getOrElse(Map())
-        val updatedStat: Map[String, Long] = stat ++ Map(s"count-$path" -> pageviews, s"uniques-$path" -> uniques)
+        val updatedStat: Map[String, Long] = stat ++ Map(s"count$path" -> pageviews, s"unique$path" -> uniques)
         dayStats = dayStats + (date -> updatedStat)
       }
 
