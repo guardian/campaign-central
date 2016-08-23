@@ -38,3 +38,14 @@
 
   border: 1px solid $c-grey-300;
 }
+
+.campaign-box__footer {
+  background-color: $c-grey-100;
+
+  border: 1px solid $c-grey-300;
+  border-top-width: 0px;
+
+  padding: 5px 10px;
+
+  text-align: right;
+}

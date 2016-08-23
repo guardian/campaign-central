@@ -46,7 +46,7 @@ class CampaignInformationEdit extends React.Component {
 
     return (
       <div className="campaign-box__footer">
-        <button className="campaign-info__actions__button" onClick={this.triggerSave}>Save</button>
+        <span className="campaign-info__button" onClick={this.triggerSave}>Save</span>
       </div>
     );
   }

@@ -15,3 +15,19 @@
 .campaign-info__field__value {
   margin: 0 5px;
 }
+
+.campaign-info__button {
+
+  display: inline-block;
+  background-color: $c-highlight-main;
+  padding: 5px 20px;
+
+  color: white;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  border-radius: 3px;
+}
