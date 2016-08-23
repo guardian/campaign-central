@@ -1,5 +1,13 @@
 package services
 
+import java.io.InputStream
+import java.util.Properties
+
+import com.amazonaws.services.s3.model.GetObjectRequest
+import services.Config._
+
+import scala.collection.JavaConversions._
+
 object Config extends AwsInstanceTags {
 
   lazy val conf = readTag("Stage") match {
@@ -22,6 +30,52 @@ sealed trait Config {
   def campaignTableName = s"campaign-central-$stage-campaigns"
   def campaignNotesTableName = s"campaign-central-$stage-campaign-notes"
   def campaignContentTableName = s"campaign-central-$stage-campaign-content"
+
+  // remote configuration is used for things we don't want to check in to version control
+  // such as passwords, private urls, and gossip about other teams
+
+
+  private lazy val stack = readTag("Stack") getOrElse "flexible"
+  private lazy val app = readTag("App") getOrElse "campaign-central"
+  private lazy val remoteConfigBucket = s"guconf-${stack}"
+
+  private val remoteConfiguration: Map[String, String] = loadRemoteConfiguration
+
+  lazy val googleAnalyticsViewId = getRequiredRemoteStringProperty("googleAnalytivsViewId")
+
+  def googleServiceAccountJsonInputStream: InputStream = {
+    val jsonLocation = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
+    val credentailsJson = AWS.S3Client.getObject(remoteConfigBucket, s"$app/$jsonLocation")
+    credentailsJson.getObjectContent
+  }
+
+  private def getRequiredRemoteStringProperty(key: String): String = {
+    remoteConfiguration.getOrElse(key, {
+      throw new IllegalArgumentException(s"Property '$key' not configured")
+    })
+  }
+
+  private def loadRemoteConfiguration = {
+
+
+
+    def loadPropertiesFromS3(propertiesKey: String, props: Properties): Unit = {
+      val s3Properties = AWS.S3Client.getObject(new GetObjectRequest(remoteConfigBucket, propertiesKey))
+      val propertyInputStream = s3Properties.getObjectContent
+      try {
+        props.load(propertyInputStream)
+      } finally {
+        try {propertyInputStream.close()} catch {case _: Throwable => /*ignore*/}
+      }
+    }
+
+    val props = new Properties()
+
+    loadPropertiesFromS3(s"$app/global.properties", props)
+    loadPropertiesFromS3(s"$app/$stage.properties", props)
+
+    props.toMap
+  }
 }
 
 class DevConfig extends Config {
