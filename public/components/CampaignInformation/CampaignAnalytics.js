@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import CampaignDailyTrafficChart from './Analytics/CampaignDailyTrafficChart'
+import CampaignPagesCumulativeTrafficChart from './Analytics/CampaignPagesCumulativeTrafficChart'
 
 class CampaignAnalytics extends React.Component {
 
@@ -20,6 +21,7 @@ class CampaignAnalytics extends React.Component {
           {this.props.campaignAnalytics.seenPaths.map((p) => <li key={p}>{p}</li>)}
         </ul>
         <CampaignDailyTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats} />
+        <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats} paths={this.props.campaignAnalytics.seenPaths}/>
       </div>
     );
   }
