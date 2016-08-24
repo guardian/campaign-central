@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import CampaignPerformanceSummary from './Analytics/CampaignPerformanceSummary'
 import CampaignDailyTrafficChart from './Analytics/CampaignDailyTrafficChart'
 import CampaignPagesCumulativeTrafficChart from './Analytics/CampaignPagesCumulativeTrafficChart'
+import ContentTrafficChart from './Analytics/ContentTrafficChart'
 
 class CampaignAnalytics extends React.Component {
 
@@ -28,6 +29,9 @@ class CampaignAnalytics extends React.Component {
         <CampaignPerformanceSummary campaign={this.props.campaign} paths={this.props.campaignAnalytics.seenPaths} latestCounts={this.getLatestCounts()} />
         <CampaignDailyTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats} />
         <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats} paths={this.props.campaignAnalytics.seenPaths}/>
+        {this.props.campaignAnalytics.seenPaths.map((p) =>
+          <ContentTrafficChart key={p} pageCountStats={this.props.campaignAnalytics.pageCountStats} path={p} />
+        )}
       </div>
     );
   }
