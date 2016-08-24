@@ -34,8 +34,10 @@ class CampaignInformationEdit extends React.Component {
     const fieldValue = e.target.value;
     const value = fieldValue[0] === '£' ? fieldValue.substr(1, fieldValue.length) : fieldValue; //Strip out £
 
+    const numValue = parseInt(value) === NaN ? undefined : parseInt(value);
+
     this.triggerUpdate(Object.assign({}, this.props.campaign, {
-      actualValue: value
+      actualValue: numValue
     }));
   }
 

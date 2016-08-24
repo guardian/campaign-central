@@ -29,7 +29,7 @@ function errorSavingCampaign(error) {
 export function saveCampaign(id, campaign) {
     return dispatch => {
       dispatch(requestCampaignSave(id, campaign));
-      return saveCampaignApi(id)
+      return saveCampaignApi(id, campaign)
         .catch(error => dispatch(errorSavingCampaign(error)))
         .then(res => {
           dispatch(recieveCampaignSave(res));
