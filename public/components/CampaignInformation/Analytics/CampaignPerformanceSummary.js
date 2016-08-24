@@ -49,7 +49,7 @@ class CampaignPerformanceSummary extends React.Component {
     return (
       <div className="analytics-chart">
         <label>Campaign performance</label>
-        <ResponsiveContainer height="200" width="90%">
+        <ResponsiveContainer height={200} width="90%">
           <RadialBarChart cx={150} cy={150} innerRadius={20} outerRadius={140} barSize={10} data={this.buildContributionData()}>
             <RadialBar minAngle={15} label background clockWise={true} dataKey='count'/>
             <Legend iconSize={10} width={120} height={140} layout='vertical' verticalAlign='middle'/>

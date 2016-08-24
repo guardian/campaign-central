@@ -35,7 +35,7 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
     return (
       <div className="analytics-chart">
         <label>Cumulative uniques</label>
-        <ResponsiveContainer height="300" width="90%">
+        <ResponsiveContainer height={300} width="90%">
           <AreaChart data={this.props.pageCountStats}>
             <XAxis dataKey="date" tickFormatter={this.formatDate} label="Date" />
             <YAxis label="Views"/>
