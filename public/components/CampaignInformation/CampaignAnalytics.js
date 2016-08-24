@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react'
+import CampaignPerformanceSummary from './Analytics/CampaignPerformanceSummary'
 import CampaignDailyTrafficChart from './Analytics/CampaignDailyTrafficChart'
 import CampaignPagesCumulativeTrafficChart from './Analytics/CampaignPagesCumulativeTrafficChart'
 
@@ -6,6 +7,14 @@ class CampaignAnalytics extends React.Component {
 
   componentWillMount() {
     this.props.campaignAnalyticsActions.getCampaignAnalytics(this.props.campaign.id);
+  }
+
+  getLatestCounts() {
+    if(this.props.campaignAnalytics) {
+      return this.props.campaignAnalytics.pageCountStats[this.props.campaignAnalytics.pageCountStats.length - 1];
+    }
+    
+    return undefined;
   }
 
   render () {
@@ -16,10 +25,7 @@ class CampaignAnalytics extends React.Component {
     return (
       <div className="campaign-info__body">
         
-        Here's where all the charts go... known paths<br/>
-        <ul>
-          {this.props.campaignAnalytics.seenPaths.map((p) => <li key={p}>{p}</li>)}
-        </ul>
+        <CampaignPerformanceSummary campaign={this.props.campaign} paths={this.props.campaignAnalytics.seenPaths} latestCounts={this.getLatestCounts()} />
         <CampaignDailyTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats} />
         <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats} paths={this.props.campaignAnalytics.seenPaths}/>
       </div>
