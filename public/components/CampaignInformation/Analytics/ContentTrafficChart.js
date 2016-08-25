@@ -32,14 +32,14 @@ class ContentTrafficChart extends React.Component {
   render () {
 
     return (
-      <div className="analytics-chart">
-        <label>content views for {this.formatPath(this.props.path)}</label>
+      <div className="analytics-chart__quarter-width">
+        <label className="analytics-chart__label">content views for {this.formatPath(this.props.path)}</label>
         <ResponsiveContainer height={300} width="90%">
           <ComposedChart data={this.props.pageCountStats}>
             <XAxis dataKey="date" tickFormatter={this.formatDate} label="Date" />
             <YAxis label="Views"/>
-            <Line type="linear" dataKey={"count" + this.props.path} stroke={this.getStrokeColour(0)} name="Daily page Views"/>
-            <Line type="linear" dataKey={"unique" + this.props.path} stroke={this.getStrokeColour(1)} name="Daily uniques"/>
+            <Line type="linear" dataKey={"count" + this.props.path} stroke={this.getStrokeColour(0)} name="Daily page Views" dot={false} />
+            <Line type="linear" dataKey={"unique" + this.props.path} stroke={this.getStrokeColour(1)} name="Daily uniques" dot={false}/>
             <Area type='linear'
                   dataKey={'cumulative-count' + this.props.path}
                   stackId="0"
