@@ -1,18 +1,8 @@
 import React, { PropTypes } from 'react'
 import {RadialBarChart, RadialBar, Legend, ResponsiveContainer} from 'recharts'
-import {analyticsPalette} from '../../../constants/analyticsPalette'
+import {formatPath, getFillColour} from '../../../util/analyticsHelper'
 
 class CampaignPerformanceSummary extends React.Component {
-
-  getColour(index) {
-    const i = index % analyticsPalette.length;
-    return analyticsPalette[i].fill;
-  }
-
-  formatPath(p) {
-    var pathParts = p.split('/');
-    return pathParts[pathParts.length - 1];
-  }
 
   getCampaignTargetUniques() {
     var targets = this.props.campaign.targets;
@@ -31,14 +21,14 @@ class CampaignPerformanceSummary extends React.Component {
 
     var target = this.getCampaignTargetUniques();
     if (target) {
-      data.push( {name: "target", count: target, fill: this.getColour(index++)} );
+      data.push( {name: "target", count: target, fill: getFillColour(index++)} );
     }
 
-    data.push( {name: "uniques", count: this.props.latestCounts["cumulative-unique-total"], fill: this.getColour(index++)} )
+    data.push( {name: "uniques", count: this.props.latestCounts["cumulative-unique-total"], fill: getFillColour(index++)} );
 
     for(var i = 0; i < this.props.paths.length; i++) {
       const path = this.props.paths[i];
-      data.push( {name: this.formatPath(path), count: this.props.latestCounts["cumulative-unique" + path], fill: this.getColour(index++)} );
+      data.push( {name: formatPath(path), count: this.props.latestCounts["cumulative-unique" + path], fill: getFillColour(index++)} );
     }
 
     return data;

@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts'
 import {formatMillisecondDate, shortFormatMillisecondDate} from '../../../util/dateFormatter'
+import {getStrokeColour} from '../../../util/analyticsHelper'
 
 class CampaignDailyTrafficChart extends React.Component {
 
@@ -13,8 +14,8 @@ class CampaignDailyTrafficChart extends React.Component {
           <LineChart data={this.props.pageCountStats}>
             <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
             <YAxis label="Views"/>
-            <Line type="linear" dataKey="count-total" stroke="#8884d8"  name="Page Views"/>
-            <Line type="linear" dataKey="unique-total" stroke="#82ca9d" name="Uniques"/>
+            <Line type="linear" dataKey="count-total" stroke={getStrokeColour(0)}  name="Page Views"/>
+            <Line type="linear" dataKey="unique-total" stroke={getStrokeColour(1)} name="Uniques"/>
             <Tooltip labelFormatter={formatMillisecondDate} />
             <Legend />
           </LineChart>

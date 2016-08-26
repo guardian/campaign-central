@@ -1,25 +1,9 @@
 import React, { PropTypes } from 'react'
 import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts'
-import {analyticsPalette} from '../../../constants/analyticsPalette'
 import {formatMillisecondDate, shortFormatMillisecondDate} from '../../../util/dateFormatter'
+import {formatPath, getStrokeColour, getFillColour} from '../../../util/analyticsHelper'
 
 class CampaignPagesCumulativeTrafficChart extends React.Component {
-
-
-  getStrokeColour(index) {
-    const i = index % analyticsPalette.length;
-    return analyticsPalette[i].stroke;
-  }
-  
-  getFillColour(index) {
-    const i = index % analyticsPalette.length;
-    return analyticsPalette[i].fill;
-  }
-
-  formatPath(p) {
-    var pathParts = p.split('/');
-    return pathParts[pathParts.length - 1];
-  }
 
   render () {
 
@@ -37,9 +21,9 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
                     type='linear'
                     dataKey={'cumulative-unique' + p}
                     stackId="1"
-                    name={this.formatPath(p)}
-                    stroke={this.getStrokeColour(index)}
-                    fill={this.getFillColour(index)} />
+                    name={formatPath(p)}
+                    stroke={getStrokeColour(index)}
+                    fill={getFillColour(index)} />
             )}
           </AreaChart>
         </ResponsiveContainer>
