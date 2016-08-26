@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts'
 import {analyticsPalette} from '../../../constants/analyticsPalette'
+import {formatMillisecondDate, shortFormatMillisecondDate} from '../../../util/dateFormatter'
 
 class CampaignPagesCumulativeTrafficChart extends React.Component {
 
@@ -15,16 +16,6 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
     return analyticsPalette[i].fill;
   }
 
-  formatDate(millis) {
-    const date = new Date(millis);
-    return date.toLocaleDateString();
-  }
-
-  tooltipFormatDate(millis) {
-    var date = new Date(millis);
-    return date.toDateString();
-  }
-
   formatPath(p) {
     var pathParts = p.split('/');
     return pathParts[pathParts.length - 1];
@@ -37,9 +28,9 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
         <label className="analytics-chart__label">Cumulative uniques</label>
         <ResponsiveContainer height={300} width="90%">
           <AreaChart data={this.props.pageCountStats}>
-            <XAxis dataKey="date" tickFormatter={this.formatDate} label="Date" />
+            <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
             <YAxis label="Views"/>
-            <Tooltip labelFormatter={this.tooltipFormatDate} />
+            <Tooltip labelFormatter={formatMillisecondDate} />
             <Legend />
             {this.props.paths.map((p, index) =>
               <Area key={index}

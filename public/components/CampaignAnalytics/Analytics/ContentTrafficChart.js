@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import {ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts'
 import {analyticsPalette} from '../../../constants/analyticsPalette'
+import {formatMillisecondDate, shortFormatMillisecondDate} from '../../../util/dateFormatter'
 
 class ContentTrafficChart extends React.Component {
 
@@ -36,7 +37,7 @@ class ContentTrafficChart extends React.Component {
         <label className="analytics-chart__label">Content views for {this.formatPath(this.props.path)}</label>
         <ResponsiveContainer height={300} width="90%">
           <ComposedChart data={this.props.pageCountStats}>
-            <XAxis dataKey="date" tickFormatter={this.formatDate} label="Date" />
+            <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
             <YAxis label="Views"/>
             <Line type="linear" dataKey={"count" + this.props.path} stroke={this.getStrokeColour(0)} name="Daily page Views" dot={false} />
             <Line type="linear" dataKey={"unique" + this.props.path} stroke={this.getStrokeColour(1)} name="Daily uniques" dot={false}/>
@@ -52,7 +53,7 @@ class ContentTrafficChart extends React.Component {
                   name="Cumulative uniques"
                   stroke={this.getStrokeColour(1)}
                   fill={this.getFillColour(1)} />
-            <Tooltip labelFormatter={this.tooltipFormatDate} />
+            <Tooltip labelFormatter={formatMillisecondDate} />
             <Legend />
           </ComposedChart>
         </ResponsiveContainer>
