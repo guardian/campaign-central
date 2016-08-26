@@ -2,8 +2,14 @@ import React, { PropTypes } from 'react'
 import {AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts'
 import {formatMillisecondDate, shortFormatMillisecondDate} from '../../../util/dateFormatter'
 import {formatPath, getStrokeColour, getFillColour} from '../../../util/analyticsHelper'
+import {pageCountStat} from '../../../propTypes/analytics'
 
 class CampaignPagesCumulativeTrafficChart extends React.Component {
+
+  static propTypes = {
+    pageCountStats: PropTypes.arrayOf(pageCountStat).isRequired,
+    paths: PropTypes.arrayOf(PropTypes.string).isRequired
+  };
 
   render () {
 

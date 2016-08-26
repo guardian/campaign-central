@@ -1,8 +1,20 @@
 import React, { PropTypes } from 'react'
 import {RadialBarChart, RadialBar, Legend, ResponsiveContainer} from 'recharts'
 import {formatPath, getFillColour} from '../../../util/analyticsHelper'
+import {pageCountStat} from '../../../propTypes/analytics'
 
 class CampaignPerformanceSummary extends React.Component {
+
+  static propTypes = {
+    latestCounts: pageCountStat.isRequired,
+    campaign: PropTypes.shape({
+      targets: PropTypes.arrayOf(PropTypes.shape({
+        targetType: PropTypes.string.isRequired,
+        value: PropTypes.number.isRequired
+      }))
+    }),
+    paths: PropTypes.arrayOf(PropTypes.string).isRequired
+  };
 
   getCampaignTargetUniques() {
     var targets = this.props.campaign.targets;
