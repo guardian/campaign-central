@@ -19,6 +19,8 @@ sealed trait Config {
   def pandaDomain: String
   def pandaAuthCallback: String
 
+  def logShippingStreamName: Option[String] = None
+
   def campaignTableName = s"campaign-central-$stage-campaigns"
   def campaignNotesTableName = s"campaign-central-$stage-campaign-notes"
   def campaignContentTableName = s"campaign-central-$stage-campaign-content"
@@ -27,6 +29,8 @@ sealed trait Config {
 class DevConfig extends Config {
   override def stage = "DEV"
 
+  override def logShippingStreamName = Some("elk-CODE-KinesisStream-M03ERGK5PVD9")
+
   override def pandaDomain: String = "local.dev-gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.local.dev-gutools.co.uk/oauthCallback"
 }
@@ -34,12 +38,16 @@ class DevConfig extends Config {
 class CodeConfig extends Config {
   override def stage = "CODE"
 
+  override def logShippingStreamName = Some("elk-PROD-KinesisStream-1PYU4KS1UEQA")
+
   override def pandaDomain: String = "code.dev-gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.code.dev-gutools.co.uk/oauthCallback"
 }
 
 class ProdConfig extends Config {
   override def stage = "PROD"
+
+  override def logShippingStreamName = Some("elk-PROD-KinesisStream-1PYU4KS1UEQA")
 
   override def pandaDomain: String = "gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.gutools.co.uk/oauthCallback"

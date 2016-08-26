@@ -185,6 +185,23 @@
       }
     },
 
+    "CampaignCentralKinesisPolicy" : {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "CampaignCentralKinesisPolicy",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [ "kinesis:*" ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [ { "Ref": "CampaignCentralRole" } ]
+      }
+    },
+
     "CampaignCentralInstanceProfile": {
       "Type": "AWS::IAM::InstanceProfile",
       "Properties": {
