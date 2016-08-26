@@ -47,7 +47,7 @@ class CampaignPerformanceSummary extends React.Component {
   render () {
 
     return (
-      <div className="analytics-chart__full-width">
+      <div className="analytics-chart--full-width">
         <label className="analytics-chart__label">Campaign performance</label>
         <ResponsiveContainer height={300} width="90%">
           <RadialBarChart cx={250} cy={250} innerRadius={20} outerRadius={240} barSize={10} data={this.buildContributionData()}>

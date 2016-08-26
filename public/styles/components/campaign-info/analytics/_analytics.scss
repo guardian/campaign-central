@@ -16,19 +16,19 @@
   border: 1px solid $c-grey-300;
 }
 
-.analytics-chart__full-width {
+.analytics-chart--full-width {
 
   @extend %analytics-chart;
   width: calc(100% - 20px);
 }
 
-.analytics-chart__half-width {
+.analytics-chart--half-width {
 
   @extend %analytics-chart;
   width: calc(50% - 20px);
 }
 
-.analytics-chart__quarter-width {
+.analytics-chart--quarter-width {
 
   @extend %analytics-chart;
   width: calc(25% - 20px);

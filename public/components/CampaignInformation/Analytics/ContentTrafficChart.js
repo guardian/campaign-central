@@ -32,7 +32,7 @@ class ContentTrafficChart extends React.Component {
   render () {
 
     return (
-      <div className="analytics-chart__quarter-width">
+      <div className="analytics-chart--quarter-width">
         <label className="analytics-chart__label">Content views for {this.formatPath(this.props.path)}</label>
         <ResponsiveContainer height={300} width="90%">
           <ComposedChart data={this.props.pageCountStats}>

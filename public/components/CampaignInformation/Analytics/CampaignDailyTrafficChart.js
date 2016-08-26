@@ -16,7 +16,7 @@ class CampaignDailyTrafficChart extends React.Component {
   render () {
 
     return (
-      <div className="analytics-chart__half-width">
+      <div className="analytics-chart--half-width">
         <label className="analytics-chart__label">Daily page views</label>
         <ResponsiveContainer height={300} width="90%">
           <LineChart data={this.props.pageCountStats}>
