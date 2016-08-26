@@ -14,7 +14,9 @@ GET            /reauth                                                 controlle
 #Campaign Api
 GET /api/campaigns              controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/:id          controllers.CampaignApi.getCampaign(id: String)
+PUT /api/campaigns/:id          controllers.CampaignApi.updateCampaign(id: String)
 GET /api/campaigns/:id/analytics          controllers.CampaignApi.getCampaignAnalytics(id: String)
+
 GET /api/bootstrap              controllers.CampaignApi.bootstrapData
 
 GET /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

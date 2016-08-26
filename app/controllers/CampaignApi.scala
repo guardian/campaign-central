@@ -21,8 +21,18 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     CampaignRepository.getCampaign(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
   }
 
+  def updateCampaign(id: String) = APIAuthAction { req =>
+    req.body.asJson.flatMap(_.asOpt[Campaign]) match {
+      case None => BadRequest("Could not convert json to campaign")
+      case Some(campaign) => {
+        CampaignRepository.putCampaign(campaign)
+        Ok(Json.toJson(campaign))
+      }
+    }
+  }
+
   def getCampaignAnalytics(id: String) = APIAuthAction { req =>
-    GoogleAnalytics.getAnalyticsForCampaign(id).flatten map { c => Ok(Json.toJson(c))} getOrElse NotFound
+    GoogleAnalytics.getAnalyticsForCampaign(id).flatten map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
   def bootstrapData() = APIAuthAction { req =>

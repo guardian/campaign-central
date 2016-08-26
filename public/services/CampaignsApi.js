@@ -16,6 +16,15 @@ export function fetchCampaign(id) {
   });
 }
 
+export function saveCampaign(id, campaign) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id,
+    data: JSON.stringify(campaign),
+    contentType: 'application/json',
+    method: 'put'
+  });
+}
+
 export function fetchCampaignAnalytics(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/analytics',

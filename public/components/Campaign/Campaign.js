@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
-import CampaignInformation from '../CampaignInformation/CampaignInformation';
+import CampaignInformationEdit from '../CampaignInformationEdit/CampaignInformationEdit';
+import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
 
 class Campaign extends React.Component {
 
@@ -15,7 +16,14 @@ class Campaign extends React.Component {
     return (
       <div className="campaign">
         <h2>{this.props.campaign.name}</h2>
-        <CampaignInformation campaign={this.props.campaign}/>
+        <div className="campaign__row">
+          <div className="campaign__column">
+            <CampaignInformationEdit campaign={this.props.campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
+          </div>
+        </div>
+        <div className="campaign__row">
+            <CampaignAnalytics campaign={this.props.campaign} />
+        </div>
       </div>
     );
   }
@@ -25,6 +33,8 @@ class Campaign extends React.Component {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as getCampaign from '../../actions/CampaignActions/getCampaign';
+import * as updateCampaign from '../../actions/CampaignActions/updateCampaign';
+import * as saveCampaign from '../../actions/CampaignActions/saveCampaign';
 
 function mapStateToProps(state) {
   return {
@@ -34,7 +44,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign), dispatch)
+    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign), dispatch)
   };
 }
 

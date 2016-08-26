@@ -21,7 +21,7 @@ class Main extends React.Component {
       <div className="error-bar">
         {this.props.error || 'An error has occured, please refresh your browser. If this problem persists please contact Central Production'}
         <span className="error-bar__dismiss" onClick={this.clearError.bind(this)}>
-          <i className="i-cross-white"></i>
+          <i className="i-cross-grey"></i>
         </span>
       </div>
     );
