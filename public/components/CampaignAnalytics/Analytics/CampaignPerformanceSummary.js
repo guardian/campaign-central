@@ -38,13 +38,15 @@ class CampaignPerformanceSummary extends React.Component {
 
     return (
       <div className="analytics-chart--full-width">
-        <label className="analytics-chart__label">Campaign performance</label>
-        <ResponsiveContainer height={300} width="90%">
-          <RadialBarChart cx={250} cy={250} innerRadius={20} outerRadius={240} barSize={10} data={this.buildContributionData()}>
-            <RadialBar minAngle={15} label background clockWise={true} dataKey='count'/>
-            <Legend iconSize={10} width={120} height={140} layout='vertical' align='right' verticalAlign='middle'/>
-          </RadialBarChart>
-        </ResponsiveContainer>
+        <div className="campaign-box__header">Campaign performance</div>
+        <div className="campaign-box__body">
+          <ResponsiveContainer height={300} width="90%">
+            <RadialBarChart cx={250} cy={250} innerRadius={20} outerRadius={240} barSize={10} data={this.buildContributionData()}>
+              <RadialBar minAngle={15} label background clockWise={true} dataKey='count'/>
+              <Legend iconSize={10} width={120} height={140} layout='vertical' align='right' verticalAlign='middle'/>
+            </RadialBarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     );
   }
