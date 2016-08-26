@@ -1,23 +1,33 @@
-.campaign-info {
-  width: 100%;
 
+.campaign-info__field {
+  label {
+
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 14px;
+
+    font-weight: bold;
+
+    padding: 5px 0;
+  }
 }
 
-.campaign-info__header {
-  background-color: $c-grey-light-main;
+.campaign-info__field__value {
+  margin: 0 5px;
+}
+
+.campaign-info__button {
+
+  display: inline-block;
+  background-color: $c-highlight-main;
+  padding: 5px 20px;
+
   color: white;
-
-  font-size: 16px;
   text-transform: uppercase;
+  font-size: 14px;
+  font-weight: bold;
 
-  padding: 10px 20px;
+  cursor: pointer;
 
-  margin-top: 30px;
-}
-
-.campaign-info__body {
-  padding: 20px;
-
-  border: 1px solid $c-grey-300;
-  background-color: $c-grey-100;
+  border-radius: 3px;
 }
