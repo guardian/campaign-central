@@ -29,6 +29,8 @@ case class Campaign(
                    ) {
 
   def toItem = Item.fromJSON(Json.toJson(this).toString())
+
+  def gaFilterExpression: Option[String] = Some("ga:pagePath=~/advertiser-content/visit-britain")
 }
 
 object Campaign {

@@ -1,0 +1,47 @@
+
+%analytics-chart {
+
+  display: inline-block;
+  vertical-align: top;
+  //position: relative;
+  //
+  //height: 350px;
+  //
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-top: 20px;
+  //
+  //padding-top: 50px;
+  //
+  //background-color: $c-grey-200;
+  //border: 1px solid $c-grey-300;
+}
+
+.analytics-chart--full-width {
+
+  @extend %analytics-chart;
+  width: calc(100% - 20px);
+}
+
+.analytics-chart--half-width {
+
+  @extend %analytics-chart;
+  width: calc(50% - 20px);
+}
+
+.analytics-chart--third-width {
+
+  @extend %analytics-chart;
+  width: calc(33% - 20px);
+}
+
+.analytics-chart__label {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  padding: 10px;
+  background-color: $c-grey-300;
+}

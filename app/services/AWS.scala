@@ -7,6 +7,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.ec2.AmazonEC2Client
 import com.amazonaws.services.ec2.model.{DescribeTagsRequest, Filter}
+import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.util.EC2MetadataUtils
 
 import scala.collection.JavaConverters._
@@ -30,6 +31,7 @@ object AWS {
 
   lazy val EC2Client = region.createClient(classOf[AmazonEC2Client], creds, null)
   lazy val DynamoClient = AWS.region.createClient(classOf[AmazonDynamoDBClient], creds, null)
+  lazy val S3Client  = region.createClient(classOf[AmazonS3Client], creds, null)
 
 }
 

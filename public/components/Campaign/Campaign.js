@@ -1,6 +1,6 @@
 import React, { PropTypes } from 'react';
 import CampaignInformationEdit from '../CampaignInformationEdit/CampaignInformationEdit';
-import CampaignPerformanceMetrics from '../CampaignPerformanceMetrics/CampaignPerformanceMetrics';
+import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
 
 class Campaign extends React.Component {
 
@@ -20,9 +20,9 @@ class Campaign extends React.Component {
           <div className="campaign__column">
             <CampaignInformationEdit campaign={this.props.campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
           </div>
-          <div className="campaign__column--double-width">
-            <CampaignPerformanceMetrics campaign={this.props.campaign} />
-          </div>
+        </div>
+        <div className="campaign__row">
+            <CampaignAnalytics campaign={this.props.campaign} />
         </div>
       </div>
     );
