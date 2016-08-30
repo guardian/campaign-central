@@ -199,7 +199,7 @@
             {
               "Effect": "Allow",
               "Action": [ "kinesis:*" ],
-              "Resource": {"Fn::Join": [ "arn:aws:kinesis:eu-west-1:743583969668:stream/", {"Ref":"LogsKinesisStreamName"} ] }
+              "Resource": {"Fn::Join": ["", ["arn:aws:kinesis:eu-west-1:743583969668:stream/", {"Ref":"LogsKinesisStreamName"} ] ] }
             }
           ]
         },
