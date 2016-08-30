@@ -7,6 +7,7 @@ import com.google.api.services.analyticsreporting.v4.model._
 import com.google.api.services.analyticsreporting.v4.{AnalyticsReporting, AnalyticsReportingScopes}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
+import play.api.Logger
 import play.api.libs.json.Format
 import repositories.GoogleAnalytics.ParsedDailyCountsReport
 import services.{AWS, Config}
@@ -35,6 +36,7 @@ object GoogleAnalytics {
   val gaClient = initialiseGaClient
 
   def getAnalyticsForCampaign(campaignId: String) = {
+    Logger.info(s"fetch ga analytics for campaign $campaignId")
     for(
       campaign <- CampaignRepository.getCampaign(campaignId);
       startDate <- Some(new DateTime().minusMonths(1) );//campaign.startDate;
