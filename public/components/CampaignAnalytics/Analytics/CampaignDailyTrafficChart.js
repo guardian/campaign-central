@@ -2,12 +2,12 @@ import React, { PropTypes } from 'react'
 import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer} from 'recharts'
 import {formatMillisecondDate, shortFormatMillisecondDate} from '../../../util/dateFormatter'
 import {getStrokeColour} from '../../../util/analyticsHelper'
-import {pageCountStat} from '../../../propTypes/analytics'
+import {pageCountStatPropType} from '../../../propTypes/analytics'
 
 class CampaignDailyTrafficChart extends React.Component {
 
   static propTypes = {
-    pageCountStats: PropTypes.arrayOf(pageCountStat).isRequired
+    pageCountStats: PropTypes.arrayOf(pageCountStatPropType).isRequired
   };
 
   render () {

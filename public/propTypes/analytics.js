@@ -1,6 +1,6 @@
 import { PropTypes } from 'react'
 
-export const pageCountStat = PropTypes.shape({
+export const pageCountStatPropType = PropTypes.shape({
   date: PropTypes.number,
   "count-total": PropTypes.number,
   "count-total": PropTypes.number,
