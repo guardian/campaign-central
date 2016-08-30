@@ -24,3 +24,11 @@ export function saveCampaign(id, campaign) {
     method: 'put'
   });
 }
+
+export function fetchCampaignAnalytics(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/analytics',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}

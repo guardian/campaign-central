@@ -9,7 +9,7 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import com.gu.pandomainauth.model.{User => PandaUser}
-import repositories.CampaignRepository
+import repositories.{CampaignRepository, GoogleAnalytics}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -29,6 +29,10 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         Ok(Json.toJson(campaign))
       }
     }
+  }
+
+  def getCampaignAnalytics(id: String) = APIAuthAction { req =>
+    GoogleAnalytics.getAnalyticsForCampaign(id).flatten map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
   def bootstrapData() = APIAuthAction { req =>
