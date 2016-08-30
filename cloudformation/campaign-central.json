@@ -42,6 +42,11 @@
       "Type": "String",
       "Default": "Editorial-Tools-SSHAccess"
     },
+    "LogsKinesisStreamName": {
+      "Description": "The kinesis stream to send logs to",
+      "Type": "String",
+      "Default": "elk-PROD-KinesisStream-1PYU4KS1UEQA"
+    },
     "CertificateArn": {
       "Description": "ARN of the SSL certificate for this service",
       "Type": "String"
@@ -194,7 +199,7 @@
             {
               "Effect": "Allow",
               "Action": [ "kinesis:*" ],
-              "Resource": "*"
+              "Resource": {"Fn::Join": [ "arn:aws:kinesis:eu-west-1:743583969668:stream/", {"Ref":"LogsKinesisStreamName"} ] }
             }
           ]
         },
