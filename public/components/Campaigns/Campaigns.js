@@ -12,14 +12,17 @@ class Campaigns extends Component {
 
     switch (filterName) {
 
-      case 'prospects':
-        return campaigns.filter((c) => !c.isAgreed);
+      case 'prospect':
+        return campaigns.filter((c) => c.status === 'prospect');
 
       case 'production':
-        return campaigns.filter((c) => !c.isActive && c.isAgreed);
+        return campaigns.filter((c) => c.status === 'production');
 
-      case 'active':
-        return campaigns.filter((c) => c.isActive);
+      case 'live':
+        return campaigns.filter((c) => c.status === 'live');
+
+      case 'dead':
+        return campaigns.filter((c) => c.status === 'dead');
 
       default:
         return campaigns;

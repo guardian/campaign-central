@@ -44,7 +44,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
       Campaign(
         id = UUID.randomUUID().toString,
         name = "Something about cars",
-        status = "active",
+        status = "live",
         client = Client(UUID.randomUUID().toString, "Carmaker", "UK", Some(Agency(UUID.randomUUID().toString, "OMG"))),
         created = now,
         createdBy = user,
@@ -68,7 +68,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
       ),Campaign(
         id = UUID.randomUUID().toString,
         name = "TBC",
-        status = "in production",
+        status = "production",
         client = Client(UUID.randomUUID().toString, "Babylon Zoo", "UK", Some(Agency(UUID.randomUUID().toString, "Local Host"))),
         created = now,
         createdBy = user,
