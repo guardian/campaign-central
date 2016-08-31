@@ -1,5 +1,5 @@
 import React from 'react';
-import {Router, Route, IndexRoute, browserHistory} from 'react-router';
+import {Router, Route, IndexRoute, browserHistory, IndexRedirect} from 'react-router';
 
 import {getStore} from './util/storeAccessor';
 import {hasPermission} from './util/verifyPermission';
@@ -18,6 +18,7 @@ function requirePermission(permissionName, nextState, replaceState) {
 export const router = (
   <Router history={browserHistory}>
     <Route path="/" component={Main}>
+      <IndexRedirect to="/campaigns" />
       <Route path="/campaigns" component={Campaigns} />
       <Route path="/campaigns/:filterName" component={Campaigns} />
       <Route path="/campaign/:id" component={Campaign} />
