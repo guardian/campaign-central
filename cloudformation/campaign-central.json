@@ -42,6 +42,11 @@
       "Type": "String",
       "Default": "Editorial-Tools-SSHAccess"
     },
+    "LogsKinesisStreamName": {
+      "Description": "The kinesis stream to send logs to",
+      "Type": "String",
+      "Default": "elk-PROD-KinesisStream-1PYU4KS1UEQA"
+    },
     "CertificateArn": {
       "Description": "ARN of the SSL certificate for this service",
       "Type": "String"
@@ -113,6 +118,22 @@
         "Roles": [ { "Ref": "CampaignCentralRole" } ]
       }
     },
+    "CampaignCentralGetConfigPolicy" : {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "CampaignCentralGetConfigPolicy",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [ "s3:GetObject" ],
+              "Resource": [ "arn:aws:s3:::guconf-flexible/campaign-central/*" ]
+            }
+          ]
+        },
+        "Roles": [ { "Ref": "CampaignCentralRole" } ]
+      }
+    },
     "CampaignCentralPanDomainPolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
@@ -178,6 +199,23 @@
               "Effect": "Allow",
               "Action": [ "dynamodb:*" ],
               "Resource": "*"
+            }
+          ]
+        },
+        "Roles": [ { "Ref": "CampaignCentralRole" } ]
+      }
+    },
+
+    "CampaignCentralKinesisPolicy" : {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "CampaignCentralKinesisPolicy",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [ "kinesis:*" ],
+              "Resource": {"Fn::Join": ["", ["arn:aws:kinesis:eu-west-1:743583969668:stream/", {"Ref":"LogsKinesisStreamName"} ] ] }
             }
           ]
         },

@@ -9,6 +9,7 @@ import com.amazonaws.services.ec2.AmazonEC2Client
 import com.amazonaws.services.ec2.model.{DescribeTagsRequest, Filter}
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.util.EC2MetadataUtils
+import play.api.Logger
 
 import scala.collection.JavaConverters._
 
@@ -21,10 +22,12 @@ object AWS {
 
   def init(profile: Option[String]): Unit = {
     creds = profile map {p =>
+      Logger.info(s"using local aws profile $p")
       new ProfileCredentialsProvider(p)
-    } getOrElse(
+    } getOrElse{
+      Logger.info("using default aWS profile")
       new DefaultAWSCredentialsProviderChain()
-      )
+    }
   }
 
   def credentialsProvider = creds
