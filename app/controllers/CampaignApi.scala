@@ -52,7 +52,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         lastModifiedBy = user,
         nominalValue = Some(10000),
         actualValue = Some(0),
-        targets = List(CampaignTarget("Unique users", 10000))
+        targets = Map("uniques" -> 10000L)
       ),Campaign(
         id = UUID.randomUUID().toString,
         name = "Pure hate",
@@ -64,7 +64,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         lastModifiedBy = user,
         nominalValue = Some(10000),
         actualValue = Some(0),
-        targets = List(CampaignTarget("Unique users", 10000))
+        targets = Map("uniques" -> 10000L)
       ),Campaign(
         id = UUID.randomUUID().toString,
         name = "TBC",
@@ -76,7 +76,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         lastModifiedBy = user,
         nominalValue = Some(10000),
         actualValue = Some(0),
-        targets = List(CampaignTarget("Unique users", 10000))
+        targets = Map("uniques" -> 10000L)
       ),Campaign(
         id = UUID.randomUUID().toString,
         name = "I love it when a plan comes together",
@@ -88,7 +88,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         lastModifiedBy = user,
         nominalValue = Some(10000),
         actualValue = Some(0),
-        targets = List(CampaignTarget("Unique users", 10000))
+        targets = Map("uniques" -> 10000L)
       )
     )
 
