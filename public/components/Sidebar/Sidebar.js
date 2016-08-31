@@ -12,7 +12,7 @@ class Sidebar extends React.Component {
           <SidebarLink to="/campaigns/prospect">Prospects</SidebarLink>
           <SidebarLink to="/campaigns/production">In Production</SidebarLink>
           <SidebarLink to="/campaigns/live">Live</SidebarLink>
-          <SidebarLink to="/campaigns/dead">Daed</SidebarLink>
+          <SidebarLink to="/campaigns/dead">Dead</SidebarLink>
         </div>
       </div>
     );
