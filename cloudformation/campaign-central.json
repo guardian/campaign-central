@@ -118,6 +118,22 @@
         "Roles": [ { "Ref": "CampaignCentralRole" } ]
       }
     },
+    "CampaignCentralGetConfigPolicy" : {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "CampaignCentralGetConfigPolicy",
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [ "s3:GetObject" ],
+              "Resource": [ "arn:aws:s3:::guconf-flexible/campaign-central/*" ]
+            }
+          ]
+        },
+        "Roles": [ { "Ref": "CampaignCentralRole" } ]
+      }
+    },
     "CampaignCentralPanDomainPolicy": {
       "Type": "AWS::IAM::Policy",
       "Properties": {
