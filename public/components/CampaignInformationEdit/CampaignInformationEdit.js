@@ -1,9 +1,17 @@
 import React, { PropTypes } from 'react';
 import EditableText from '../utils/EditableText';
+import EditableDropdown from '../utils/EditableDropdown';
 
 import {formatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignInformationEdit extends React.Component {
+
+  stateValues = { //Not sure if this is the best place for it. Maybe we should have dedicated module with those values and import it here, in sidebar and filters?
+    live: 'Live',
+    prospect: 'Prospect',
+    production: 'Production',
+    dead: 'Dead'
+  }
 
   state = {
     isCampaignDirty: false
@@ -41,6 +49,12 @@ class CampaignInformationEdit extends React.Component {
     }));
   }
 
+  updateCampaignStatus = (e) => {
+    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+      status: e.target.value
+    }));
+  }
+
   renderSaveButtons = () => {
     if (!this.state.isCampaignDirty) {
       return false;
@@ -69,8 +83,16 @@ class CampaignInformationEdit extends React.Component {
             <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.created)} by {this.props.campaign.createdBy.firstName} {this.props.campaign.createdBy.lastName}</span>
           </div>
           <div className="campaign-info__field">
+            <label>Last modified</label>
+            <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.lastModified)} by {this.props.campaign.lastModifiedBy.firstName} {this.props.campaign.lastModifiedBy.lastName}</span>
+          </div>
+          <div className="campaign-info__field">
             <label>Value</label>
             <EditableText value={this.props.campaign.actualValue ? "£" + this.props.campaign.actualValue : ""} onChange={this.updateCampaignValue} />
+          </div>
+          <div className="campaign-info__field">
+            <label>Status</label>
+            <EditableDropdown values={this.stateValues} name="status" selectedValue={this.props.campaign.status} onChange={this.updateCampaignStatus} />
           </div>
         </div>
         {this.renderSaveButtons()}
