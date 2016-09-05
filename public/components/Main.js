@@ -8,7 +8,7 @@ class Main extends React.Component {
     children: React.PropTypes.element.isRequired
   }
 
-  clearError() {
+  clearError = () => {
     this.props.uiActions.clearError();
   }
 
@@ -20,7 +20,7 @@ class Main extends React.Component {
     return (
       <div className="error-bar">
         {this.props.error || 'An error has occured, please refresh your browser. If this problem persists please contact Central Production'}
-        <span className="error-bar__dismiss" onClick={this.clearError.bind(this)}>
+        <span className="error-bar__dismiss" onClick={this.clearError}>
           <i className="i-cross-grey"></i>
         </span>
       </div>
