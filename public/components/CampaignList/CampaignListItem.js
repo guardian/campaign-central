@@ -13,8 +13,24 @@ class CampaignListItem extends React.Component {
   render () {
     return (
       <Link className="campaign-list__item" to={"/campaign/" + this.props.campaign.id}>
-        <div className="campaign-list__item__name">
-          {this.props.campaign.name}
+        <div className="campaign-list__item__info">
+          <span className="campaign-list__item__info-name">{this.props.campaign.name}</span>
+          <span className="campaign-list__item__info-other">
+            <span className="campaign-list__item__info-other--info">Status: </span>
+            <span className="campaign-list__item__info-other--status">{this.props.campaign.status} </span>
+          </span>
+          <span className="campaign-list__item__info-other">
+            <span className="campaign-list__item__info-other--info">Value: </span>
+            <span className="campaign-list__item__info-other--value">{this.props.campaign.actualValue} </span>
+          </span>
+          <span className="campaign-list__item__info-other">
+            <span className="campaign-list__item__info-other--info">Start date: </span>
+            <span className="campaign-list__item__info-other--value">13.08.2016 </span>
+          </span>
+          <span className="campaign-list__item__info-other">
+                <span className="campaign-list__item__info-other--info">Finish date: </span>
+                <span className="campaign-list__item__info-other--value">13.11.2016 - 55 days left</span>
+          </span>
         </div>
       </Link>
     );
