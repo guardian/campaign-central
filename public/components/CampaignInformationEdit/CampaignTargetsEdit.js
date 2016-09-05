@@ -55,8 +55,8 @@ class CampaignTargetsEdit extends React.Component {
         {keys.map((k) =>
           <div className="campaign-info__field" key={k} >
             <label>{ this.formatTargetName(k) }</label>
-            <EditableNumber value={this.props.campaign.targets[k]} onNumberChange={this.updateTargetValue.bind(this, k)} />
-            <div className="editable-text__button" onClick={this.deleteTarget.bind(this, k)} >
+            <EditableNumber value={this.props.campaign.targets[k]} onNumberChange={ (n) => this.updateTargetValue(k, n)} />
+            <div className="editable-text__button" onClick={ () => this.deleteTarget(k) } >
               <i className="i-delete"/>
             </div>
           </div>
