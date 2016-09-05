@@ -25,6 +25,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   Logger.info("bootstrapping controllers")
   val appController = new App(wsClient)
   val campaignApiController = new CampaignApi(wsClient)
+  val clientApiController = new ClientApi(wsClient)
   val managementController = new Management()
   val assetsController = new Assets(httpErrorHandler)
 
@@ -32,6 +33,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
     httpErrorHandler,
     appController,
     campaignApiController,
+    clientApiController,
     assetsController,
     managementController
   )
