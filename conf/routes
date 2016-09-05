@@ -3,9 +3,9 @@ GET	/		                      controllers.App.index(id = "")
 GET	/campaigns		            controllers.App.index(id = "")
 GET	/campaigns/:id		        controllers.App.index(id)
 GET	/campaign/:id		          controllers.App.index(id)
+GET	/clients		              controllers.App.index(id = "")
+GET	/clients/:id		          controllers.App.index(id)
 
-
-GET	/hello		                  controllers.App.hello
 
 GET            /oauthCallback                                          controllers.App.oauthCallback
 GET            /logout                                                 controllers.App.logout

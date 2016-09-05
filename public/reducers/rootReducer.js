@@ -4,11 +4,16 @@ import config from './configReducer';
 import campaigns from './campaignsReducer';
 import campaign from './campaignReducer';
 import campaignAnalytics from './campaignAnalyticsReducer';
+import clients from './clientsReducer';
+import client from './clientReducer';
+
 
 export default combineReducers({
   error,
   config,
   campaigns,
   campaign,
-  campaignAnalytics
+  campaignAnalytics,
+  clients,
+  client
 });
