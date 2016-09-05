@@ -71,6 +71,7 @@ class AddTargetControl extends React.Component {
           <select value={this.state.selectedTarget} onChange={this.updateSelectedMetric}>
             <option value=""></option>
             { availbleTargets.map((t) => <option key={t.value} value={t.value}>{t.name}</option>) }
+            <option value="custom">Custom</option>
           </select>
           <br/>
           Target: <EditableText value={this.state.target} onChange={this.updateTarget} />
@@ -85,6 +86,7 @@ class AddTargetControl extends React.Component {
         <select value={this.state.selectedTarget} onChange={this.updateSelectedMetric}>
           <option value=""></option>
           { availbleTargets.map((t) => <option key={t.value} value={t.value}>{t.name}</option>) }
+          <option value="custom">Custom</option>
         </select>
         &nbsp;Count: <EditableNumber value={this.state.value} onNumberChange={this.updateTargetValue} />
         {this.renderAddButton()}
