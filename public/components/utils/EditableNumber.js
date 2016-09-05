@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react';
 class EditableNumber extends React.Component {
 
   static propTypes = {
-    value: PropTypes.number.isRequired,
+    value: PropTypes.number,
     onNumberChange: PropTypes.func.isRequired
   }; 
 
@@ -46,7 +46,7 @@ class EditableNumber extends React.Component {
 
     return (
       <div className="editable-text">
-        <input className="editable-text__input" value={this.props.value} onChange={this.updateValue} />
+        <input className="editable-text__input" value={this.props.value || ""} onChange={this.updateValue} />
         <div className="editable-text__button" onClick={this.disableEditing} >
           <i className="i-cross-grey"/>
         </div>

@@ -1,6 +1,8 @@
 import React, { PropTypes } from 'react';
 import R from 'ramda';
+import AddTargetControl from './AddTargetControl';
 import EditableNumber from '../utils/EditableNumber';
+import { defaultTargets } from '../../constants/defaultTargets'
 
 class CampaignTargetsEdit extends React.Component {
 
@@ -39,6 +41,11 @@ class CampaignTargetsEdit extends React.Component {
     }));
   }
 
+  formatTargetName = k => {
+    const targetInfo = defaultTargets.find(t => t.value === k);
+    return targetInfo ? targetInfo.name : k;
+  }
+
   renderTargetsList = () => {
 
     const keys = Object.keys(this.props.campaign.targets).sort();
@@ -47,7 +54,7 @@ class CampaignTargetsEdit extends React.Component {
       <ul>
         {keys.map((k) =>
           <div className="campaign-info__field" key={k} >
-            <label>{k}</label>
+            <label>{ this.formatTargetName(k) }</label>
             <EditableNumber value={this.props.campaign.targets[k]} onNumberChange={this.updateTargetValue.bind(this, k)} />
             <div className="editable-text__button" onClick={this.deleteTarget.bind(this, k)} >
               <i className="i-delete"/>
@@ -68,6 +75,7 @@ class CampaignTargetsEdit extends React.Component {
           <div>
             {this.renderTargetsList()}
           </div>
+          <AddTargetControl existingTargets={Object.keys(this.props.campaign.targets)} onTargetAdded={this.updateTargetValue} />
         </div>
       </div>
     );
