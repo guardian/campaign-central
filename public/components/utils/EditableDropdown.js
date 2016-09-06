@@ -4,7 +4,7 @@ class EditableDropdown extends React.Component {
 
   static propTypes = {
     name: PropTypes.string.isRequired,
-    values: PropTypes.object.isRequired,
+    values: PropTypes.array.isRequired,
     selectedValue: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired
   };
@@ -29,20 +29,24 @@ class EditableDropdown extends React.Component {
     const values = this.props.values;
     let options = [];
 
-    for (let prop in values) {
-      if (values.hasOwnProperty(prop)) {
-        options.push(<option value={prop} key={prop}>{values[prop]}</option>);
-      }
-    }
+    values.map((prop, index) =>
+      options.push(<option value={prop.value} key={index}>{prop.name}</option>)
+    );
 
     return options;
   }
 
+  isMatchingValue = (obj) => {
+      return obj.value === this.props.selectedValue;
+  }
+
   render () {
-    if (!this.state.editable) {
+    const matchedValue = this.props.values.filter(this.isMatchingValue);
+
+    if (!this.state.editable && matchedValue.length) {
       return (
         <div className="editable-text" onClick={this.enableEditing} >
-          <span className={"editable-text__text"}>{this.props.values[this.props.selectedValue]}</span>
+          <span className={"editable-text__text"}>{matchedValue[0].name}</span>
           <div className="editable-text__button" >
             <i className="i-pen"/>
           </div>

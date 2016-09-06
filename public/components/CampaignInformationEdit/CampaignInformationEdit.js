@@ -1,17 +1,11 @@
 import React, { PropTypes } from 'react';
+import {campaignStatuses} from '../../constants/campaignStatuses';
 import EditableText from '../utils/EditableText';
 import EditableDropdown from '../utils/EditableDropdown';
 
 import {formatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignInformationEdit extends React.Component {
-
-  stateValues = { //Not sure if this is the best place for it. Maybe we should have dedicated module with those values and import it here, in sidebar and filters?
-    live: 'Live',
-    prospect: 'Prospect',
-    production: 'Production',
-    dead: 'Dead'
-  }
 
   state = {
     isCampaignDirty: false
@@ -68,6 +62,7 @@ class CampaignInformationEdit extends React.Component {
   }
 
   render () {
+      console.log(campaignStatuses);
     return (
       <div className="campaign-info campaign-box">
         <div className="campaign-box__header">
@@ -92,7 +87,7 @@ class CampaignInformationEdit extends React.Component {
           </div>
           <div className="campaign-info__field">
             <label>Status</label>
-            <EditableDropdown values={this.stateValues} name="status" selectedValue={this.props.campaign.status} onChange={this.updateCampaignStatus} />
+            <EditableDropdown values={campaignStatuses} name="status" selectedValue={this.props.campaign.status} onChange={this.updateCampaignStatus} />
           </div>
         </div>
         {this.renderSaveButtons()}
