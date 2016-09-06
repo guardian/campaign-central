@@ -16,7 +16,7 @@ class Clients extends Component {
     return (
       <div className="campaigns">
         <h2 className="campaigns__header">Clients</h2>
-        {this.props.clients.map(c => <Link to={"/clients/" + c.id}>{c.name}</Link>)}
+        {this.props.clients.map(c => <div key={c.id}><Link to={"/clients/" + c.id}>{c.name}</Link></div>)}
       </div>
     );
   }

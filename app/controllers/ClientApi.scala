@@ -22,7 +22,7 @@ class ClientApi(override val wsClient: WSClient) extends Controller with PandaAu
 
   def updateClient(id: String) = APIAuthAction { req =>
     req.body.asJson.flatMap(_.asOpt[Client]) match {
-      case None => BadRequest("Could not convert json to campaign")
+      case None => BadRequest("Could not convert json to client")
       case Some(client) => {
         ClientRepository.putClient(client)
         Ok(Json.toJson(client))

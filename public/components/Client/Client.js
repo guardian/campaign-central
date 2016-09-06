@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
+import ClientInformationEdit from '../ClientInformationEdit/ClientInformationEdit';
 
-class Campaign extends React.Component {
+class Client extends React.Component {
 
   static propTypes = {
-    client: PropTypes.object.isRequired
+    client: PropTypes.object
   }
 
   componentWillMount() {
@@ -17,7 +18,7 @@ class Campaign extends React.Component {
 
     return (
       <div className="client">
-        <h2>{this.props.client.name}</h2>
+        <ClientInformationEdit client={this.props.client} updateClient={this.props.clientActions.updateClient} saveClient={this.props.clientActions.saveClient}/>
       </div>
     );
   }
@@ -27,6 +28,8 @@ class Campaign extends React.Component {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as getClient from '../../actions/ClientActions/getClient';
+import * as updateClient from '../../actions/ClientActions/updateClient';
+import * as saveClient from '../../actions/ClientActions/saveClient';
 
 function mapStateToProps(state) {
   return {
@@ -36,8 +39,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    clientActions: bindActionCreators(Object.assign({}, getClient), dispatch)
+    clientActions: bindActionCreators(Object.assign({}, getClient, updateClient, saveClient), dispatch)
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Campaign);
+export default connect(mapStateToProps, mapDispatchToProps)(Client);

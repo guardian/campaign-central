@@ -42,7 +42,7 @@ class EditableText extends React.Component {
 
     return (
       <div className="editable-text">
-        <input className="editable-text__input" value={this.props.value} onChange={this.props.onChange} />
+        <input className="editable-text__input" value={this.props.value || ""} onChange={this.props.onChange} />
         <div className="editable-text__button" onClick={this.disableEditing} >
           <i className="i-cross-grey"/>
         </div>

@@ -15,3 +15,12 @@ export function fetchClient(id) {
     method: 'get'
   });
 }
+
+export function saveClient(id, client) {
+  return AuthedReqwest({
+    url: '/api/clients/' + id,
+    data: JSON.stringify(client),
+    contentType: 'application/json',
+    method: 'put'
+  });
+}
