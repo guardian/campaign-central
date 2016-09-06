@@ -123,6 +123,40 @@
         }
       },
       "DeletionPolicy": "Retain"
+    },
+    "ClientDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "10",
+          "WriteCapacityUnits": "10"
+        },
+        "TableName": {
+          "Fn::Join": [
+            "-",
+            [
+              "campaign-central",
+              {
+                "Ref": "Stage"
+              },
+              "clients"
+            ]
+          ]
+        }
+      },
+      "DeletionPolicy": "Retain"
     }
   }
 }

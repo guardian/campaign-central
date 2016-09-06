@@ -25,7 +25,7 @@ object AWS {
       Logger.info(s"using local aws profile $p")
       new ProfileCredentialsProvider(p)
     } getOrElse{
-      Logger.info("using default aWS profile")
+      Logger.info("using default AWS profile")
       new DefaultAWSCredentialsProviderChain()
     }
   }
@@ -61,4 +61,6 @@ object Dynamo {
   lazy val campaignTable = dynamoDb.getTable(Config().campaignTableName)
   lazy val campaignNotesTable = dynamoDb.getTable(Config().campaignNotesTableName)
   lazy val campaignContentTable = dynamoDb.getTable(Config().campaignContentTableName)
+  lazy val clientTable = dynamoDb.getTable(Config().clientTableName)
+
 }

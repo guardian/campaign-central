@@ -3,21 +3,34 @@ GET	/		                      controllers.App.index(id = "")
 GET	/campaigns		            controllers.App.index(id = "")
 GET	/campaigns/:id		        controllers.App.index(id)
 GET	/campaign/:id		          controllers.App.index(id)
+GET	/clients		              controllers.App.index(id = "")
+GET	/clients/:id		          controllers.App.index(id)
 
-
-GET	/hello		                  controllers.App.hello
 
 GET            /oauthCallback                                          controllers.App.oauthCallback
 GET            /logout                                                 controllers.App.logout
 GET            /reauth                                                 controllers.App.reauth
 
 #Campaign Api
+
+GET /api/campaigns/bootstrap    controllers.CampaignApi.bootstrapData
+
+
 GET /api/campaigns              controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/:id          controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id          controllers.CampaignApi.updateCampaign(id: String)
 GET /api/campaigns/:id/analytics          controllers.CampaignApi.getCampaignAnalytics(id: String)
 
-GET /api/bootstrap              controllers.CampaignApi.bootstrapData
+
+#Clients Api
+
+GET /api/clients/bootstrap    controllers.ClientApi.bootstrapData
+
+GET /api/clients              controllers.ClientApi.getAllClients
+GET /api/clients/:id          controllers.ClientApi.getClient(id: String)
+PUT /api/clients/:id          controllers.ClientApi.updateClient(id: String)
+
+
 
 GET /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 

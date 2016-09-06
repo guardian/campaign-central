@@ -33,6 +33,9 @@ sealed trait Config {
   def campaignNotesTableName = s"campaign-central-$stage-campaign-notes"
   def campaignContentTableName = s"campaign-central-$stage-campaign-content"
 
+  def clientTableName = s"campaign-central-$stage-clients"
+
+
   // remote configuration is used for things we don't want to check in to version control
   // such as passwords, private urls, and gossip about other teams
 
