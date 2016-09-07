@@ -8,6 +8,8 @@ import Main from './components/Main';
 import Campaigns from './components/Campaigns/Campaigns';
 import Campaign from './components/Campaign/Campaign';
 
+import Clients from './components/Clients/Clients';
+import Client from './components/Client/Client';
 
 function requirePermission(permissionName, nextState, replaceState) {
   if (!hasPermission(permissionName)) {
@@ -22,6 +24,8 @@ export const router = (
       <Route path="/campaigns" component={Campaigns} />
       <Route path="/campaigns/:filterName" component={Campaigns} />
       <Route path="/campaign/:id" component={Campaign} />
+      <Route path="/clients" component={Clients} />
+      <Route path="/clients/:id" component={Client} />
     </Route>
   </Router>
 );

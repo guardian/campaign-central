@@ -1,5 +1,5 @@
 
-export default function campaign(state = false, action) {
+export default function campaign(state = null, action) {
   switch (action.type) {
 
     case 'CAMPAIGN_GET_RECIEVE':

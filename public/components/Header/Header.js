@@ -15,7 +15,6 @@ export default class Header extends React.Component {
                     <div className="header__logo__text--small">Central</div>
                 </Link>
                 <div className="header__title">
-                    Manage your campaigns
                 </div>
             </header>
         );
