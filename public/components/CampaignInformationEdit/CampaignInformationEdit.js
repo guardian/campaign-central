@@ -5,22 +5,14 @@ import {formatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignInformationEdit extends React.Component {
 
-  state = {
-    isCampaignDirty: false
-  }
+  static propTypes = {
+    updateCampaign: PropTypes.func.isRequired,
+    markDirty: PropTypes.func.isRequired
+  };
 
-  triggerSave = () => {
-    this.props.saveCampaign(this.props.campaign.id, this.props.campaign);
-    this.setState({
-      isCampaignDirty: false
-    });
-  }
 
   triggerUpdate = (newCampaign) => {
-    this.setState({
-      isCampaignDirty: true
-    });
-
+    this.props.markDirty();
     this.props.updateCampaign(newCampaign.id, newCampaign);
   }
 
@@ -41,25 +33,13 @@ class CampaignInformationEdit extends React.Component {
     }));
   }
 
-  renderSaveButtons = () => {
-    if (!this.state.isCampaignDirty) {
-      return false;
-    }
-
-    return (
-      <div className="campaign-box__footer">
-        <span className="campaign-info__button" onClick={this.triggerSave}>Save</span>
-      </div>
-    );
-  }
-
   render () {
     return (
-      <div className="campaign-info campaign-box">
-        <div className="campaign-box__header">
+      <div className="campaign-info campaign-box-section">
+        <div className="campaign-box-section__header">
           Campaign Info
         </div>
-        <div className="campaign-box__body">
+        <div className="campaign-box-section__body">
           <div className="campaign-info__field">
             <label>Name</label>
             <EditableText value={this.props.campaign.name} onChange={this.updateCampaignName} />
@@ -73,7 +53,6 @@ class CampaignInformationEdit extends React.Component {
             <EditableText value={this.props.campaign.actualValue ? "£" + this.props.campaign.actualValue : ""} onChange={this.updateCampaignValue} />
           </div>
         </div>
-        {this.renderSaveButtons()}
       </div>
     );
   }

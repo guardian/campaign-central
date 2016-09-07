@@ -6,21 +6,13 @@ import { defaultTargets } from '../../constants/defaultTargets'
 
 class CampaignTargetsEdit extends React.Component {
 
-  state = {
-    isCampaignDirty: false
-  }
-
-  triggerSave = () => {
-    this.props.saveCampaign(this.props.campaign.id, this.props.campaign);
-    this.setState({
-      isCampaignDirty: false
-    });
-  }
-
+  static propTypes = {
+    updateCampaign: PropTypes.func.isRequired,
+    markDirty: PropTypes.func.isRequired
+  };
+  
   triggerUpdate = (newCampaign) => {
-    this.setState({
-      isCampaignDirty: true
-    });
+    this.props.markDirty();
 
     this.props.updateCampaign(newCampaign.id, newCampaign);
   }
@@ -67,11 +59,11 @@ class CampaignTargetsEdit extends React.Component {
   
   render () {
     return (
-      <div className="campaign-info campaign-box">
-        <div className="campaign-box__header">
+      <div className="campaign-info campaign-box-section">
+        <div className="campaign-box-section__header">
           Campaign Targets
         </div>
-        <div className="campaign-box__body">
+        <div className="campaign-box-section__body">
           <div>
             {this.renderTargetsList()}
           </div>
