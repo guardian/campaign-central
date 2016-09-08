@@ -62,7 +62,6 @@ class CampaignInformationEdit extends React.Component {
   }
 
   render () {
-      console.log(campaignStatuses);
     return (
       <div className="campaign-info campaign-box">
         <div className="campaign-box__header">

@@ -30,7 +30,7 @@ class EditableDropdown extends React.Component {
     let options = [];
 
     values.map((prop, index) =>
-      options.push(<option value={prop.value} key={index}>{prop.name}</option>)
+      options.push(<option value={prop.value} key={prop.value}>{prop.name}</option>)
     );
 
     return options;
