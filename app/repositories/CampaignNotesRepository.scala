@@ -10,7 +10,7 @@ import scala.collection.JavaConversions._
 object CampaignNotesRepository {
 
   def getNotesForCampaign(campaignId: String) = {
-    Dynamo.campaignNotesTable.query("campaignId", campaignId).map{ Note.fromItem }.toList
+     Dynamo.campaignNotesTable.query("campaignId", campaignId).map{ Note.fromItem }.toList
   }
 
   def getNote(campaignId: String, created: DateTime) = {

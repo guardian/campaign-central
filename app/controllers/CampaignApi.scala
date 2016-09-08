@@ -9,7 +9,7 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import com.gu.pandomainauth.model.{User => PandaUser}
-import repositories.{CampaignRepository, GoogleAnalytics}
+import repositories.{CampaignNotesRepository, CampaignRepository, GoogleAnalytics}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -33,6 +33,20 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
   def getCampaignAnalytics(id: String) = APIAuthAction { req =>
     GoogleAnalytics.getAnalyticsForCampaign(id).flatten map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+  }
+
+  def getCampaignNotes(id: String) =  APIAuthAction { req =>
+    Ok(Json.toJson(CampaignNotesRepository.getNotesForCampaign(id)))
+  }
+
+  def addCampaignNote(id: String) = APIAuthAction { req =>
+    req.body.asJson.flatMap(_.asOpt[Note]) match {
+      case None => BadRequest("Could not convert json to a note")
+      case Some(note) => {
+        CampaignNotesRepository.putNote(note)
+        Ok(Json.toJson(note))
+      }
+    }
   }
 
   def bootstrapData() = APIAuthAction { req =>
