@@ -15,7 +15,8 @@ class CampaignEdit extends React.Component {
     });
   }
 
-  markDirty = () => {
+  triggerUpdate = (newCampaign) => {
+    this.props.updateCampaign(newCampaign.id, newCampaign);
     this.setState({
       isCampaignDirty: true
     });
@@ -41,10 +42,10 @@ class CampaignEdit extends React.Component {
         </div>
         <div className="campaign-box__body">
           <div className="campaign__column">
-            <CampaignInformationEdit campaign={this.props.campaign} updateCampaign={this.props.updateCampaign} markDirty={this.markDirty}/>
+            <CampaignInformationEdit campaign={this.props.campaign} updateCampaign={this.triggerUpdate} />
           </div>
           <div className="campaign__column">
-            <CampaignTargetsEdit campaign={this.props.campaign} updateCampaign={this.props.updateCampaign} markDirty={this.markDirty}/>
+            <CampaignTargetsEdit campaign={this.props.campaign} updateCampaign={this.triggerUpdate} />
           </div>
         </div>
         {this.renderSaveButtons()}

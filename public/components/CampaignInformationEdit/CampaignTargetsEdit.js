@@ -7,20 +7,13 @@ import { defaultTargets } from '../../constants/defaultTargets'
 class CampaignTargetsEdit extends React.Component {
 
   static propTypes = {
-    updateCampaign: PropTypes.func.isRequired,
-    markDirty: PropTypes.func.isRequired
+    updateCampaign: PropTypes.func.isRequired
   };
-  
-  triggerUpdate = (newCampaign) => {
-    this.props.markDirty();
-
-    this.props.updateCampaign(newCampaign.id, newCampaign);
-  }
 
   updateTargetValue = (target, number) => {
     const updatedTargets = Object.assign({}, this.props.campaign.targets, { [target]: number })
 
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       targets: updatedTargets
     }));
   }
@@ -28,7 +21,7 @@ class CampaignTargetsEdit extends React.Component {
   deleteTarget = (target) => {
     const updatedTargets = R.omit(target, this.props.campaign.targets);
 
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       targets: updatedTargets
     }));
   }

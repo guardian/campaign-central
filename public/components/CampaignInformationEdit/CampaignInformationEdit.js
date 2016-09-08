@@ -8,24 +8,17 @@ import {formatMillisecondDate} from '../../util/dateFormatter';
 class CampaignInformationEdit extends React.Component {
 
   static propTypes = {
-    updateCampaign: PropTypes.func.isRequired,
-    markDirty: PropTypes.func.isRequired
+    updateCampaign: PropTypes.func.isRequired
   };
 
-
-  triggerUpdate = (newCampaign) => {
-    this.props.markDirty();
-    this.props.updateCampaign(newCampaign.id, newCampaign);
-  }
-
   updateCampaignName = (e) => {
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       name: e.target.value
     }));
   }
 
   updateCampaignStatus = (e) => {
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       status: e.target.value
     }));
   }
@@ -36,7 +29,7 @@ class CampaignInformationEdit extends React.Component {
 
     const numValue = parseInt(value) === NaN ? undefined : parseInt(value);
 
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       actualValue: numValue
     }));
   }
