@@ -7,28 +7,19 @@ import {formatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignInformationEdit extends React.Component {
 
-  state = {
-    isCampaignDirty: false
-  }
-
-  triggerSave = () => {
-    this.props.saveCampaign(this.props.campaign.id, this.props.campaign);
-    this.setState({
-      isCampaignDirty: false
-    });
-  }
-
-  triggerUpdate = (newCampaign) => {
-    this.setState({
-      isCampaignDirty: true
-    });
-
-    this.props.updateCampaign(newCampaign.id, newCampaign);
-  }
+  static propTypes = {
+    updateCampaign: PropTypes.func.isRequired
+  };
 
   updateCampaignName = (e) => {
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       name: e.target.value
+    }));
+  }
+
+  updateCampaignStatus = (e) => {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
+      status: e.target.value
     }));
   }
 
@@ -38,36 +29,18 @@ class CampaignInformationEdit extends React.Component {
 
     const numValue = parseInt(value) === NaN ? undefined : parseInt(value);
 
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       actualValue: numValue
     }));
   }
 
-  updateCampaignStatus = (e) => {
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
-      status: e.target.value
-    }));
-  }
-
-  renderSaveButtons = () => {
-    if (!this.state.isCampaignDirty) {
-      return false;
-    }
-
-    return (
-      <div className="campaign-box__footer">
-        <span className="campaign-info__button" onClick={this.triggerSave}>Save</span>
-      </div>
-    );
-  }
-
   render () {
     return (
-      <div className="campaign-info campaign-box">
-        <div className="campaign-box__header">
+      <div className="campaign-info campaign-box-section">
+        <div className="campaign-box-section__header">
           Campaign Info
         </div>
-        <div className="campaign-box__body">
+        <div className="campaign-box-section__body">
           <div className="campaign-info__field">
             <label>Name</label>
             <EditableText value={this.props.campaign.name} onChange={this.updateCampaignName} />
@@ -89,7 +62,6 @@ class CampaignInformationEdit extends React.Component {
             <EditableDropdown values={campaignStatuses} name="status" selectedValue={this.props.campaign.status} onChange={this.updateCampaignStatus} />
           </div>
         </div>
-        {this.renderSaveButtons()}
       </div>
     );
   }

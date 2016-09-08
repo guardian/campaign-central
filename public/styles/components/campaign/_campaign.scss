@@ -49,3 +49,25 @@
 
   text-align: right;
 }
+
+.campaign-box-section {
+  width: 100%;
+}
+
+.campaign-box-section__header {
+  background-color: $c-grey-200;
+  color: black;
+
+  font-size: 16px;
+  text-transform: uppercase;
+
+  padding: 10px 20px;
+}
+
+.campaign-box-section__body {
+  padding: 20px;
+
+  font-size: 14px;
+
+  border: 1px solid $c-grey-300;;
+}
