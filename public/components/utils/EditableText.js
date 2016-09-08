@@ -16,15 +16,28 @@ class EditableText extends React.Component {
   }
 
   enableEditing = () => {
+
+    window.addEventListener('click', this.disableEditing, true);
+
     this.setState({
       editable: true
     });
+
   }
 
-  disableEditing = () => {
-    this.setState({
-      editable: false
-    });
+  disableEditing = (event) => {
+
+    if (event.target !== this.refs.editableInput) {
+        window.removeEventListener('click', this.disableEditing, true);
+
+        this.setState({
+            editable: false
+        });
+    }
+  }
+
+  componentWillUnmount() {
+      window.removeEventListener('click', this.disableEditing, true);
   }
 
   render () {
@@ -42,13 +55,9 @@ class EditableText extends React.Component {
 
     return (
       <div className="editable-text">
-        <input className="editable-text__input" value={this.props.value || ""} onChange={this.props.onChange} />
-        <div className="editable-text__button" onClick={this.disableEditing} >
-          <i className="i-cross-grey"/>
-        </div>
+        <input ref="editableInput" className="editable-text__input" value={this.props.value || ""} onChange={this.props.onChange} />
       </div>
     );
-
   }
 }
 
