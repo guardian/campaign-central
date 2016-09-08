@@ -15,16 +15,13 @@ class AddTargetControl extends React.Component {
   static defaultProps = {
     target: undefined,
     value: null
-  }
+  };
 
-  state = {
-    isTargetValid: false
-  }
+  state = {};
 
   triggerAdd = () => {
     this.props.onTargetAdded(this.state.target, this.state.value);
     this.setState({
-      isTargetValid: false,
       selectedTarget: undefined,
       target: undefined,
       value: null
