@@ -5,22 +5,31 @@ class EditableNumber extends React.Component {
   static propTypes = {
     value: PropTypes.number,
     onNumberChange: PropTypes.func.isRequired
-  }; 
+  };
 
   state = {
     editable: false
   }
 
   enableEditing = () => {
+
+    window.addEventListener('click', this.disableEditing, true);
+
     this.setState({
       editable: true
     });
   }
 
   disableEditing = () => {
-    this.setState({
-      editable: false
-    });
+    if (event.target !== this.refs.editableInput) {
+
+      window.removeEventListener('click', this.disableEditing, true);
+
+      this.setState({
+        editable: false
+      });
+
+    }
   }
 
   updateValue = (e) => {
@@ -29,6 +38,10 @@ class EditableNumber extends React.Component {
     if(parseInt(fieldValue) !== NaN) {
       this.props.onNumberChange(parseInt(fieldValue));
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('click', this.disableEditing, true);
   }
 
   render () {
@@ -46,10 +59,7 @@ class EditableNumber extends React.Component {
 
     return (
       <div className="editable-text">
-        <input className="editable-text__input" value={this.props.value || ""} onChange={this.updateValue} />
-        <div className="editable-text__button" onClick={this.disableEditing} >
-          <i className="i-cross-grey"/>
-        </div>
+        <input ref="editableInput" className="editable-text__input" value={this.props.value || ""} onChange={this.updateValue} />
       </div>
     );
 
