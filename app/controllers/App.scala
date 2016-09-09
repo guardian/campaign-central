@@ -9,10 +9,6 @@ import scala.concurrent.Future
 
 class App(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
-  def hello = AuthAction {
-    Ok("hello world")
-  }
-
   def index(id: String = "") = AuthAction {
 
     val jsFileName = "build/app.js"
@@ -37,4 +33,3 @@ class App(override val wsClient: WSClient) extends Controller with PandaAuthActi
     Future(processLogout)
   }
 }
-

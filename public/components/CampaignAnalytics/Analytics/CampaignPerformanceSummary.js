@@ -8,23 +8,15 @@ class CampaignPerformanceSummary extends React.Component {
   static propTypes = {
     latestCounts: pageCountStatPropType.isRequired,
     campaign: PropTypes.shape({
-      targets: PropTypes.arrayOf(PropTypes.shape({
-        targetType: PropTypes.string.isRequired,
-        value: PropTypes.number.isRequired
-      }))
+      targets: PropTypes.shape({
+        uniques: PropTypes.number
+      })
     }),
     paths: PropTypes.arrayOf(PropTypes.string).isRequired
   };
 
   getCampaignTargetUniques() {
-    var targets = this.props.campaign.targets;
-
-    for(var i = 0; i < targets.length; i++) {
-      if(targets[i].targetType === "Unique users"){
-        return targets[i].value;
-      }
-    }
-    return undefined;
+    return this.props.campaign.targets ? this.props.campaign.targets.uniques : undefined
   }
 
   buildContributionData() {

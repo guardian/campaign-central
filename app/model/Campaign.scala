@@ -25,7 +25,7 @@ case class Campaign(
                    endDate: Option[DateTime] = None,
                    category: Option[String] = None,
                    collaborators: List[User] = Nil,
-                   targets: List[CampaignTarget] = Nil
+                   targets: Map[String, Long] = Map.empty
                    ) {
 
   def toItem = Item.fromJSON(Json.toJson(this).toString())

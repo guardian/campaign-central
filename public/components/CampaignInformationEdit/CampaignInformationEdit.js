@@ -1,49 +1,29 @@
 import React, { PropTypes } from 'react';
+import {campaignStatuses} from '../../constants/campaignStatuses';
 import EditableText from '../utils/EditableText';
+import EditableDropdown from '../utils/EditableDropdown';
 
 import {formatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignInformationEdit extends React.Component {
 
+  static propTypes = {
+    updateCampaign: PropTypes.func.isRequired
+  }
+
   state = {
-    isCampaignDirty: false,
-    error: '',
-    editable: false
-  }
-
-  enableEditing = () => {
-    this.setState({
-        editable: true,
-        error: ''
-    });
-  }
-
-  disableEditing = () => {
-    this.setState({
-        editable: false,
-        error: ''
-    });
-  }
-
-  triggerSave = () => {
-    this.props.saveCampaign(this.props.campaign.id, this.props.campaign);
-    this.setState({
-      isCampaignDirty: false,
-      error: ''
-    });
-  }
-
-  triggerUpdate = (newCampaign) => {
-    this.setState({
-      isCampaignDirty: true
-    });
-
-    this.props.updateCampaign(newCampaign.id, newCampaign);
+    error: ''
   }
 
   updateCampaignName = (e) => {
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       name: e.target.value
+    }));
+  }
+
+  updateCampaignStatus = (e) => {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
+      status: e.target.value
     }));
   }
 
@@ -62,30 +42,19 @@ class CampaignInformationEdit extends React.Component {
         });
     }
 
-    this.triggerUpdate(Object.assign({}, this.props.campaign, {
+    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       actualValue: numValue
     }));
   }
 
-  renderSaveButtons = () => {
-    if (!this.state.isCampaignDirty) {
-      return false;
-    }
-
-    return (
-      <div className="campaign-box__footer">
-        <span className="campaign-info__button" onClick={this.triggerSave}>Save</span>
-      </div>
-    );
-  }
-
   render () {
+      console.log(this.state);
     return (
-      <div className="campaign-info campaign-box">
-        <div className="campaign-box__header">
+      <div className="campaign-info campaign-box-section">
+        <div className="campaign-box-section__header">
           Campaign Info
         </div>
-        <div className="campaign-box__body">
+        <div className="campaign-box-section__body">
           <div className="campaign-info__field">
             <label>Name</label>
             <EditableText value={this.props.campaign.name} onChange={this.updateCampaignName} />
@@ -95,14 +64,18 @@ class CampaignInformationEdit extends React.Component {
             <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.created)} by {this.props.campaign.createdBy.firstName} {this.props.campaign.createdBy.lastName}</span>
           </div>
           <div className="campaign-info__field">
-            <label>Value</label>
-            <EditableText value={this.props.campaign.actualValue ? "£" + this.props.campaign.actualValue : ""} onChange={this.updateCampaignValue} disableEditing={this.disableEditing} enableEditing={this.enableEditing} editable={this.state.editable}/>
+            <label>Last modified</label>
+            <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.lastModified)} by {this.props.campaign.lastModifiedBy.firstName} {this.props.campaign.lastModifiedBy.lastName}</span>
           </div>
           <div className="campaign-info__field">
-            <span className="campaign-info__field__error">{this.state.error}</span>
+            <label>Value</label>
+            <EditableText value={this.props.campaign.actualValue ? "£" + this.props.campaign.actualValue : ""} onChange={this.updateCampaignValue} error={this.state.error}/>
+          </div>
+          <div className="campaign-info__field">
+            <label>Status</label>
+            <EditableDropdown values={campaignStatuses} name="status" selectedValue={this.props.campaign.status} onChange={this.updateCampaignStatus} />
           </div>
         </div>
-        {this.renderSaveButtons()}
       </div>
     );
   }

@@ -9,9 +9,14 @@ class Sidebar extends React.Component {
         <div className="sidebar__link-group">
           <div className="sidebar__link-group__header">Campaigns</div>
           <SidebarLink to="/campaigns">All Campaigns</SidebarLink>
-          <SidebarLink to="/campaigns/prospects">Prospects</SidebarLink>
+          <SidebarLink to="/campaigns/prospect">Prospects</SidebarLink>
           <SidebarLink to="/campaigns/production">In Production</SidebarLink>
-          <SidebarLink to="/campaigns/active">Active</SidebarLink>
+          <SidebarLink to="/campaigns/live">Live</SidebarLink>
+          <SidebarLink to="/campaigns/dead">Dead</SidebarLink>
+        </div>
+        <div className="sidebar__link-group">
+          <div className="sidebar__link-group__header">Clients</div>
+          <SidebarLink to="/clients">All Clients</SidebarLink>
         </div>
       </div>
     );
