@@ -32,3 +32,11 @@ export function fetchCampaignAnalytics(id) {
     method: 'get'
   });
 }
+
+export function fetchCampaignNotes(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/notes',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
