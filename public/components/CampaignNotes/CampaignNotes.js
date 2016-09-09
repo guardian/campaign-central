@@ -22,9 +22,9 @@ class CampaignNotes extends Component {
     }
 
     return (
-      <div className="campaign__column">
-        <div className="campaign-box__header">Notes</div>
-        <div className="campaign-box__body">
+      <div className="campaign-info campaign-box-section">
+        <div className="campaign-box-section__header">Notes</div>
+        <div className="campaign-box-section__body">
           {this.props.campaignNotes.map((n) => <div key={n.id}>{n.content}</div>)}
         </div>
       </div>
