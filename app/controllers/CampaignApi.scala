@@ -108,7 +108,31 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
     campaigns foreach( CampaignRepository.putCampaign )
 
-    Ok("added 4 example campaigns")
+    val firstCampaignId = campaigns.head.id
+    val oneSecondLater = now.plusSeconds(1)
+
+    val notes = List(
+      Note(
+        campaignId = firstCampaignId,
+        created = now,
+        createdBy = user,
+        lastModified = now,
+        lastModifiedBy = user,
+        content = "This is a note"
+      ),
+      Note(
+        campaignId = firstCampaignId,
+        created = oneSecondLater,
+        createdBy = user,
+        lastModified = oneSecondLater,
+        lastModifiedBy = user,
+        content = "This is another note"
+      )
+    )
+
+    notes foreach( CampaignNotesRepository.putNote )
+
+    Ok("added 4 example campaigns and 2 example notes")
   }
 
   def loggedInUser(pandaUser: PandaUser) = User(pandaUser.firstName, pandaUser.lastName, pandaUser.email)
