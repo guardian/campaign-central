@@ -1,4 +1,5 @@
 import React, {Component, PropTypes} from 'react';
+import CampaignNotesList from '../CampaignNotesList/CampaignNotesList';
 
 class CampaignNotes extends Component {
 
@@ -8,25 +9,10 @@ class CampaignNotes extends Component {
 
   render() {
 
-
-    if (!this.props.campaignNotes) {
-        return <div>Loading notes...</div>;
-    }
-
-    if (!this.props.campaignNotes.length) {
-      return (
-        <div className="notes">
-          This campaign does not have any notes
-        </div>
-      );
-    }
-
     return (
       <div className="campaign-info campaign-box-section">
         <div className="campaign-box-section__header">Notes</div>
-        <div className="campaign-box-section__body">
-          {this.props.campaignNotes.map((n) => <div key={n.id}>{n.content}</div>)}
-        </div>
+        <CampaignNotesList campaignNotes={this.props.campaignNotes}/>
       </div>
     );
   }
