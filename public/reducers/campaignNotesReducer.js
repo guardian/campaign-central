@@ -8,6 +8,14 @@ export default function campaignNotes(state = [], action) {
     case 'NOTE_CREATE_RECIEVE':
       return state.concat([action.note]);
 
+    case 'NOTE_UPDATE_RECEIVE':
+      return state.map(note => {
+        if (note.created === action.note.created) {
+          return action.note;
+        }
+        return note;
+      });
+
     default:
       return state;
   }
