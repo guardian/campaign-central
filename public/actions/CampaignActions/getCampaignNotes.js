@@ -1,7 +1,7 @@
 import {fetchCampaignNotes} from '../../services/CampaignsApi';
 
 function requestCampaignNotes(id) {
-    return {
+   return {
         type:       'NOTES_GET_REQUEST',
         id:         id,
         receivedAt: Date.now()

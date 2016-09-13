@@ -40,13 +40,23 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def addCampaignNote(id: String) = APIAuthAction { req =>
-    req.body.asJson.flatMap(_.asOpt[Note]) match {
-      case None => BadRequest("Could not convert json to a note")
-      case Some(note) => {
-        CampaignNotesRepository.putNote(note)
-        Ok(Json.toJson(note))
-      }
-    }
+
+    val content: String = (req.body.asJson.get \ "content").as[String]
+    val created = DateTime.now()
+    val lastModified = created
+    val createdBy = User(req.user.firstName, req.user.lastName, req.user.email)
+    val lastModifiedBy = createdBy
+    val newNote = Note(
+      campaignId = id,
+      created = created,
+      createdBy = createdBy,
+      lastModified = lastModified,
+      lastModifiedBy = lastModifiedBy,
+      content = content
+    )
+
+    CampaignNotesRepository.putNote(newNote)
+    Ok(Json.toJson(newNote))
   }
 
   def bootstrapData() = APIAuthAction { req =>

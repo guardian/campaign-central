@@ -40,3 +40,12 @@ export function fetchCampaignNotes(id) {
     method: 'get'
   });
 }
+
+export function createCampaignNote(id, note) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/notes',
+    data: JSON.stringify(note),
+    contentType: 'application/json',
+    method: 'post'
+  });
+}

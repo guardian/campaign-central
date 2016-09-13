@@ -8,20 +8,19 @@ class CampaignNotesList extends Component {
   };
 
   static propTypes = {
-    campaignNotes: PropTypes.array
+    campaignNotes: PropTypes.array,
+    campaignId: PropTypes.string
   };
 
   render() {
     if (!this.props.campaignNotes.length) {
       return (
-        <div className="notes">
-          This campaign does not have any notes
-        </div>
+        <div>This campaign does not have any notes</div>
       );
     }
 
     return (
-      <div className="campaign-box-section__body">
+      <div>
         {this.props.campaignNotes.map((note) => <CampaignNotesListItem key={note.created} noteContent={note.content}/> )}
       </div>
     );

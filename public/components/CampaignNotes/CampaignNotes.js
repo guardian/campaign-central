@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import CampaignNotesList from '../CampaignNotesList/CampaignNotesList';
+import CampaignNotesAdd from './CampaignNotesAdd';
 
 class CampaignNotes extends Component {
 
@@ -12,7 +13,10 @@ class CampaignNotes extends Component {
     return (
       <div className="campaign-info campaign-box-section">
         <div className="campaign-box-section__header">Notes</div>
-        <CampaignNotesList campaignNotes={this.props.campaignNotes}/>
+        <div className="campaign-box-section__body">
+            <CampaignNotesList campaignNotes={this.props.campaignNotes}/>
+            <CampaignNotesAdd id={this.props.campaign.id}/>
+        </div>
       </div>
     );
   }
