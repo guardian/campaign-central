@@ -2,6 +2,11 @@ import React, {Component, PropTypes} from 'react';
 
 class CampaignNotesAdd extends Component {
 
+  static propTypes = {
+      id: PropTypes.string.isRequired,
+      onSave: PropTypes.func.isRequired
+  };
+
   state = {
     adding: false
   }
@@ -36,7 +41,7 @@ class CampaignNotesAdd extends Component {
   }
 
   saveNote = () => {
-      this.props.campaignNotesAddActions.createNote(this.props.id, { content: this.state.message });
+      this.props.onSave(this.props.id, { content: this.state.message });
       window.removeEventListener('click', this.disableAdding, true);
 
       this.setState({
@@ -63,22 +68,6 @@ class CampaignNotesAdd extends Component {
 
   };
 }
-//REDUX CONNECTIONS
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as createNote from '../../actions/CampaignActions/createCampaignNote';
 
-function mapStateToProps(state) {
-  return {
-      message: state.message
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    campaignNotesAddActions: bindActionCreators(Object.assign({}, createNote), dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignNotesAdd);
+export default CampaignNotesAdd;
 
