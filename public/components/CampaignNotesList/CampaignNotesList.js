@@ -1,15 +1,16 @@
 import React, {Component, PropTypes} from 'react';
-import CampaignNotesListItem from './CampaignNotesListItem';
+import CampaignNotesAdd from '../CampaignNotes/CampaignNotesAdd';
 
 class CampaignNotesList extends Component {
 
   static defaultProps = {
-    campaignNotes: []
+    campaignNotes: [],
+    onSave: PropTypes.func.isRequired
   };
 
   static propTypes = {
-    campaignNotes: PropTypes.array,
-    campaignId: PropTypes.string
+    campaignNotes: PropTypes.array.isRequired,
+    campaignId: PropTypes.string.isRequired
   };
 
   render() {
@@ -21,7 +22,7 @@ class CampaignNotesList extends Component {
 
     return (
       <div>
-        {this.props.campaignNotes.map((note) => <CampaignNotesListItem key={note.created} noteContent={note.content}/> )}
+        {this.props.campaignNotes.map((note) => <CampaignNotesAdd key={note.created} id={this.props.campaignId} content={note.content} created={note.created} onSave={this.props.onSave}/> )}
       </div>
     );
   }

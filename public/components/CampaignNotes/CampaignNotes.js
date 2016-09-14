@@ -9,12 +9,12 @@ class CampaignNotes extends Component {
   }
 
   saveNote = () => {
-      this.props.campaignNotesAddActions.createNote(this.props.id, { content: this.state.message });
-      window.removeEventListener('click', this.disableAdding, true);
+    this.props.campaignNotesAddActions.createNote(this.props.id, { content: this.state.message });
+    window.removeEventListener('click', this.disableAdding, true);
 
-      this.setState({
-        adding: false
-      });
+    this.setState({
+      adding: false
+    });
   }
 
 
@@ -24,8 +24,8 @@ class CampaignNotes extends Component {
       <div className="campaign-info campaign-box-section">
         <div className="campaign-box-section__header">Notes</div>
         <div className="campaign-box-section__body">
-            <CampaignNotesList campaignNotes={this.props.campaignNotes}/>
-            <CampaignNotesAdd id={this.props.campaign.id} onSave={this.props.campaignNoteActions.createNote}/>
+          <CampaignNotesList campaignNotes={this.props.campaignNotes} campaignId={this.props.campaign.id} onSave={this.props.campaignNoteActions.updateNote}/>
+          <CampaignNotesAdd id={this.props.campaign.id} onSave={this.props.campaignNoteActions.createNote}/>
         </div>
       </div>
     );
@@ -37,6 +37,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as getCampaignNotes from '../../actions/CampaignActions/getCampaignNotes';
 import * as createNote from '../../actions/CampaignActions/createCampaignNote';
+import * as updateNote from '../../actions/CampaignActions/updateCampaignNote';
 
 function mapStateToProps(state) {
   return {
@@ -46,7 +47,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignNoteActions: bindActionCreators(Object.assign({}, getCampaignNotes, createNote), dispatch),
+    campaignNoteActions: bindActionCreators(Object.assign({}, getCampaignNotes, createNote, updateNote), dispatch),
   };
 }
 
