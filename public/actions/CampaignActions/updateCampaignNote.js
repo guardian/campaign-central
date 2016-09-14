@@ -3,6 +3,7 @@ import {updateCampaignNote} from '../../services/CampaignsApi';
 function requestNoteUpdate(note) {
     return {
         type: 'NOTE_UPDATE_REQUEST',
+        note: note,
         receivedAt: Date.now()
     };
 }
@@ -10,7 +11,6 @@ function requestNoteUpdate(note) {
 function receiveNoteUpdate(note) {
     return {
         type: 'NOTE_UPDATE_RECIEVE',
-        note: note,
         receivedAt: Date.now()
     };
 }
