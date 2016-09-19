@@ -14,7 +14,7 @@ class CampaignNotesAdd extends Component {
 
   enableAdding = () => {
 
-    window.addEventListener('click', this.disableAdding, true);
+    window.addEventListener('click', this.saveNote, true);
 
     this.setState({
       adding: true
@@ -27,10 +27,12 @@ class CampaignNotesAdd extends Component {
     }
   }
 
-  disableAdding = (event) => {
+  saveNote = (event) => {
+
+    this.props.onSave(this.props.id, { content: this.state.content, created: this.props.created });
 
     if (event.target !== this.refs.addNote && event.target !== this.refs.submitNote) {
-      window.removeEventListener('click', this.disableAdding, true);
+      window.removeEventListener('click', this.saveNote, true);
 
       this.setState({
         adding: false
@@ -39,7 +41,7 @@ class CampaignNotesAdd extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('click', this.disableAdding, true);
+    window.removeEventListener('click', this.saveNote, true);
   }
 
   updateNote = (event) => {
@@ -47,39 +49,28 @@ class CampaignNotesAdd extends Component {
 
   }
 
-  saveNote = () => {
-    this.props.onSave(this.props.id, { content: this.state.content, created: this.props.created });
-    window.removeEventListener('click', this.disableAdding, true);
-
-    this.setState({
-      adding: false
-    });
-  }
-
   render() {
 
     if (!this.state.adding && this.props.content) {
-      return <div onClick={this.enableAdding}>{this.props.content}</div>;
+      return <div className="note-container" onClick={this.enableAdding}>{this.props.content}</div>;
     }
 
     if (!this.state.adding) {
       return (
-        <button onClick={this.enableAdding}>Add a note</button>
+        <div className="note-add" onClick={this.enableAdding}><i title="Add a new note" className="i-pen"/></div>
       );
     }
 
     if (!this.props.content) {
       return (
         <div ref="parent">
-          <textarea ref="addNote" onChange={this.updateNote.bind(this)} placeholder="Add a new note"></textarea>
-          <button ref="submitNote" onClick={this.saveNote}>submit</button>
+          <textarea className="note-input" ref="addNote" onChange={this.updateNote.bind(this)} placeholder="Add a new note"></textarea>
         </div>
       );
     }
     return (
       <div ref="parent">
-        <textarea ref="addNote" onChange={this.updateNote.bind(this)} value={this.state.content}></textarea>
-        <button ref="submitNote" onClick={this.saveNote}>submit</button>
+        <textarea className="note-input" ref="addNote" onChange={this.updateNote.bind(this)} value={this.state.content}></textarea>
       </div>
     );
   };
