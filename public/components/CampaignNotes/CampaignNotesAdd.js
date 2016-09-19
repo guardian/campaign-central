@@ -29,7 +29,9 @@ class CampaignNotesAdd extends Component {
 
   saveNote = (event) => {
 
-    this.props.onSave(this.props.id, { content: this.state.content, created: this.props.created });
+    if (this.state.content) {
+      this.props.onSave(this.props.id, { content: this.state.content, created: this.props.created });
+    }
 
     if (event.target !== this.refs.addNote && event.target !== this.refs.submitNote) {
       window.removeEventListener('click', this.saveNote, true);
