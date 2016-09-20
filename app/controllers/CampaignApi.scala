@@ -42,34 +42,36 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   def addCampaignNote(id: String) = APIAuthAction { req =>
 
     val content = (req.body.asJson.get \ "content").as[String]
-    val created = DateTime.now()
-    val lastModified = created
-    val createdBy = User(req.user.firstName, req.user.lastName, req.user.email)
-    val lastModifiedBy = createdBy
 
-    val newNote = Note(
-      campaignId = id,
-      created = created,
-      createdBy = createdBy,
-      lastModified = lastModified,
-      lastModifiedBy = lastModifiedBy,
-      content = content
-    )
+    if (content.isEmpty())
+      BadRequest("Cannot add a note with no content")
+    else {
+      val created = DateTime.now()
+      val lastModified = created
+      val createdBy = User(req.user.firstName, req.user.lastName, req.user.email)
+      val lastModifiedBy = createdBy
 
-    CampaignNotesRepository.putNote(newNote)
-    Ok(Json.toJson(newNote))
+      val newNote = Note(
+        campaignId = id,
+        created = created,
+        createdBy = createdBy,
+        lastModified = lastModified,
+        lastModifiedBy = lastModifiedBy,
+        content = content
+      )
+
+      CampaignNotesRepository.putNote(newNote)
+      Ok(Json.toJson(newNote))
+    }
   }
 
   def updateCampaignNote(id: String) = APIAuthAction { req =>
-    println("now updating campaing note with req ", req)
 
     val dateCreated = (req.body.asJson.get \ "created").as[DateTime]
-
     CampaignNotesRepository.getNote(id, dateCreated) match {
       case None => BadRequest(s"Could not find note with id $id and create time $dateCreated")
       case Some(note) => {
-        println("got the note from the repo ", note)
-
+       
         val lastModified = DateTime.now()
         val modifiedBy = User(req.user.firstName, req.user.lastName, req.user.email)
         val content = (req.body.asJson.get \ "content").as[String]
