@@ -8,13 +8,20 @@ class CampaignNotes extends Component {
     this.props.campaignNoteActions.getCampaignNotes(this.props.campaign.id);
   }
 
-  saveNote = () => {
-    this.props.campaignNotesAddActions.createNote(this.props.id, { content: this.state.message });
-    window.removeEventListener('click', this.disableAdding, true);
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.campaign.id !== this.props.campaign.id) {
+      this.props.campaignNoteActions.getCampaignNotes(nextProps.campaign.id);
+    }
 
-    this.setState({
-      adding: false
-    });
+  }
+
+  saveNote = () => {
+      this.props.campaignNotesAddActions.createNote(this.props.id, { content: this.state.message });
+      window.removeEventListener('click', this.disableAdding, true);
+
+      this.setState({
+        adding: false
+      });
   }
 
 
@@ -24,8 +31,8 @@ class CampaignNotes extends Component {
       <div className="campaign-info campaign-box-section">
         <div className="campaign-box-section__header">Notes</div>
         <div className="campaign-box-section__body">
-          <CampaignNotesList campaignNotes={this.props.campaignNotes} campaignId={this.props.campaign.id} onSave={this.props.campaignNoteActions.updateNote}/>
-          <CampaignNotesAdd id={this.props.campaign.id} onSave={this.props.campaignNoteActions.createNote}/>
+            <CampaignNotesList campaignNotes={this.props.campaignNotes} campaignId={this.props.campaign.id} onSave={this.props.campaignNoteActions.updateNote}/>
+            <CampaignNotesAdd id={this.props.campaign.id} onSave={this.props.campaignNoteActions.createNote}/>
         </div>
       </div>
     );
