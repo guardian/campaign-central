@@ -37,7 +37,8 @@ class CampaignNotesAdd extends Component {
       window.removeEventListener('click', this.saveNote, true);
 
       this.setState({
-        adding: false
+        adding: false,
+        content: ''
       });
     }
   }

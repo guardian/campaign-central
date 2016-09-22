@@ -27,7 +27,7 @@ function errorNoteUpdate(error) {
 export function updateNote(id, note) {
     return dispatch => {
         dispatch(requestNoteUpdate(note));
-        return updateCampaignNote(id, note)
+        return updateCampaignNote(id, note.created, note)
         .catch(error => dispatch(errorNoteUpdate(error)))
         .then(res => {
             dispatch(receiveNoteUpdate(res));

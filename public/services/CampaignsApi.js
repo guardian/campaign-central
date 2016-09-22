@@ -50,9 +50,9 @@ export function createCampaignNote(id, note) {
   });
 }
 
-export function updateCampaignNote(id, note) {
+export function updateCampaignNote(id, date, note) {
   return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/notes',
+    url: '/api/campaigns/' + id + '/note/' + date,
     data: JSON.stringify(note),
     contentType: 'application/json',
     method: 'put'

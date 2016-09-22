@@ -65,30 +65,31 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     }
   }
 
-  def updateCampaignNote(id: String) = APIAuthAction { req =>
+  def updateCampaignNote(id: String, date: String) = {
 
-    val dateCreated = (req.body.asJson.get \ "created").as[DateTime]
-    CampaignNotesRepository.getNote(id, dateCreated) match {
-      case None => BadRequest(s"Could not find note with id $id and create time $dateCreated")
-      case Some(note) => {
-       
-        val lastModified = DateTime.now()
-        val modifiedBy = User(req.user.firstName, req.user.lastName, req.user.email)
-        val content = (req.body.asJson.get \ "content").as[String]
+    APIAuthAction { req =>
 
-        val updatedNote = note.copy(
-          lastModified = lastModified,
-          lastModifiedBy = modifiedBy,
-          content = content
-        )
+      val dateCreated = new DateTime(date.toLong)
 
-        CampaignNotesRepository.putNote(updatedNote)
-        Ok(Json.toJson(updatedNote))
+      CampaignNotesRepository.getNote(id, dateCreated) match {
+        case None => NotFound
+        case Some(note) => {
+
+          val lastModified = DateTime.now()
+          val modifiedBy = User(req.user.firstName, req.user.lastName, req.user.email)
+          val content = (req.body.asJson.get \ "content").as[String]
+
+          val updatedNote = note.copy(
+            lastModified = lastModified,
+            lastModifiedBy = modifiedBy,
+            content = content
+          )
+
+          CampaignNotesRepository.putNote(updatedNote)
+          Ok(Json.toJson(updatedNote))
+        }
       }
     }
-
-
-
   }
 
   def bootstrapData() = APIAuthAction { req =>
