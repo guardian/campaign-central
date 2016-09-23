@@ -9,7 +9,7 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import com.gu.pandomainauth.model.{User => PandaUser}
-import repositories.{CampaignRepository, GoogleAnalytics}
+import repositories.{CampaignNotesRepository, CampaignRepository, GoogleAnalytics}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -33,6 +33,63 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
   def getCampaignAnalytics(id: String) = APIAuthAction { req =>
     GoogleAnalytics.getAnalyticsForCampaign(id).flatten map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+  }
+
+  def getCampaignNotes(id: String) =  APIAuthAction { req =>
+    Ok(Json.toJson(CampaignNotesRepository.getNotesForCampaign(id)))
+  }
+
+  def addCampaignNote(id: String) = APIAuthAction { req =>
+
+    val content = (req.body.asJson.get \ "content").as[String]
+
+    if (content.isEmpty())
+      BadRequest("Cannot add a note with no content")
+    else {
+      val created = DateTime.now()
+      val lastModified = created
+      val createdBy = User(req.user.firstName, req.user.lastName, req.user.email)
+      val lastModifiedBy = createdBy
+
+      val newNote = Note(
+        campaignId = id,
+        created = created,
+        createdBy = createdBy,
+        lastModified = lastModified,
+        lastModifiedBy = lastModifiedBy,
+        content = content
+      )
+
+      CampaignNotesRepository.putNote(newNote)
+      Ok(Json.toJson(newNote))
+    }
+  }
+
+  def updateCampaignNote(id: String, date: String) = {
+
+    APIAuthAction { req =>
+
+      val dateCreated = new DateTime(date.toLong)
+
+      CampaignNotesRepository.getNote(id, dateCreated) match {
+        case None => NotFound
+        case Some(note) => {
+
+          val lastModified = DateTime.now()
+          val modifiedBy = User(req.user.firstName, req.user.lastName, req.user.email)
+          val content = (req.body.asJson.get \ "content").as[String]
+
+          val updatedNote = note.copy(
+            lastModified = lastModified,
+            lastModifiedBy = modifiedBy,
+            content = content
+          )
+
+          CampaignNotesRepository.putNote(updatedNote)
+          Ok(Json.toJson(updatedNote))
+        }
+      }
+    }
   }
 
   def bootstrapData() = APIAuthAction { req =>
@@ -94,7 +151,31 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
     campaigns foreach( CampaignRepository.putCampaign )
 
-    Ok("added 4 example campaigns")
+    val firstCampaignId = campaigns.head.id
+    val oneSecondLater = now.plusSeconds(1)
+
+    val notes = List(
+      Note(
+        campaignId = firstCampaignId,
+        created = now,
+        createdBy = user,
+        lastModified = now,
+        lastModifiedBy = user,
+        content = "This is a note"
+      ),
+      Note(
+        campaignId = firstCampaignId,
+        created = oneSecondLater,
+        createdBy = user,
+        lastModified = oneSecondLater,
+        lastModifiedBy = user,
+        content = "This is another note"
+      )
+    )
+
+    notes foreach( CampaignNotesRepository.putNote )
+
+    Ok("added 4 example campaigns and 2 example notes")
   }
 
   def loggedInUser(pandaUser: PandaUser) = User(pandaUser.firstName, pandaUser.lastName, pandaUser.email)

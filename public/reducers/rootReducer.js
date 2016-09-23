@@ -6,7 +6,7 @@ import campaign from './campaignReducer';
 import campaignAnalytics from './campaignAnalyticsReducer';
 import clients from './clientsReducer';
 import client from './clientReducer';
-
+import campaignNotes from './campaignNotesReducer';
 
 export default combineReducers({
   error,
@@ -15,5 +15,6 @@ export default combineReducers({
   campaign,
   campaignAnalytics,
   clients,
-  client
+  client,
+  campaignNotes
 });

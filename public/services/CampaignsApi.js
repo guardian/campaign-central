@@ -32,3 +32,29 @@ export function fetchCampaignAnalytics(id) {
     method: 'get'
   });
 }
+
+export function fetchCampaignNotes(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/notes',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
+export function createCampaignNote(id, note) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/notes',
+    data: JSON.stringify(note),
+    contentType: 'application/json',
+    method: 'post'
+  });
+}
+
+export function updateCampaignNote(id, date, note) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/note/' + date,
+    data: JSON.stringify(note),
+    contentType: 'application/json',
+    method: 'put'
+  });
+}
