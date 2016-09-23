@@ -15,16 +15,6 @@ class CampaignNotes extends Component {
 
   }
 
-  saveNote = () => {
-      this.props.campaignNotesAddActions.createNote(this.props.id, { content: this.state.message });
-      window.removeEventListener('click', this.disableAdding, true);
-
-      this.setState({
-        adding: false
-      });
-  }
-
-
   render() {
 
     return (
