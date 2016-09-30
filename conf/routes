@@ -5,6 +5,7 @@ GET	/campaigns/:id		        controllers.App.index(id)
 GET	/campaign/:id		          controllers.App.index(id)
 GET	/clients		              controllers.App.index(id = "")
 GET	/clients/:id		          controllers.App.index(id)
+GET	/capiImport		          controllers.App.index(id = "")
 
 
 GET            /oauthCallback                                          controllers.App.oauthCallback
