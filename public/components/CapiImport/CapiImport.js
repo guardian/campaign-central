@@ -1,18 +1,16 @@
 import React, {Component, PropTypes} from 'react';
 import TagPicker from '../utils/TagPicker';
+import {importCampaignFromTag} from '../../services/CampaignsApi';
 
 class CapiImport extends Component {
 
-  static propTypes = {
-    
-  }
 
-  componentDidMount() {
-    //this.props.clientActions.getClients();
-  }
-  
   tagSelected = (tag) => {
     console.log('tag picked', tag);
+    importCampaignFromTag(tag).then((resp) => {
+      console.log('imported tag, resp', resp);
+    })
+    
   }
 
   render() {

@@ -92,6 +92,12 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     }
   }
 
+  def importFromTag() = APIAuthAction { req =>
+
+//    val tag = (req.body.asJson.get \ "content").as[String]
+    Ok("hello world")
+  }
+
   def bootstrapData() = APIAuthAction { req =>
 
     val user = loggedInUser(req.user)
