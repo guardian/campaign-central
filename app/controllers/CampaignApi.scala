@@ -48,7 +48,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     else {
       val created = DateTime.now()
       val lastModified = created
-      val createdBy = User(req.user.firstName, req.user.lastName, req.user.email)
+      val createdBy = User(req.user)
       val lastModifiedBy = createdBy
 
       val newNote = Note(
@@ -76,7 +76,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         case Some(note) => {
 
           val lastModified = DateTime.now()
-          val modifiedBy = User(req.user.firstName, req.user.lastName, req.user.email)
+          val modifiedBy = User(req.user)
           val content = (req.body.asJson.get \ "content").as[String]
 
           val updatedNote = note.copy(
@@ -100,7 +100,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
   def bootstrapData() = APIAuthAction { req =>
 
-    val user = loggedInUser(req.user)
+    val user = User(req.user)
     val now = new DateTime
 
     val campaigns = List(
@@ -184,5 +184,4 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Ok("added 4 example campaigns and 2 example notes")
   }
 
-  def loggedInUser(pandaUser: PandaUser) = User(pandaUser.firstName, pandaUser.lastName, pandaUser.email)
 }
