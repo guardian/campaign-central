@@ -3,7 +3,9 @@ package repositories
 import model.Client
 import play.api.Logger
 import services.Dynamo
+
 import scala.collection.JavaConversions._
+import scala.util.Random
 
 object ClientRepository {
 
@@ -25,6 +27,10 @@ object ClientRepository {
         None
       }
     }
+  }
+
+  def getRandomClient(): Option[Client] = { //This is used for bootstrapping purposes, shouldn't be relied upon.
+    Random.shuffle(getAllClients()).headOption
   }
 
 }
