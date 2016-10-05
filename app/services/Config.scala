@@ -50,6 +50,11 @@ sealed trait Config {
 
   lazy val googleAnalyticsViewId = getRequiredRemoteStringProperty("googleAnalytivsViewId")
 
+  lazy val capiKey = getRequiredRemoteStringProperty("capi.key")
+  lazy val capiPreviewUrl = getRequiredRemoteStringProperty("capi.preview.url")
+  lazy val capiPreviewUser = getRequiredRemoteStringProperty("capi.preview.username")
+  lazy val capiPreviewPassword = getRequiredRemoteStringProperty("capi.preview.password")
+
   def googleServiceAccountJsonInputStream: InputStream = {
     val jsonLocation = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
     val credentailsJson = AWS.S3Client.getObject(remoteConfigBucket, s"$app/$jsonLocation")
@@ -63,8 +68,6 @@ sealed trait Config {
   }
 
   private def loadRemoteConfiguration = {
-
-
 
     def loadPropertiesFromS3(propertiesKey: String, props: Properties): Unit = {
       val s3Properties = AWS.S3Client.getObject(new GetObjectRequest(remoteConfigBucket, propertiesKey))

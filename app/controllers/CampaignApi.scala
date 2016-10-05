@@ -9,6 +9,8 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import com.gu.pandomainauth.model.{User => PandaUser}
+import model.command.ImportCampaignFromCAPICommand
+import model.command.CommandError._
 import repositories.{CampaignNotesRepository, CampaignRepository, GoogleAnalytics}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
@@ -93,8 +95,16 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def importFromTag() = APIAuthAction { req =>
-
-//    val tag = (req.body.asJson.get \ "content").as[String]
+    implicit val user = req.user
+    req.body.asJson.map { json =>
+      try {
+        json.as[ImportCampaignFromCAPICommand].process.map{ t => Ok(Json.toJson(t)) } getOrElse NotFound
+      } catch {
+        commandErrorAsResult
+      }
+    }.getOrElse {
+      BadRequest("Expecting Json data")
+    }
     Ok("hello world")
   }
 
