@@ -9,7 +9,7 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import com.gu.pandomainauth.model.{User => PandaUser}
-import repositories.{CampaignNotesRepository, CampaignRepository, GoogleAnalytics}
+import repositories.{CampaignNotesRepository, CampaignRepository, ClientRepository, GoogleAnalytics}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -97,12 +97,14 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     val user = loggedInUser(req.user)
     val now = new DateTime
 
+    val randomClient = ClientRepository.getRandomClient().get
+
     val campaigns = List(
       Campaign(
         id = UUID.randomUUID().toString,
         name = "Something about cars",
         status = "live",
-        client = Client(UUID.randomUUID().toString, "Carmaker", "UK", Some(Agency(UUID.randomUUID().toString, "OMG"))),
+        clientId = randomClient.id,
         created = now,
         createdBy = user,
         lastModified = now,
@@ -114,7 +116,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         id = UUID.randomUUID().toString,
         name = "Pure hate",
         status = "prospect",
-        client = Client(UUID.randomUUID().toString, "Nigel Trump", "UK", Some(Agency(UUID.randomUUID().toString, "Evil"))),
+        clientId = randomClient.id,
         created = now,
         createdBy = user,
         lastModified = now,
@@ -126,7 +128,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         id = UUID.randomUUID().toString,
         name = "TBC",
         status = "production",
-        client = Client(UUID.randomUUID().toString, "Babylon Zoo", "UK", Some(Agency(UUID.randomUUID().toString, "Local Host"))),
+        clientId = randomClient.id,
         created = now,
         createdBy = user,
         lastModified = now,
@@ -138,7 +140,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         id = UUID.randomUUID().toString,
         name = "I love it when a plan comes together",
         status = "dead",
-        client = Client(UUID.randomUUID().toString, "A Team", "UK", Some(Agency(UUID.randomUUID().toString, "AWOL"))),
+        clientId = randomClient.id,
         created = now,
         createdBy = user,
         lastModified = now,
@@ -149,7 +151,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
       )
     )
 
-    campaigns foreach( CampaignRepository.putCampaign )
+    campaigns foreach CampaignRepository.putCampaign
 
     val firstCampaignId = campaigns.head.id
     val oneSecondLater = now.plusSeconds(1)

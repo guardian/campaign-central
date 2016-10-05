@@ -12,7 +12,7 @@ case class Campaign(
                    id: String,
                    name: String,
                    status: String,
-                   client: Client,
+                   clientId: String,
                    created: DateTime,
                    createdBy: User,
                    lastModified: DateTime,
