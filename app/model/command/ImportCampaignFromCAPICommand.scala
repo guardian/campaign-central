@@ -102,10 +102,14 @@ case class ImportCampaignFromCAPICommand(
 
     val startDate = apiContent.flatMap(_.fields.flatMap(_.firstPublicationDate)).sortBy(_.dateTime).headOption
 
+    val ctaAtoms = apiContent.flatMap(_.atoms.flatMap(_.cta)).flatten
+    ctaAtoms.map(_.id)
+
     val updatedCampaign = campaign.copy(
       startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
       status = if(startDate.isDefined) "live" else campaign.status,
-      pathPrefix =  Some(section.pathPrefix)
+      pathPrefix = Some(section.pathPrefix),
+      callToActions = ctaAtoms.map(ctaAtom => CallToAction(Some(ctaAtom.id)))
     )
 
     CampaignRepository.putCampaign(updatedCampaign)
