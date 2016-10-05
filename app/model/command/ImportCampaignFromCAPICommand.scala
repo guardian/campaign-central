@@ -73,6 +73,7 @@ case class ImportCampaignFromCAPICommand(
         name = externalName,
         status = "pending",
         tagId = Some(id),
+        pathPrefix = Some(section.pathPrefix),
         clientId = findOrCreateClient(hostedTag).id,
         created = now,
         createdBy = userOrDefault,
@@ -103,7 +104,8 @@ case class ImportCampaignFromCAPICommand(
 
     val updatedCampaign = campaign.copy(
       startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
-      status = if(startDate.isDefined) "live" else campaign.status
+      status = if(startDate.isDefined) "live" else campaign.status,
+      pathPrefix =  Some(section.pathPrefix)
     )
 
     CampaignRepository.putCampaign(updatedCampaign)

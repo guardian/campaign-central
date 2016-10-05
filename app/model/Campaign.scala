@@ -18,6 +18,7 @@ case class Campaign(
                    lastModified: DateTime,
                    lastModifiedBy: User,
                    tagId: Option[Long] = None,
+                   pathPrefix: Option[String] = None,
                    callToActions: List[CallToAction] = Nil,
                    nominalValue: Option[Long] = None,
                    actualValue: Option[Long] = None,
@@ -30,7 +31,7 @@ case class Campaign(
 
   def toItem = Item.fromJSON(Json.toJson(this).toString())
 
-  def gaFilterExpression: Option[String] = Some("ga:pagePath=~/advertiser-content/visit-britain")
+  def gaFilterExpression: Option[String] = pathPrefix.map{path => s"ga:pagePath=~/$path"}
 }
 
 object Campaign {
