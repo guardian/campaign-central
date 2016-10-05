@@ -19,7 +19,10 @@ GET /api/campaigns/bootstrap    controllers.CampaignApi.bootstrapData
 GET /api/campaigns              controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/:id          controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id          controllers.CampaignApi.updateCampaign(id: String)
-GET /api/campaigns/:id/analytics          controllers.CampaignApi.getCampaignAnalytics(id: String)
+GET /api/campaigns/:id/analytics       controllers.CampaignApi.getCampaignAnalytics(id: String)
+GET /api/campaigns/:id/notes    controllers.CampaignApi.getCampaignNotes(id: String)
+POST /api/campaigns/:id/notes   controllers.CampaignApi.addCampaignNote(id: String)
+PUT /api/campaigns/:id/note/:date    controllers.CampaignApi.updateCampaignNote(id: String, date: String)
 
 
 #Clients Api
