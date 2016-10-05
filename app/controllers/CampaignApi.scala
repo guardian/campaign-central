@@ -105,7 +105,6 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     }.getOrElse {
       BadRequest("Expecting Json data")
     }
-    Ok("hello world")
   }
 
   def bootstrapData() = APIAuthAction { req =>

@@ -12,7 +12,10 @@ case class ContentItem(
                         id: String,
                         `type` : String,
                         composerId: Option[String],
-                        path: Option[String]
+                        path: Option[String],
+                        title: String,
+                        isLive: Boolean,
+                        atoms: List[Atom] = Nil
                       ) {
 
   def toItem = Item.fromJSON(Json.toJson(this).toString())
