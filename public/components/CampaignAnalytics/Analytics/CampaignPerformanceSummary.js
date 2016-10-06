@@ -46,7 +46,7 @@ class CampaignPerformanceSummary extends React.Component {
         <div className="campaign-box__body">
           <ResponsiveContainer height={300} width="90%">
             <RadialBarChart cx={250} cy={250} innerRadius={20} outerRadius={240} barSize={10} data={this.buildContributionData()}>
-              <RadialBar minAngle={15} label background clockWise={true} dataKey='count'/>
+              <RadialBar minAngle={5} label background clockWise={true} dataKey='count'/>
               <Legend iconSize={10} layout='vertical' align='right' verticalAlign='top'/>
             </RadialBarChart>
           </ResponsiveContainer>
