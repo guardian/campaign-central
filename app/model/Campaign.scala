@@ -18,6 +18,7 @@ case class Campaign(
                    lastModified: DateTime,
                    lastModifiedBy: User,
                    tagId: Option[Long] = None,
+                   campaignLogo: Option[String] = None,
                    pathPrefix: Option[String] = None,
                    callToActions: List[CallToAction] = Nil,
                    nominalValue: Option[Long] = None,
