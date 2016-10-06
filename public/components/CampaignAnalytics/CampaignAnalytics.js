@@ -7,7 +7,13 @@ import ContentTrafficChart from './Analytics/ContentTrafficChart'
 class CampaignAnalytics extends React.Component {
 
   componentWillMount() {
-    this.props.campaignAnalyticsActions.getCampaignAnalytics(this.props.campaign.id);
+    if (this.isAnalysisAvailable()) {
+      this.props.campaignAnalyticsActions.getCampaignAnalytics(this.props.campaign.id);
+    }
+  }
+
+  isAnalysisAvailable() {
+    return (this.props.campaign.status === 'live' && this.props.campaign.startDate && this.props.campaign.pathPrefix );
   }
 
   getLatestCounts() {
@@ -19,6 +25,10 @@ class CampaignAnalytics extends React.Component {
   }
 
   render () {
+    if (!this.isAnalysisAvailable()) {
+      return null;
+    }
+
     if (!this.props.campaignAnalytics) {
       return <div className="campaign-info__body">Loading... </div>;
     }
