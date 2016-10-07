@@ -1,18 +1,14 @@
 import React, { PropTypes } from 'react';
-import {getStore} from '../../util/storeAccessor'
+import {tagEditUrl, ctaEditUrl} from '../../util/urlBuilder'
 
 class CampaignLevelAssets extends React.Component {
 
-
-
   renderTagInformation = () => {
-    const store = getStore();
-    const tagManagerUrl = store.getState().config.tagManagerUrl;
 
     if(this.props.campaign.tagId) {
       return (
         <span className="campaign-assets__field__value">
-          <a href={tagManagerUrl + '/tag/' + this.props.campaign.tagId} target="_blank">
+          <a href={tagEditUrl(this.props.campaign.tagId)} target="_blank">
             <img src={this.props.campaign.campaignLogo} className="campaign-assets__field__logo"/>
             {this.props.campaign.pathPrefix}
           </a>
@@ -28,14 +24,12 @@ class CampaignLevelAssets extends React.Component {
   }
 
   renderCtaInformation = () => {
-    const store = getStore();
-    const ctaAtomMakerUrl = store.getState().config.ctaAtomMakerUrl;
 
     if(this.props.campaign.callToActions && this.props.campaign.callToActions.length > 0) {
       return (
         <span className="campaign-assets__field__value">
           <ul>
-            {this.props.campaign.callToActions.map( cta => <li key={cta.builderId}><a href={ctaAtomMakerUrl + '/#/atom/' + cta.builderId} target="_blank">{cta.builderId}</a></li> )}
+            {this.props.campaign.callToActions.map( cta => <li key={cta.builderId}><a href={ctaEditUrl(cta.builderId)} target="_blank">{cta.builderId}</a></li> )}
           </ul>
         </span>
       )
