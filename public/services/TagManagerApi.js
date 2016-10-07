@@ -4,7 +4,7 @@ import {AuthedReqwest} from '../util/pandaReqwest';
 
 export function searchTags(params) {
   const store = getStore();
-  const tagsApiUrl = store.getState().config.tagManagerUrl + '/tags';
+  const tagsApiUrl = store.getState().config.tagManagerUrl + '/hyper/tags';
 
   return AuthedReqwest({
     url: tagsApiUrl,
