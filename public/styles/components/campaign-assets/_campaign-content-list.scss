@@ -1,0 +1,43 @@
+.campaign-content-list__row {
+  @extend %table__row;
+}
+
+.campaign-content-list__content-type,
+.campaign-content-list__content-title,
+.campaign-content-list__content-status,
+.campaign-content-list__content-links {
+  @extend %table__cell;
+  white-space: normal;
+
+  position: relative;
+
+  overflow: auto;
+
+  &--header {
+    @extend %table__cell;
+
+    background-color: $c-grey-200;
+
+    font-weight: bold;
+    white-space: normal;
+  }
+}
+.campaign-content-list__content-type,
+.campaign-content-list__content-type--header {
+  width: 15%;
+}
+
+.campaign-content-list__content-title,
+.campaign-content-list__content-title--header {
+  width: 45%;
+}
+
+.campaign-content-list__content-status,
+.campaign-content-list__content-status--header {
+  width: 15%;
+}
+
+.campaign-content-list__content-links,
+.campaign-content-list__content-links--header {
+  width: 25%;
+}
