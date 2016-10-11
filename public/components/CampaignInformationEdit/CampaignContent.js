@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import ProgressSpinner from '../utils/ProgressSpinner';
+import {composerEditUrl, previewUrl, liveUrl, mediaAtomEditUrl} from '../../util/urlBuilder';
 
 class CampaignContent extends Component {
 
@@ -18,19 +19,42 @@ class CampaignContent extends Component {
         <div className="campaign-content-list__content-type"></div>
         <div className="campaign-content-list__content-title">{atom.type}: {atom.title}</div>
         <div className="campaign-content-list__content-status"></div>
-        <div className="campaign-content-list__content-links">Links</div>
+        <div className="campaign-content-list__content-links">
+          <a href={mediaAtomEditUrl(atom.id)} target="_blank" title="Edit in atom builder"><i className="i-atom" /></a>
+        </div>
       </div>
     );
   }
 
   renderContentItem = (content) => {
+    var contentTypeIcon;
+
+    if (content.type === 'Article') {
+      contentTypeIcon = <i className="i-article" />
+    } else if (content.type === 'Gallery') {
+      contentTypeIcon = <i className="i-gallery" />
+    } else if (content.type === 'Video') {
+      contentTypeIcon = <i className="i-video" />
+    }
+
+    var status;
+    if(content.isLive) {
+      status = 'Live';
+    } else {
+      status = 'Draft';
+    }
+
     return (
-      <span>
-        <div key={content.id} className="campaign-content-list__row">
-          <div className="campaign-content-list__content-type">{content.type}</div>
+      <span key={content.id} >
+        <div className="campaign-content-list__row">
+          <div className="campaign-content-list__content-type">{contentTypeIcon}{content.type}</div>
           <div className="campaign-content-list__content-title">{content.title}</div>
-          <div className="campaign-content-list__content-status">Status</div>
-          <div className="campaign-content-list__content-links">Links</div>
+          <div className="campaign-content-list__content-status">{status}</div>
+          <div className="campaign-content-list__content-links">
+            <a href={composerEditUrl(content.composerId)} target="_blank" title="Edit in composer"><i className="i-composer" /></a>
+            <a href={previewUrl(content.path)} target="_blank" title="Preview"><i className="i-preview-eye" /></a>
+            <a href={liveUrl(content.path)} target="_blank" title="See live"><i className="i-live-site" /></a>
+          </div>
         </div>
         {content.atoms.map( this.renderContentAtoms )}
       </span>
@@ -42,8 +66,6 @@ class CampaignContent extends Component {
     if(!this.props.campaignContent) {
       return (<ProgressSpinner />);
     }
-
-    console.log('content', this.props.campaignContent, this.props.campaignContent.length);
 
     if(this.props.campaignContent.length > 0) {
       return (
