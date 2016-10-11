@@ -18,6 +18,10 @@ class Sidebar extends React.Component {
           <div className="sidebar__link-group__header">Clients</div>
           <SidebarLink to="/clients">All Clients</SidebarLink>
         </div>
+        <div className="sidebar__link-group">
+          <div className="sidebar__link-group__header">Tools</div>
+          <SidebarLink to="/capiImport">Import from CAPI</SidebarLink>
+        </div>
       </div>
     );
   }

@@ -58,3 +58,12 @@ export function updateCampaignNote(id, date, note) {
     method: 'put'
   });
 }
+
+export function importCampaignFromTag(tag) {
+  return AuthedReqwest({
+    url: '/api/campaigns/import',
+    data: JSON.stringify(tag),
+    contentType: 'application/json',
+    method: 'post'
+  });
+}

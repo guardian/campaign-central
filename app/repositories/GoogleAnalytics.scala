@@ -39,7 +39,7 @@ object GoogleAnalytics {
     Logger.info(s"fetch ga analytics for campaign $campaignId")
     for(
       campaign <- CampaignRepository.getCampaign(campaignId);
-      startDate <- Some(new DateTime().minusMonths(1) );//campaign.startDate;
+      startDate <- campaign.startDate orElse Some(new DateTime().minusMonths(1) );//campaign.startDate;
       gaFilter <- campaign.gaFilterExpression
     ) yield {
 

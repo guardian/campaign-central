@@ -9,6 +9,8 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import com.gu.pandomainauth.model.{User => PandaUser}
+import model.command.ImportCampaignFromCAPICommand
+import model.command.CommandError._
 import repositories.{CampaignNotesRepository, CampaignRepository, ClientRepository, GoogleAnalytics}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
@@ -48,7 +50,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     else {
       val created = DateTime.now()
       val lastModified = created
-      val createdBy = User(req.user.firstName, req.user.lastName, req.user.email)
+      val createdBy = User(req.user)
       val lastModifiedBy = createdBy
 
       val newNote = Note(
@@ -76,7 +78,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
         case Some(note) => {
 
           val lastModified = DateTime.now()
-          val modifiedBy = User(req.user.firstName, req.user.lastName, req.user.email)
+          val modifiedBy = User(req.user)
           val content = (req.body.asJson.get \ "content").as[String]
 
           val updatedNote = note.copy(
@@ -92,9 +94,22 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     }
   }
 
+  def importFromTag() = APIAuthAction { req =>
+    implicit val user = Option(User(req.user))
+    req.body.asJson.map { json =>
+      try {
+        json.as[ImportCampaignFromCAPICommand].process.map{ t => Ok(Json.toJson(t)) } getOrElse NotFound
+      } catch {
+        commandErrorAsResult
+      }
+    }.getOrElse {
+      BadRequest("Expecting Json data")
+    }
+  }
+
   def bootstrapData() = APIAuthAction { req =>
 
-    val user = loggedInUser(req.user)
+    val user = User(req.user)
     val now = new DateTime
 
     val randomClient = ClientRepository.getRandomClient().get
@@ -180,5 +195,4 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Ok("added 4 example campaigns and 2 example notes")
   }
 
-  def loggedInUser(pandaUser: PandaUser) = User(pandaUser.firstName, pandaUser.lastName, pandaUser.email)
 }

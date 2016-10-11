@@ -35,6 +35,8 @@ sealed trait Config {
 
   def clientTableName = s"campaign-central-$stage-clients"
 
+  def tagManagerApiUrl: String
+
 
   // remote configuration is used for things we don't want to check in to version control
   // such as passwords, private urls, and gossip about other teams
@@ -47,6 +49,11 @@ sealed trait Config {
   private val remoteConfiguration: Map[String, String] = loadRemoteConfiguration
 
   lazy val googleAnalyticsViewId = getRequiredRemoteStringProperty("googleAnalytivsViewId")
+
+  lazy val capiKey = getRequiredRemoteStringProperty("capi.key")
+  lazy val capiPreviewUrl = getRequiredRemoteStringProperty("capi.preview.url")
+  lazy val capiPreviewUser = getRequiredRemoteStringProperty("capi.preview.username")
+  lazy val capiPreviewPassword = getRequiredRemoteStringProperty("capi.preview.password")
 
   def googleServiceAccountJsonInputStream: InputStream = {
     val jsonLocation = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
@@ -61,8 +68,6 @@ sealed trait Config {
   }
 
   private def loadRemoteConfiguration = {
-
-
 
     def loadPropertiesFromS3(propertiesKey: String, props: Properties): Unit = {
       val s3Properties = AWS.S3Client.getObject(new GetObjectRequest(remoteConfigBucket, propertiesKey))
@@ -90,6 +95,8 @@ class DevConfig extends Config {
 
   override def pandaDomain: String = "local.dev-gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.local.dev-gutools.co.uk/oauthCallback"
+
+  override def tagManagerApiUrl = "https://tagmanager.local.dev-gutools.co.uk/hyper"
 }
 
 class CodeConfig extends Config {
@@ -99,6 +106,8 @@ class CodeConfig extends Config {
 
   override def pandaDomain: String = "code.dev-gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.code.dev-gutools.co.uk/oauthCallback"
+
+  override def tagManagerApiUrl = "https://tagmanager.code.dev-gutools.co.uk/hyper"
 }
 
 class ProdConfig extends Config {
@@ -108,4 +117,6 @@ class ProdConfig extends Config {
 
   override def pandaDomain: String = "gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.gutools.co.uk/oauthCallback"
+
+  override def tagManagerApiUrl = "https://tagmanager.gutools.co.uk/hyper"
 }

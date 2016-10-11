@@ -33,7 +33,7 @@ class ClientApi(override val wsClient: WSClient) extends Controller with PandaAu
 
   def bootstrapData() = APIAuthAction { req =>
 
-    val user = loggedInUser(req.user)
+    val user = User(req.user)
     val now = new DateTime
 
     val clients = List(
@@ -69,5 +69,4 @@ class ClientApi(override val wsClient: WSClient) extends Controller with PandaAu
     Ok("added 5 example clients")
   }
 
-  def loggedInUser(pandaUser: PandaUser) = User(pandaUser.firstName, pandaUser.lastName, pandaUser.email)
 }
