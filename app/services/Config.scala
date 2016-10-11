@@ -36,6 +36,11 @@ sealed trait Config {
   def clientTableName = s"campaign-central-$stage-clients"
 
   def tagManagerApiUrl: String
+  def composerUrl: String
+  def liveUrl: String
+  def previewUrl: String
+  def mediaAtomMakerUrl: String
+  def ctaAtomMakerUrl: String
 
 
   // remote configuration is used for things we don't want to check in to version control
@@ -96,7 +101,12 @@ class DevConfig extends Config {
   override def pandaDomain: String = "local.dev-gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.local.dev-gutools.co.uk/oauthCallback"
 
-  override def tagManagerApiUrl = "https://tagmanager.local.dev-gutools.co.uk/hyper"
+  override def tagManagerApiUrl = "https://tagmanager.local.dev-gutools.co.uk"
+  override def composerUrl = "https://composer.local.dev-gutools.co.uk"
+  override def liveUrl = "https://www.theguardian.com"
+  override def previewUrl = "https://viewer.gutools.co.uk/preview"
+  override def mediaAtomMakerUrl = "https://media-atom-maker.local.dev-gutools.co.uk"
+  override def ctaAtomMakerUrl = "https://cta-atom-maker.local.dev-gutools.co.uk"
 }
 
 class CodeConfig extends Config {
@@ -107,7 +117,12 @@ class CodeConfig extends Config {
   override def pandaDomain: String = "code.dev-gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.code.dev-gutools.co.uk/oauthCallback"
 
-  override def tagManagerApiUrl = "https://tagmanager.code.dev-gutools.co.uk/hyper"
+  override def tagManagerApiUrl = "https://tagmanager.code.dev-gutools.co.uk"
+  override def composerUrl = "https://composer.code.dev-gutools.co.uk"
+  override def liveUrl = "http://m.code.dev-theguardian.com"
+  override def previewUrl = "https://viewer.code.dev-gutools.co.uk/preview"
+  override def mediaAtomMakerUrl = "https://media-atom-maker.code.dev-gutools.co.uk"
+  override def ctaAtomMakerUrl = "https://cta-atom-maker.code.dev-gutools.co.uk"
 }
 
 class ProdConfig extends Config {
@@ -118,5 +133,10 @@ class ProdConfig extends Config {
   override def pandaDomain: String = "gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.gutools.co.uk/oauthCallback"
 
-  override def tagManagerApiUrl = "https://tagmanager.gutools.co.uk/hyper"
+  override def tagManagerApiUrl = "https://tagmanager.gutools.co.uk"
+  override def composerUrl = "https://composer.gutools.co.uk"
+  override def liveUrl = "https://www.theguardian.com"
+  override def previewUrl = "https://viewer.gutools.co.uk/preview"
+  override def mediaAtomMakerUrl = "https://media-atom-maker.gutools.co.uk"
+  override def ctaAtomMakerUrl = "https://cta-atom-maker.gutools.co.uk"
 }

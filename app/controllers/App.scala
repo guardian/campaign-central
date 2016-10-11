@@ -20,7 +20,14 @@ class App(override val wsClient: WSClient) extends Controller with PandaAuthActi
       case None => routes.Assets.versioned(jsFileName).toString
     }
 
-    val clientConf = Map("tagManagerUrl" -> Config().tagManagerApiUrl)
+    val clientConf = Map(
+      "tagManagerUrl" -> Config().tagManagerApiUrl,
+      "composerUrl" -> Config().composerUrl,
+      "liveUrl" -> Config().liveUrl,
+      "previewUrl" -> Config().previewUrl,
+      "mediaAtomMakerUrl" -> Config().mediaAtomMakerUrl,
+      "ctaAtomMakerUrl" -> Config().ctaAtomMakerUrl
+    )
 
     Ok(views.html.Application.app("Campaign Central", jsLocation, Json.toJson(clientConf).toString()))
   }

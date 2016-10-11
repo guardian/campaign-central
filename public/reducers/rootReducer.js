@@ -6,6 +6,7 @@ import campaign from './campaignReducer';
 import campaignAnalytics from './campaignAnalyticsReducer';
 import clients from './clientsReducer';
 import client from './clientReducer';
+import campaignContent from './campaignContentReducer';
 import campaignNotes from './campaignNotesReducer';
 
 export default combineReducers({
@@ -16,5 +17,6 @@ export default combineReducers({
   campaignAnalytics,
   clients,
   client,
+  campaignContent,
   campaignNotes
 });

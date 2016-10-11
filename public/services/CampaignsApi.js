@@ -33,6 +33,14 @@ export function fetchCampaignAnalytics(id) {
   });
 }
 
+export function fetchCampaignContent(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/content',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
 export function fetchCampaignNotes(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/notes',
