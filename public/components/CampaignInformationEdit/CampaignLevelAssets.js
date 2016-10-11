@@ -44,19 +44,14 @@ class CampaignLevelAssets extends React.Component {
 
   render () {
     return (
-      <div className="campaign-assets campaign-box-section">
-        <div className="campaign-box-section__header">
-          Campaign Level Assets
+      <div className="campaign-assets">
+        <div className="campaign-assets__field">
+          <label>Tag</label>
+          {this.renderTagInformation()}
         </div>
-        <div className="campaign-box-section__body">
-          <div className="campaign-assets__field">
-            <label>Tag</label>
-            {this.renderTagInformation()}
-          </div>
-          <div className="campaign-assets__field">
-            <label>Call to actions</label>
-            {this.renderCtaInformation()}
-          </div>
+        <div className="campaign-assets__field">
+          <label>Call to actions</label>
+          {this.renderCtaInformation()}
         </div>
       </div>
     );

@@ -69,7 +69,7 @@ class CampaignContent extends Component {
 
     if(this.props.campaignContent.length > 0) {
       return (
-        <div className="campaign-content-list">
+        <div className="campaign-content-list campaign-assets__field__value">
           <div className="campaign-content-list__row">
             <div className="campaign-content-list__content-type--header">Type</div>
             <div className="campaign-content-list__content-title--header">Title</div>
@@ -91,15 +91,10 @@ class CampaignContent extends Component {
   render() {
 
     return (
-      <div className="campaign-assets campaign-box-section">
-        <div className="campaign-box-section__header">
-          Campaign Content
-        </div>
-        <div className="campaign-box-section__body">
-          <div className="campaign-assets__field">
-            <label>Content</label>
-            {this.renderContentItems()}
-          </div>
+      <div className="campaign-assets">
+        <div className="campaign-assets__field">
+          <label>Content</label>
+          {this.renderContentItems()}
         </div>
       </div>
     );
