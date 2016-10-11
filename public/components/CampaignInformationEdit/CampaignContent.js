@@ -17,7 +17,7 @@ class CampaignContent extends Component {
     return (
       <div key={atom.id} className="campaign-content-list__row">
         <div className="campaign-content-list__content-type"></div>
-        <div className="campaign-content-list__content-title">{atom.type}: {atom.title}</div>
+        <div className="campaign-content-list__atom-title">{atom.type}: {atom.title}</div>
         <div className="campaign-content-list__content-status"></div>
         <div className="campaign-content-list__content-links">
           <a href={mediaAtomEditUrl(atom.id)} target="_blank" title="Edit in atom builder"><i className="i-atom" /></a>
@@ -45,7 +45,7 @@ class CampaignContent extends Component {
     }
 
     return (
-      <span key={content.id} >
+      <div key={content.id} className="campaign-content-list__item">
         <div className="campaign-content-list__row">
           <div className="campaign-content-list__content-type">{contentTypeIcon}{content.type}</div>
           <div className="campaign-content-list__content-title">{content.title}</div>
@@ -57,7 +57,7 @@ class CampaignContent extends Component {
           </div>
         </div>
         {content.atoms.map( this.renderContentAtoms )}
-      </span>
+      </div>
     );
   }
 

@@ -1,9 +1,15 @@
 .campaign-content-list__row {
   @extend %table__row;
+  border-bottom: none;
+}
+
+.campaign-content-list__item {
+  border-bottom: 1px solid $c-grey-300;
 }
 
 .campaign-content-list__content-type,
 .campaign-content-list__content-title,
+.campaign-content-list__atom-title,
 .campaign-content-list__content-status,
 .campaign-content-list__content-links {
   @extend %table__cell;
@@ -12,6 +18,8 @@
   position: relative;
 
   overflow: auto;
+
+  border-bottom: none;
 
   &--header {
     @extend %table__cell;
@@ -22,12 +30,14 @@
     white-space: normal;
   }
 }
+
 .campaign-content-list__content-type,
 .campaign-content-list__content-type--header {
   width: 15%;
 }
 
 .campaign-content-list__content-title,
+.campaign-content-list__atom-title,
 .campaign-content-list__content-title--header {
   width: 45%;
 }
@@ -40,4 +50,8 @@
 .campaign-content-list__content-links,
 .campaign-content-list__content-links--header {
   width: 25%;
+}
+
+.campaign-content-list__atom-title {
+  padding-left: 20px;
 }
