@@ -10,17 +10,19 @@ class Campaign extends React.Component {
   }
 
   render () {
-    if (!this.props.campaign) {
+    const campaign = this.props.campaign && this.props.params.id === this.props.campaign.id ? this.props.campaign : undefined;
+
+    if (!campaign) {
       return <div>Loading... </div>;
     }
 
     return (
       <div className="campaign">
-        <h2>{this.props.campaign.name}</h2>
+        <h2>{campaign.name}</h2>
         <div className="campaign__row">
-          <CampaignEdit campaign={this.props.campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
-          <CampaignAssets campaign={this.props.campaign} />
-          <CampaignAnalytics campaign={this.props.campaign} />
+          <CampaignEdit campaign={campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
+          <CampaignAssets campaign={campaign} />
+          <CampaignAnalytics campaign={campaign} />
         </div>
       </div>
     );

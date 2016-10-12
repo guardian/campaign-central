@@ -7,13 +7,23 @@ import ContentTrafficChart from './Analytics/ContentTrafficChart'
 class CampaignAnalytics extends React.Component {
 
   componentWillMount() {
-    if (this.isAnalysisAvailable()) {
+    this.props.campaignAnalyticsActions.clearCampaignAnalytics();
+    if (this.isAnalysisAvailable(this.props.campaign)) {
       this.props.campaignAnalyticsActions.getCampaignAnalytics(this.props.campaign.id);
     }
   }
 
-  isAnalysisAvailable() {
-    return (this.props.campaign.status === 'live' && this.props.campaign.startDate && this.props.campaign.pathPrefix );
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.campaign.id !== this.props.campaign.id) {
+      this.props.campaignAnalyticsActions.clearCampaignAnalytics();
+      if (this.isAnalysisAvailable(nextProps.campaign)) {
+        this.props.campaignAnalyticsActions.getCampaignAnalytics(nextProps.campaign.id)
+      }
+    }
+  }
+
+  isAnalysisAvailable(campaign) {
+    return (campaign.status === 'live' && campaign.startDate && campaign.pathPrefix );
   }
 
   getLatestCounts() {
@@ -25,7 +35,7 @@ class CampaignAnalytics extends React.Component {
   }
 
   render () {
-    if (!this.isAnalysisAvailable()) {
+    if (!this.isAnalysisAvailable(this.props.campaign)) {
       return null;
     }
 
@@ -52,6 +62,7 @@ class CampaignAnalytics extends React.Component {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as getCampaignAnalytics from '../../actions/CampaignActions/getCampaignAnalytics';
+import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
 
 function mapStateToProps(state) {
   return {
@@ -61,7 +72,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignAnalytics), dispatch)
+    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignAnalytics, clearCampaignAnalytics), dispatch)
   };
 }
 
