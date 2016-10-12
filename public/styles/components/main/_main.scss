@@ -2,20 +2,18 @@
     margin-top: $size-header-height;
     height: calc(100vh - #{$size-header-height});
     width: 100%;
-
-    display: flex;
 }
 
 .main__content {
-    flex-grow: 1;
     width: 100%;
 
     padding: 40px;
-
+    padding-left: $size-sidebar-width + 40;
 }
 
 .main__sidebar {
     width: $size-sidebar-width;
-    flex-shrink: 0;
     background-color: $c-grey-main;
+    position: fixed;
+    height: 100%;
 }
