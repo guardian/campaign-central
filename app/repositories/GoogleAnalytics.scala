@@ -35,9 +35,9 @@ object GoogleAnalytics {
 
   val gaClient = initialiseGaClient
 
-  def getAnalyticsForCampaign(campaignId: String) = {
+  def getAnalyticsForCampaign(campaignId: String): Option[CampaignDailyCountsReport] = {
     Logger.info(s"fetch ga analytics for campaign $campaignId")
-    for(
+    val report = for(
       campaign <- CampaignRepository.getCampaign(campaignId);
       startDate <- campaign.startDate orElse Some(new DateTime().minusMonths(1) );//campaign.startDate;
       gaFilter <- campaign.gaFilterExpression
@@ -72,6 +72,8 @@ object GoogleAnalytics {
 
       stats.map(CampaignDailyCountsReport(_))
     }
+
+    report.flatten
   }
 
   case class ParsedDailyCountsReport(seenPaths: Set[String], dayStats: Map[DateTime, Map[String, Long]]) {
