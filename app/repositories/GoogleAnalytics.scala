@@ -43,7 +43,7 @@ object GoogleAnalytics {
       gaFilter <- campaign.gaFilterExpression
     ) yield {
 
-      val endOfRange = campaign.endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("today")
+      val endOfRange = campaign.endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
       val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
 
       val pageViewMetric = new Metric().setExpression("ga:pageviews").setAlias("pageviews")
