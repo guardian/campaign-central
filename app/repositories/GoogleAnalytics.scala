@@ -35,15 +35,15 @@ object GoogleAnalytics {
 
   val gaClient = initialiseGaClient
 
-  def getAnalyticsForCampaign(campaignId: String) = {
+  def getAnalyticsForCampaign(campaignId: String): Option[CampaignDailyCountsReport] = {
     Logger.info(s"fetch ga analytics for campaign $campaignId")
-    for(
+    val report = for(
       campaign <- CampaignRepository.getCampaign(campaignId);
       startDate <- campaign.startDate orElse Some(new DateTime().minusMonths(1) );//campaign.startDate;
       gaFilter <- campaign.gaFilterExpression
     ) yield {
 
-      val endOfRange = campaign.endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("today")
+      val endOfRange = campaign.endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
       val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
 
       val pageViewMetric = new Metric().setExpression("ga:pageviews").setAlias("pageviews")
@@ -72,6 +72,8 @@ object GoogleAnalytics {
 
       stats.map(CampaignDailyCountsReport(_))
     }
+
+    report.flatten
   }
 
   case class ParsedDailyCountsReport(seenPaths: Set[String], dayStats: Map[DateTime, Map[String, Long]]) {
