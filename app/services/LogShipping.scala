@@ -1,9 +1,10 @@
 package services
 
+import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger => LogbackLogger}
 import com.gu.logback.appender.kinesis.KinesisAppender
 import net.logstash.logback.layout.LogstashLayout
-import org.slf4j.{Logger => SLFLogger, LoggerFactory}
+import org.slf4j.{LoggerFactory, Logger => SLFLogger}
 import play.api.Logger
 
 object LogShipping extends AwsInstanceTags {
@@ -26,7 +27,7 @@ object LogShipping extends AwsInstanceTags {
       layout.setCustomFields(s"""{"stack":"$stack","app":"$app","stage":"$stage"}""")
       layout.start()
 
-      val appender = new KinesisAppender()
+      val appender = new KinesisAppender[ILoggingEvent]()
       appender.setBufferSize(1000)
       appender.setRegion(AWS.region.getName)
       appender.setStreamName(streamName)
