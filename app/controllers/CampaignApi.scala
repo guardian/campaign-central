@@ -9,7 +9,7 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
 import com.gu.pandomainauth.model.{User => PandaUser}
-import model.command.ImportCampaignFromCAPICommand
+import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import model.command.CommandError._
 import repositories._
 
@@ -108,6 +108,15 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
       }
     }.getOrElse {
       BadRequest("Expecting Json data")
+    }
+  }
+
+  def refreshCampaignFromCAPI(campaignId: String) = APIAuthAction { req =>
+    implicit val user = Option(User(req.user))
+    try {
+      RefreshCampaignFromCAPICommand(campaignId).process.map{ t => Ok(Json.toJson(t)) } getOrElse NotFound
+    } catch {
+      commandErrorAsResult
     }
   }
 

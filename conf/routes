@@ -25,6 +25,7 @@ GET /api/campaigns/:id/content    controllers.CampaignApi.getCampaignContent(id:
 GET /api/campaigns/:id/notes    controllers.CampaignApi.getCampaignNotes(id: String)
 POST /api/campaigns/:id/notes   controllers.CampaignApi.addCampaignNote(id: String)
 PUT /api/campaigns/:id/note/:date    controllers.CampaignApi.updateCampaignNote(id: String, date: String)
+POST /api/campaigns/:id/refreshFromCAPI   controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
 POST /api/campaigns/import      controllers.CampaignApi.importFromTag()
 
 
