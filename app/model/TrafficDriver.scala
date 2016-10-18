@@ -14,9 +14,7 @@ case class TrafficDriver(
   endDate: LocalDate,
   impressionsDelivered: Int,
   clicksDelivered: Int,
-  ctrDelivered: Double,
-  expectedDeliveryPercentage: Option[Double],
-  actualDeliveryPercentage: Option[Double]
+  ctrDelivered: Double
 )
 
 object TrafficDriver {

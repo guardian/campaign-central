@@ -51,7 +51,7 @@ class CampaignTrafficDrivers extends React.Component {
             <div className="campaign-driver-list__status--header">Status</div>
             <div className="campaign-driver-list__date--header">Start</div>
             <div className="campaign-driver-list__date--header">End</div>
-            <div className="campaign-driver-list__stat--header">Imps</div>
+            <div className="campaign-driver-list__stat--header">Impressions</div>
             <div className="campaign-driver-list__stat--header">Clicks</div>
             <div className="campaign-driver-list__stat--header">CTR</div>
           </div>

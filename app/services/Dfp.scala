@@ -25,16 +25,14 @@ object Dfp {
       TrafficDriver(
         id = lineItem.getId,
         name = lineItem.getName,
-        url = s"https://www.google.com/dfp/${dfpNetworkCode}#delivery/LineItemDetail/lineItemId=${lineItem.getId}",
+        url = s"https://www.google.com/dfp/$dfpNetworkCode#delivery/LineItemDetail/lineItemId=${lineItem.getId}",
         driverType,
         status = lineItem.getStatus.getValue,
         startDate = mkLocalDate(lineItem.getStartDateTime),
         endDate = mkLocalDate(lineItem.getEndDateTime),
         impressionsDelivered = lineItem.getStats.getImpressionsDelivered.toInt,
         clicksDelivered = lineItem.getStats.getClicksDelivered.toInt,
-        ctrDelivered = lineItem.getStats.getClicksDelivered / lineItem.getStats.getImpressionsDelivered.toDouble * 100,
-        expectedDeliveryPercentage = Option(lineItem.getDeliveryIndicator).map(_.getExpectedDeliveryPercentage),
-        actualDeliveryPercentage = Option(lineItem.getDeliveryIndicator).map(_.getActualDeliveryPercentage)
+        ctrDelivered = lineItem.getStats.getClicksDelivered / lineItem.getStats.getImpressionsDelivered.toDouble * 100
       )
     }
 

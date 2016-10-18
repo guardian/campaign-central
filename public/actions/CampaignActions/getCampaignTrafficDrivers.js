@@ -31,13 +31,6 @@ export function getCampaignTrafficDrivers(id) {
       return fetchCampaignTrafficDrivers(id)
         .catch(error => dispatch(errorReceivingCampaignTrafficDrivers(error)))
         .then(res => {
-
-//          alert('here');
-//          alert(res[0]);
-//          for(var propertyName in res[0]) {
-//            alert(res[0][propertyName]);
-//          }
-
           dispatch(receiveCampaignTrafficDrivers(res));
         });
     };
