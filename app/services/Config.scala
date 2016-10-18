@@ -120,7 +120,7 @@ class DevConfig extends Config {
   override val dfpNetworkCode = "59666047"
   override val dfpNativeCardOrderId: Long = 353494647
   override val dfpMerchComponentOrderId: Long = 345535767
-  override val dfpCampaignFieldId: Long = 8727
+  override val dfpCampaignFieldId: Long = 9927
 }
 
 class CodeConfig extends Config {
@@ -141,7 +141,7 @@ class CodeConfig extends Config {
   override val dfpNetworkCode = "59666047"
   override val dfpNativeCardOrderId: Long = 353494647
   override val dfpMerchComponentOrderId: Long = 345535767
-  override val dfpCampaignFieldId: Long = 8727
+  override val dfpCampaignFieldId: Long = 9927
 }
 
 class ProdConfig extends Config {
@@ -162,5 +162,5 @@ class ProdConfig extends Config {
   override val dfpNetworkCode = "59666047"
   override val dfpNativeCardOrderId: Long = 353494647
   override val dfpMerchComponentOrderId: Long = 345535767
-  override val dfpCampaignFieldId: Long = 8727
+  override val dfpCampaignFieldId: Long = 9927
 }

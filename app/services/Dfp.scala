@@ -13,11 +13,6 @@ import services.Config.conf._
 
 object Dfp {
 
-  // todo: put ids into dfp directly
-  val campaignNames = Map(
-    "c3ca64a5-32ea-41c9-b06e-6bdb8bf41d18" -> "Act for Wildlife"
-  )
-
   def fetchTrafficDriversByCampaign(id: String): Seq[TrafficDriver] = {
 
     def mkTrafficDriver(driverType: String)(lineItem: LineItem) = {
@@ -43,18 +38,13 @@ object Dfp {
       )
     }
 
-    campaignNames.get(id) map { rawName =>
-      val name = rawName.toLowerCase
-
-      val nativeCardLineItems =
-        fetchLineItemsByOrderAndCustomField(dfpNativeCardOrderId, dfpCampaignFieldId, name)
-      val merchComponentLineItems =
-        fetchLineItemsByOrderAndCustomField(dfpMerchComponentOrderId, dfpCampaignFieldId, name)
+    val nativeCardLineItems =
+      fetchLineItemsByOrderAndCustomField(dfpNativeCardOrderId, dfpCampaignFieldId, id)
+    val merchComponentLineItems =
+      fetchLineItemsByOrderAndCustomField(dfpMerchComponentOrderId, dfpCampaignFieldId, id)
 
       nativeCardLineItems.map(mkTrafficDriver("Native card")) ++
       merchComponentLineItems.map(mkTrafficDriver("Merch component"))
-
-    } getOrElse Nil
   }
 
   def fetchLineItemsByOrderAndCustomField(orderId: Long, fieldId: Long, fieldValue: String): Seq[LineItem] = {
@@ -85,13 +75,10 @@ object Dfp {
     val lineItems = lineItemPage.getResults.toSeq
 
     lineItems filter { lineItem =>
-      //      !lineItem.getIsArchived && {
       safeSeq(lineItem.getCustomFieldValues) exists { value =>
         value.getCustomFieldId == fieldId &&
-        // todo: don't do a case-sensitive comparison
         value.asInstanceOf[CustomFieldValue].getValue.asInstanceOf[TextValue].getValue.toLowerCase == fieldValue
       }
-      //    }
     }
   }
 
