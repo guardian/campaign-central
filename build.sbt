@@ -19,7 +19,8 @@ lazy val dependencies = Seq(
   "net.logstash.logback" % "logstash-logback-encoder" % "4.2",
   "com.gu" % "kinesis-logback-appender" % "1.0.5",
   "org.slf4j" % "slf4j-api" % "1.7.12",
-  "org.slf4j" % "jcl-over-slf4j" % "1.7.12"
+  "org.slf4j" % "jcl-over-slf4j" % "1.7.12",
+  "com.google.api-ads" % "dfp-axis" % "2.20.0"
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaffArtifact)

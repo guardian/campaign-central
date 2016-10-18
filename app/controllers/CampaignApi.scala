@@ -3,15 +3,15 @@ package controllers
 import java.util.UUID
 
 import model._
+import model.command.CommandError._
+import model.command.ImportCampaignFromCAPICommand
 import org.joda.time.DateTime
-import play.api.Configuration
+import play.api.libs.json.Json._
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, Controller}
-import com.gu.pandomainauth.model.{User => PandaUser}
-import model.command.ImportCampaignFromCAPICommand
-import model.command.CommandError._
+import play.api.mvc.Controller
 import repositories._
+import services.Dfp
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -199,4 +199,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Ok("added 4 example campaigns and 2 example notes")
   }
 
+  def getCampaignTrafficDrivers(id: String) = APIAuthAction { req =>
+    Ok(toJson(Dfp.fetchTrafficDriversByCampaign(id)))
+  }
 }
