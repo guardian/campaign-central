@@ -11,7 +11,8 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
 import repositories._
-import services.Dfp
+import services.Config.conf._
+import services.{DfpFetcher, DfpFilter}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -200,6 +201,20 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def getCampaignTrafficDrivers(id: String) = APIAuthAction { req =>
-    Ok(toJson(Dfp.fetchTrafficDriversByCampaign(id)))
+
+    val dfpSession = DfpFetcher.mkSession()
+
+    def trafficDrivers(orderId: Long, driverType: String) =
+      DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
+        DfpFilter.hasCampaignIdCustomFieldValue(id)
+      } map {
+        TrafficDriver.fromDfpLineItem(driverType)
+      }
+
+    val drivers =
+      trafficDrivers(dfpNativeCardOrderId, "Native cards") ++
+      trafficDrivers(dfpMerchComponentOrderId, "Merch components")
+
+    Ok(toJson(drivers))
   }
 }
