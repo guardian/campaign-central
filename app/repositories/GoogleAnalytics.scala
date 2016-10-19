@@ -11,6 +11,7 @@ import play.api.Logger
 import play.api.libs.json.Format
 import repositories.GoogleAnalytics.ParsedDailyCountsReport
 import services.{AWS, Config}
+import util.AnalyticsCache
 
 import scala.collection.JavaConversions._
 
@@ -35,7 +36,17 @@ object GoogleAnalytics {
 
   val gaClient = initialiseGaClient
 
+  val dailyCountsReportCache = new AnalyticsCache[String, CampaignDailyCountsReport]
+
   def getAnalyticsForCampaign(campaignId: String): Option[CampaignDailyCountsReport] = {
+    dailyCountsReportCache.get(campaignId) orElse {
+      val report = loadAnalyticsForCampaign(campaignId)
+      report.foreach( dailyCountsReportCache.put(campaignId, _) )
+      report
+    }
+  }
+
+  private def loadAnalyticsForCampaign(campaignId: String): Option[CampaignDailyCountsReport] = {
     Logger.info(s"fetch ga analytics for campaign $campaignId")
     val report = for(
       campaign <- CampaignRepository.getCampaign(campaignId);
