@@ -21,7 +21,9 @@ class Campaign extends React.Component {
         <h2>{campaign.name}</h2>
         <div className="campaign__row">
           <CampaignEdit campaign={campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
-          <CampaignAssets campaign={campaign} />
+          <CampaignAssets campaign={campaign}
+                          getCampaign={this.props.campaignActions.getCampaign}
+                          getCampaignContent={this.props.campaignActions.getCampaignContent} />
           <CampaignAnalytics campaign={campaign} />
         </div>
       </div>
@@ -35,6 +37,7 @@ import { bindActionCreators } from 'redux';
 import * as getCampaign from '../../actions/CampaignActions/getCampaign';
 import * as updateCampaign from '../../actions/CampaignActions/updateCampaign';
 import * as saveCampaign from '../../actions/CampaignActions/saveCampaign';
+import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
 
 function mapStateToProps(state) {
   return {
@@ -44,7 +47,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign), dispatch)
+    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, getCampaignContent), dispatch)
   };
 }
 

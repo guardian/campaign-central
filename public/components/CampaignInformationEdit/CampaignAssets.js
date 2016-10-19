@@ -8,8 +8,8 @@ class CampaignAssets extends React.Component {
   refreshCampaign = () => {
     if (this.props.campaign.tagId) {
       refreshCampaignFromCAPI(this.props.campaign.id).then((resp) => {
-        this.props.campaignActions.getCampaign(this.props.campaign.id);
-        this.props.campaignActions.getCampaignContent(this.props.campaign.id);
+        this.props.getCampaign(this.props.campaign.id);
+        this.props.getCampaignContent(this.props.campaign.id);
       });
     }
   };
@@ -23,27 +23,11 @@ class CampaignAssets extends React.Component {
         </div>
         <div className="campaign-box__body">
           <CampaignLevelAssets campaign={this.props.campaign} />
-          <CampaignContent campaign={this.props.campaign} />
+          <CampaignContent campaign={this.props.campaign} getCampaignContent={this.props.getCampaignContent}/>
         </div>
       </div>
     );
   }
 }
 
-//REDUX CONNECTIONS
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as getCampaign from '../../actions/CampaignActions/getCampaign';
-import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
-
-function mapStateToProps() {
-  return {};
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign, getCampaignContent), dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignAssets);
+export default CampaignAssets;
