@@ -1,0 +1,46 @@
+.campaign-driver-list__row {
+  @extend %table__row;
+  border-bottom: none;
+}
+
+.campaign-driver-list__item {
+  border-bottom: 1px solid $c-grey-300;
+}
+
+.campaign-driver-list__type,
+.campaign-driver-list__status,
+.campaign-driver-list__date,
+.campaign-driver-list__stat {
+  @extend %table__cell;
+  white-space: normal;
+  position: relative;
+  overflow: auto;
+  border-bottom: none;
+
+  &--header {
+    @extend %table__cell;
+    background-color: $c-grey-200;
+    font-weight: bold;
+    white-space: normal;
+  }
+}
+
+.campaign-driver-list__type,
+.campaign-driver-list__type--header {
+  width: 20%;
+}
+
+.campaign-driver-list__status,
+.campaign-driver-list__status--header {
+  width: 20%;
+}
+
+.campaign-driver-list__date,
+.campaign-driver-list__date--header {
+  width: 15%;
+}
+
+.campaign-driver-list__stat,
+.campaign-driver-list__stat--header {
+  width: 15%;
+}
