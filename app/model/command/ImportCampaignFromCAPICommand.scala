@@ -62,6 +62,11 @@ case class ImportCampaignFromCAPICommand(
     }.getOrElse(Nil)
   }
 
+  def cleanHeadline(headline: String) = headline match {
+    case "" => "untitled"
+    case h => h
+  }
+
   override def process()(implicit user: Option[User]): Option[Campaign] = {
     Logger.info(s"importing campaign from tag $externalName")
 
@@ -96,7 +101,7 @@ case class ImportCampaignFromCAPICommand(
         `type` = deriveContentType(apic),
         composerId = apic.fields.flatMap(_.internalComposerCode),
         path = Option(apic.id),
-        title = apic.webTitle,
+        title = cleanHeadline(apic.webTitle),
         isLive = apic.fields.flatMap(_.isLive).getOrElse(false),
         atoms = buildAtomList(apic)
       )
