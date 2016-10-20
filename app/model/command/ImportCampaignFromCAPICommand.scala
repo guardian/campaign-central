@@ -10,7 +10,7 @@ import model._
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Format
-import repositories.{CampaignContentRepository, CampaignRepository, ClientRepository, ContentApi}
+import repositories._
 
 case class Section(id: Long, pathPrefix: String)
 
@@ -149,6 +149,9 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
 
     val apiContent = ContentApi.loadAllContentInSection(campaign.pathPrefix getOrElse( CampaignMissingData("pathPrefix") ))
     val hostedTag = deriveHostedTagFromContent(apiContent) getOrElse (CampaignTagNotFound)
+    val sponsorship = campaign.tagId.flatMap( TagManagerApi.getSponsorshipForTag )
+
+    Logger.info(s"sponsorship is $sponsorship")
 
     updateCampaignAndContent(apiContent, hostedTag, campaign)
   }
