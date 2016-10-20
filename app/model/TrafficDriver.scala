@@ -40,7 +40,10 @@ object TrafficDriver {
       endDate = mkLocalDate(lineItem.getEndDateTime),
       impressionsDelivered = lineItem.getStats.getImpressionsDelivered.toInt,
       clicksDelivered = lineItem.getStats.getClicksDelivered.toInt,
-      ctrDelivered = lineItem.getStats.getClicksDelivered / lineItem.getStats.getImpressionsDelivered.toDouble * 100
+      ctrDelivered =
+        if (lineItem.getStats.getImpressionsDelivered > 0)
+          lineItem.getStats.getClicksDelivered.toDouble / lineItem.getStats.getImpressionsDelivered * 100
+        else 0
     )
   }
 }
