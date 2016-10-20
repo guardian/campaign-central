@@ -13,7 +13,7 @@ class CampaignContent extends Component {
       this.props.getCampaignContent(nextProps.campaign.id);
     }
   }
-  
+
   renderContentAtoms = (atom) => {
     return (
       <div key={atom.id} className="campaign-content-list__row">

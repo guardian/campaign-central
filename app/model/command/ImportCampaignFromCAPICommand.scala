@@ -46,6 +46,11 @@ trait CAPIImportCommand extends Command {
     }.getOrElse(Nil)
   }
 
+  def cleanHeadline(headline: String) = headline match {
+    case "" => "untitled"
+    case h => h
+  }
+
   def buildContentItems(apiContent: List[ApiContent], campaignId: String): List[ContentItem] = apiContent.map{ apic =>
     ContentItem(
       campaignId = campaignId,
@@ -53,7 +58,7 @@ trait CAPIImportCommand extends Command {
       `type` = deriveContentType(apic),
       composerId = apic.fields.flatMap(_.internalComposerCode),
       path = Option(apic.id),
-      title = apic.webTitle,
+      title = cleanHeadline(apic.webTitle),
       isLive = apic.fields.flatMap(_.isLive).getOrElse(false),
       atoms = buildAtomList(apic)
     )
@@ -95,7 +100,7 @@ case class ImportCampaignFromCAPICommand(
         id = UUID.randomUUID().toString,
         name = sponsorName,
         country = "UK", // default country and agency, these can be manually
-        agency = None   // updated later
+        agency = None // updated later
       )
       ClientRepository.putClient(client) getOrElse (FailedToSaveClient(client))
     }
@@ -132,6 +137,7 @@ case class ImportCampaignFromCAPICommand(
   }
 }
 
+
 object ImportCampaignFromCAPICommand {
   implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignFromCAPICommand] = Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
 }
@@ -156,3 +162,8 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
     updateCampaignAndContent(apiContent, hostedTag, campaign)
   }
 }
+
+object RefreshCampaignFromCAPICommand {
+  implicit val refreshCampaignFromCAPICommandFormat: Format[RefreshCampaignFromCAPICommand] = Jsonx.formatCaseClass[RefreshCampaignFromCAPICommand]
+}
+

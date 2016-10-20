@@ -60,6 +60,15 @@ sealed trait Config {
   lazy val capiPreviewUser = getRequiredRemoteStringProperty("capi.preview.username")
   lazy val capiPreviewPassword = getRequiredRemoteStringProperty("capi.preview.password")
 
+  val dfpAppName = "Campaign Central"
+  lazy val dfpClientId = getRequiredRemoteStringProperty("dfp.client.id")
+  lazy val dfpClientSecret = getRequiredRemoteStringProperty("dfp.client.secret")
+  lazy val dfpRefreshToken = getRequiredRemoteStringProperty("dfp.refresh.token")
+  def dfpNetworkCode: String
+  def dfpNativeCardOrderId: Long
+  def dfpMerchComponentOrderId: Long
+  def dfpCampaignFieldId: Long
+
   def googleServiceAccountJsonInputStream: InputStream = {
     val jsonLocation = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
     val credentailsJson = AWS.S3Client.getObject(remoteConfigBucket, s"$app/$jsonLocation")
@@ -107,6 +116,11 @@ class DevConfig extends Config {
   override def previewUrl = "https://viewer.gutools.co.uk/preview"
   override def mediaAtomMakerUrl = "https://media-atom-maker.local.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.local.dev-gutools.co.uk"
+
+  override val dfpNetworkCode = "59666047"
+  override val dfpNativeCardOrderId: Long = 353494647
+  override val dfpMerchComponentOrderId: Long = 345535767
+  override val dfpCampaignFieldId: Long = 9927
 }
 
 class CodeConfig extends Config {
@@ -123,6 +137,11 @@ class CodeConfig extends Config {
   override def previewUrl = "https://viewer.code.dev-gutools.co.uk/preview"
   override def mediaAtomMakerUrl = "https://media-atom-maker.code.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.code.dev-gutools.co.uk"
+
+  override val dfpNetworkCode = "59666047"
+  override val dfpNativeCardOrderId: Long = 353494647
+  override val dfpMerchComponentOrderId: Long = 345535767
+  override val dfpCampaignFieldId: Long = 9927
 }
 
 class ProdConfig extends Config {
@@ -139,4 +158,9 @@ class ProdConfig extends Config {
   override def previewUrl = "https://viewer.gutools.co.uk/preview"
   override def mediaAtomMakerUrl = "https://media-atom-maker.gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.gutools.co.uk"
+
+  override val dfpNetworkCode = "59666047"
+  override val dfpNativeCardOrderId: Long = 353494647
+  override val dfpMerchComponentOrderId: Long = 345535767
+  override val dfpCampaignFieldId: Long = 9927
 }
