@@ -110,7 +110,7 @@ class DevConfig extends Config {
   override def pandaDomain: String = "local.dev-gutools.co.uk"
   override def pandaAuthCallback: String = "https://campaign-central.local.dev-gutools.co.uk/oauthCallback"
 
-  override def tagManagerApiUrl = "https://tagmanager.local.dev-gutools.co.uk"
+  override def tagManagerApiUrl = "https://tagmanager.code.dev-gutools.co.uk"
   override def composerUrl = "https://composer.local.dev-gutools.co.uk"
   override def liveUrl = "https://www.theguardian.com"
   override def previewUrl = "https://viewer.gutools.co.uk/preview"
