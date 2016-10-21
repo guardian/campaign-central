@@ -23,7 +23,7 @@ class CampaignListItem extends React.Component {
       startDate = shortFormatMillisecondDate(this.props.campaign.startDate);
     }
 
-    var endDate = 'not yet configured';
+    var endDate = 'Not yet configured';
     if (this.props.campaign.endDate) {
       endDate = shortFormatMillisecondDate(this.props.campaign.endDate);
     }
