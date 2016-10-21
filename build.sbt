@@ -23,7 +23,8 @@ lazy val dependencies = Seq(
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "org.slf4j" % "jcl-over-slf4j" % slf4jVersion,
   "org.joda" % "joda-convert" % "1.8.1",
-  "com.google.api-ads" % "dfp-axis" % "2.20.0"
+  "com.google.api-ads" % "dfp-axis" % "2.20.0",
+  "org.scalatest" %% "scalatest" % "3.0.0" % Test
 )
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaffArtifact)
