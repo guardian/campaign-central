@@ -5,12 +5,12 @@ import {composerEditUrl, previewUrl, liveUrl, mediaAtomEditUrl} from '../../util
 class CampaignContent extends Component {
 
   componentWillMount() {
-    this.props.campaignContentActions.getCampaignContent(this.props.campaign.id);
+    this.props.getCampaignContent(this.props.campaign.id);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.campaign.id !== this.props.campaign.id) {
-      this.props.campaignContentActions.getCampaignContent(nextProps.campaign.id);
+      this.props.getCampaignContent(nextProps.campaign.id);
     }
   }
 
@@ -104,19 +104,12 @@ class CampaignContent extends Component {
 
 //REDUX CONNECTIONS
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
 
 function mapStateToProps(state) {
   return {
-    campaignContent: state.campaignContent,
+    campaignContent: state.campaignContent
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    campaignContentActions: bindActionCreators(Object.assign({}, getCampaignContent), dispatch)
-  };
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignContent);
+export default connect(mapStateToProps)(CampaignContent);

@@ -18,36 +18,20 @@ object Section {
   implicit val sectionFormat: Format[Section] = Jsonx.formatCaseClass[Section]
 }
 
-case class ImportCampaignFromCAPICommand(
-                                        id: Long,
-                                        externalName: String,
-                                        section: Section
-                                        ) extends Command {
+trait CAPIImportCommand extends Command {
+
   override type T = Campaign
 
   def deriveHostedTagFromContent(content: List[ApiContent]) = {
     content.flatMap(_.tags).find{t => t.`type` == TagType.PaidContent && t.paidContentType == Some("HostedContent")}
   }
 
-  def findOrCreateClient(tag: Tag): Client = {
-    val sponsorName = tag.activeSponsorships.flatMap(_.headOption.map(_.sponsorName)) getOrElse (SponsorNameNotFound)
-    ClientRepository.getClientByName(sponsorName) getOrElse {
-      val client = Client(
-        id = UUID.randomUUID().toString,
-        name = sponsorName,
-        country = "UK", // default country and agency, these can be manually
-        agency = None   // updated later
-      )
-      ClientRepository.putClient(client) getOrElse (FailedToSaveClient(client))
-    }
+  def deriveContentType(apiContent: ApiContent) = {
+    apiContent.tags.filter(_.`type` == TagType.Type).headOption.map(_.webTitle).getOrElse(UnableToDetermineContentType)
   }
 
   def deriveTagLogo(tag: Tag): Option[String] = {
     tag.activeSponsorships.flatMap(_.headOption.map(_.sponsorLogo))
-  }
-
-  def deriveContentType(apiContent: ApiContent) = {
-    apiContent.tags.filter(_.`type` == TagType.Type).headOption.map(_.webTitle).getOrElse(UnableToDetermineContentType)
   }
 
   def buildAtomList(apiContent: ApiContent): List[Atom] = {
@@ -65,6 +49,61 @@ case class ImportCampaignFromCAPICommand(
   def cleanHeadline(headline: String) = headline match {
     case "" => "untitled"
     case h => h
+  }
+
+  def buildContentItems(apiContent: List[ApiContent], campaignId: String): List[ContentItem] = apiContent.map{ apic =>
+    ContentItem(
+      campaignId = campaignId,
+      id = apic.fields.flatMap(_.internalComposerCode).getOrElse(UUID.randomUUID().toString),
+      `type` = deriveContentType(apic),
+      composerId = apic.fields.flatMap(_.internalComposerCode),
+      path = Option(apic.id),
+      title = cleanHeadline(apic.webTitle),
+      isLive = apic.fields.flatMap(_.isLive).getOrElse(false),
+      atoms = buildAtomList(apic)
+    )
+  }
+
+  def updateCampaignAndContent(apiContent: List[ApiContent], hostedTag: Tag, campaign: Campaign): Option[Campaign] = {
+    val contentItems = buildContentItems(apiContent, campaign.id)
+
+    contentItems.foreach( CampaignContentRepository.putContent )
+
+    val startDate = apiContent.flatMap(_.fields.flatMap(_.firstPublicationDate)).sortBy(_.dateTime).headOption
+
+    val ctaAtoms = apiContent.flatMap(_.atoms.flatMap(_.cta)).flatten
+
+    val updatedCampaign = campaign.copy(
+      startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
+      status = if(startDate.isDefined) "live" else campaign.status,
+      callToActions = ctaAtoms.map(ctaAtom => CallToAction(Some(ctaAtom.id))).distinct,
+      campaignLogo = deriveTagLogo(hostedTag)
+    )
+
+    CampaignRepository.putCampaign(updatedCampaign)
+  }
+
+}
+
+case class ImportCampaignFromCAPICommand(
+                                        id: Long,
+                                        externalName: String,
+                                        section: Section
+                                        ) extends CAPIImportCommand {
+
+
+
+  def findOrCreateClient(tag: Tag): Client = {
+    val sponsorName = tag.activeSponsorships.flatMap(_.headOption.map(_.sponsorName)) getOrElse (SponsorNameNotFound)
+    ClientRepository.getClientByName(sponsorName) getOrElse {
+      val client = Client(
+        id = UUID.randomUUID().toString,
+        name = sponsorName,
+        country = "UK", // default country and agency, these can be manually
+        agency = None // updated later
+      )
+      ClientRepository.putClient(client) getOrElse (FailedToSaveClient(client))
+    }
   }
 
   override def process()(implicit user: Option[User]): Option[Campaign] = {
@@ -94,34 +133,7 @@ case class ImportCampaignFromCAPICommand(
       )
     }
 
-    val contentItems = apiContent.map{ apic =>
-      ContentItem(
-        campaignId = campaign.id,
-        id = apic.fields.flatMap(_.internalComposerCode).getOrElse(UUID.randomUUID().toString),
-        `type` = deriveContentType(apic),
-        composerId = apic.fields.flatMap(_.internalComposerCode),
-        path = Option(apic.id),
-        title = cleanHeadline(apic.webTitle),
-        isLive = apic.fields.flatMap(_.isLive).getOrElse(false),
-        atoms = buildAtomList(apic)
-      )
-    }
-
-    contentItems.foreach( CampaignContentRepository.putContent )
-
-    val startDate = apiContent.flatMap(_.fields.flatMap(_.firstPublicationDate)).sortBy(_.dateTime).headOption
-
-    val ctaAtoms = apiContent.flatMap(_.atoms.flatMap(_.cta)).flatten
-
-    val updatedCampaign = campaign.copy(
-      startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
-      status = if(startDate.isDefined) "live" else campaign.status,
-      pathPrefix = Some(section.pathPrefix),
-      callToActions = ctaAtoms.map(ctaAtom => CallToAction(Some(ctaAtom.id))).distinct,
-      campaignLogo = deriveTagLogo(hostedTag)
-    )
-
-    CampaignRepository.putCampaign(updatedCampaign)
+    updateCampaignAndContent(apiContent, hostedTag, campaign)
   }
 }
 
@@ -129,3 +141,26 @@ case class ImportCampaignFromCAPICommand(
 object ImportCampaignFromCAPICommand {
   implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignFromCAPICommand] = Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
 }
+
+case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand {
+
+  override def process()(implicit user: Option[User]): Option[Campaign] = {
+
+    val userOrDefault = user getOrElse(User("CAPI", "importer", "labs.beta@guardian.co.uk"))
+    val now = DateTime.now
+
+    val campaign = CampaignRepository.getCampaign(id) getOrElse { CampaignNotFound }
+
+    Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
+
+    val apiContent = ContentApi.loadAllContentInSection(campaign.pathPrefix getOrElse( CampaignMissingData("pathPrefix") ))
+    val hostedTag = deriveHostedTagFromContent(apiContent) getOrElse (CampaignTagNotFound)
+
+    updateCampaignAndContent(apiContent, hostedTag, campaign)
+  }
+}
+
+object RefreshCampaignFromCAPICommand {
+  implicit val refreshCampaignFromCAPICommandFormat: Format[RefreshCampaignFromCAPICommand] = Jsonx.formatCaseClass[RefreshCampaignFromCAPICommand]
+}
+

@@ -17,17 +17,17 @@ GET            /reauth            controllers.App.reauth
 GET /api/campaigns/bootstrap      controllers.CampaignApi.bootstrapData
 
 
-GET /api/campaigns                controllers.CampaignApi.getAllCampaigns
-GET /api/campaigns/:id            controllers.CampaignApi.getCampaign(id: String)
-PUT /api/campaigns/:id            controllers.CampaignApi.updateCampaign(id: String)
-GET /api/campaigns/:id/analytics  controllers.CampaignApi.getCampaignAnalytics(id: String)
-GET /api/campaigns/:id/content    controllers.CampaignApi.getCampaignContent(id: String)
-GET /api/campaigns/:id/notes      controllers.CampaignApi.getCampaignNotes(id: String)
-POST /api/campaigns/:id/notes     controllers.CampaignApi.addCampaignNote(id: String)
-PUT /api/campaigns/:id/note/:date controllers.CampaignApi.updateCampaignNote(id: String, date: String)
-POST /api/campaigns/import        controllers.CampaignApi.importFromTag()
-
-GET /api/campaigns/:id/drivers    controllers.CampaignApi.getCampaignTrafficDrivers(id: String)
+GET /api/campaigns                        controllers.CampaignApi.getAllCampaigns
+GET /api/campaigns/:id                    controllers.CampaignApi.getCampaign(id: String)
+PUT /api/campaigns/:id                    controllers.CampaignApi.updateCampaign(id: String)
+GET /api/campaigns/:id/analytics          controllers.CampaignApi.getCampaignAnalytics(id: String)
+GET /api/campaigns/:id/content            controllers.CampaignApi.getCampaignContent(id: String)
+GET /api/campaigns/:id/notes              controllers.CampaignApi.getCampaignNotes(id: String)
+POST /api/campaigns/:id/notes             controllers.CampaignApi.addCampaignNote(id: String)
+PUT /api/campaigns/:id/note/:date         controllers.CampaignApi.updateCampaignNote(id: String, date: String)
+POST /api/campaigns/import                controllers.CampaignApi.importFromTag()
+POST /api/campaigns/:id/refreshFromCAPI   controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
+GET /api/campaigns/:id/drivers            controllers.CampaignApi.getCampaignTrafficDrivers(id: String)
 
 
 #Clients Api

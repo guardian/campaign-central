@@ -83,3 +83,10 @@ export function importCampaignFromTag(tag) {
     method: 'post'
   });
 }
+
+export function refreshCampaignFromCAPI(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/refreshFromCAPI',
+    method: 'post'
+  });
+}
