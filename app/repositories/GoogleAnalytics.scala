@@ -130,7 +130,7 @@ object GoogleAnalytics {
     def addDailyTargets(dailyTarget: Option[Long]) = {
 
       val dayStatsWithTarget = dailyTarget.map{ target =>
-        dayStats.mapValues{stats => stats + ("targetUniques" -> target)}
+        dayStats.mapValues{stats => stats + ("target-uniques" -> target)}
       }.getOrElse(dayStats)
 
       ParsedDailyCountsReport(seenPaths, dayStatsWithTarget)
