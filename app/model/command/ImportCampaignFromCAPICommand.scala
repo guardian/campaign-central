@@ -7,6 +7,7 @@ import com.gu.contentapi.client.model.v1.{Tag, TagType, Content => ApiContent}
 import com.gu.contentatom.thrift.AtomData
 import com.gu.contentatom.thrift.atom.media.MediaAtom
 import model._
+import model.external.Sponsorship
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Format
@@ -64,7 +65,7 @@ trait CAPIImportCommand extends Command {
     )
   }
 
-  def updateCampaignAndContent(apiContent: List[ApiContent], hostedTag: Tag, campaign: Campaign): Option[Campaign] = {
+  def updateCampaignAndContent(apiContent: List[ApiContent], hostedTag: Tag, campaign: Campaign, sponsorship: Option[Sponsorship]): Option[Campaign] = {
     val contentItems = buildContentItems(apiContent, campaign.id)
 
     contentItems.foreach( CampaignContentRepository.putContent )
@@ -75,6 +76,7 @@ trait CAPIImportCommand extends Command {
 
     val updatedCampaign = campaign.copy(
       startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
+      endDate = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1))),
       status = if(startDate.isDefined) "live" else campaign.status,
       callToActions = ctaAtoms.map(ctaAtom => CallToAction(Some(ctaAtom.id))).distinct,
       campaignLogo = deriveTagLogo(hostedTag)
@@ -133,7 +135,9 @@ case class ImportCampaignFromCAPICommand(
       )
     }
 
-    updateCampaignAndContent(apiContent, hostedTag, campaign)
+    val sponsorship = campaign.tagId.flatMap( TagManagerApi.getSponsorshipForTag )
+
+    updateCampaignAndContent(apiContent, hostedTag, campaign, sponsorship)
   }
 }
 
@@ -157,9 +161,7 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
     val hostedTag = deriveHostedTagFromContent(apiContent) getOrElse (CampaignTagNotFound)
     val sponsorship = campaign.tagId.flatMap( TagManagerApi.getSponsorshipForTag )
 
-    Logger.info(s"sponsorship is $sponsorship")
-
-    updateCampaignAndContent(apiContent, hostedTag, campaign)
+    updateCampaignAndContent(apiContent, hostedTag, campaign, sponsorship)
   }
 }
 
