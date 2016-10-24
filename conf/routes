@@ -37,5 +37,9 @@ PUT /api/clients/:id              controllers.ClientApi.updateClient(id: String)
 
 GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
+# Migration
+GET /migration/addCampaignTypes   controllers.Migration.addCampaignType()
+
+
 # Management
 GET /management/healthcheck       controllers.Management.healthCheck

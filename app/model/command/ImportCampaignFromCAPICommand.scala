@@ -119,6 +119,7 @@ case class ImportCampaignFromCAPICommand(
       Campaign(
         id = UUID.randomUUID().toString,
         name = externalName,
+        `type` = Some("hosted"),
         status = "pending",
         tagId = Some(id),
         pathPrefix = Some(section.pathPrefix),
