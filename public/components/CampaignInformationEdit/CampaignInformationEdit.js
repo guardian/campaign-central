@@ -51,7 +51,6 @@ class CampaignInformationEdit extends React.Component {
       const now = new Date();
       const oneDayMillis = 24 * 60 * 60 * 1000;
       const days = Math.round((this.props.campaign.endDate - now) / oneDayMillis);
-      console.log(this.props.campaign.endDate, now, oneDayMillis, days);
 
       daysLeft = ' - ' + days + ' days left';
     }
