@@ -5,8 +5,8 @@ import java.util.concurrent.Executors
 import com.gu.contentapi.client.ContentApiClientLogic
 import com.gu.contentapi.client.model._
 import com.gu.contentapi.client.model.v1.Content
-import com.squareup.okhttp.Credentials
 import dispatch.FunctionHandler
+import okhttp3.Credentials
 import play.api.Logger
 import services.Config
 

@@ -28,6 +28,14 @@ class CampaignPerformanceSummary extends React.Component {
       data.push( {name: "target", count: target, fill: getFillColour(index++)} );
     }
 
+    if (this.props.latestCounts["cumulative-target-uniques"]) {
+      data.push({
+        name: "target to date",
+        count: this.props.latestCounts["cumulative-target-uniques"],
+        fill: getFillColour(index++)
+      });
+    }
+
     data.push( {name: "uniques", count: this.props.latestCounts["cumulative-unique-total"], fill: getFillColour(index++)} );
 
     for(var i = 0; i < this.props.paths.length; i++) {

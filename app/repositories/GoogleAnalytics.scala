@@ -5,7 +5,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.services.analyticsreporting.v4.model._
 import com.google.api.services.analyticsreporting.v4.{AnalyticsReporting, AnalyticsReportingScopes}
-import org.joda.time.DateTime
+import model.Campaign
+import org.joda.time.{DateTime, Duration}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.Logger
 import play.api.libs.json.Format
@@ -19,7 +20,7 @@ import scala.collection.JavaConversions._
 case class CampaignDailyCountsReport(seenPaths: Set[String], pageCountStats: List[Map[String, Long]])
 
 object CampaignDailyCountsReport{
-  implicit val agencyFormat: Format[CampaignDailyCountsReport] = Jsonx.formatCaseClass[CampaignDailyCountsReport]
+  implicit val campaignDailyCountsReportFormat: Format[CampaignDailyCountsReport] = Jsonx.formatCaseClass[CampaignDailyCountsReport]
 
   def apply(parsedDailyCountsReport: ParsedDailyCountsReport): CampaignDailyCountsReport = {
     CampaignDailyCountsReport(
@@ -54,6 +55,9 @@ object GoogleAnalytics {
       gaFilter <- campaign.gaFilterExpression
     ) yield {
 
+
+      val dailyUniqueTargetValue = calculateDailyUniqueTarget(campaign)
+
       val endOfRange = campaign.endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
       val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
 
@@ -79,12 +83,25 @@ object GoogleAnalytics {
       val stats = parseDailyCountsReport(reportResponse)
         .map(_.zeroMissingPaths)
         .map(_.calulateDailyTotals)
+        .map(_.addDailyTargets(dailyUniqueTargetValue))
         .map(_.calulateCumalativeVales)
 
       stats.map(CampaignDailyCountsReport(_))
     }
 
     report.flatten
+  }
+
+
+  private def calculateDailyUniqueTarget(campaign: Campaign): Option[Long] = {
+    for(
+      startDate <- campaign.startDate;
+      endDate <- campaign.endDate;
+      target <- campaign.targets.get("uniques")
+    ) yield {
+      val days = new Duration(startDate, endDate).getStandardDays
+      target / days
+    }
   }
 
   case class ParsedDailyCountsReport(seenPaths: Set[String], dayStats: Map[DateTime, Map[String, Long]]) {
@@ -108,6 +125,15 @@ object GoogleAnalytics {
       }
 
       ParsedDailyCountsReport(seenPaths, totalisedDayStats)
+    }
+
+    def addDailyTargets(dailyTarget: Option[Long]) = {
+
+      val dayStatsWithTarget = dailyTarget.map{ target =>
+        dayStats.mapValues{stats => stats + ("target-uniques" -> target)}
+      }.getOrElse(dayStats)
+
+      ParsedDailyCountsReport(seenPaths, dayStatsWithTarget)
     }
 
     def calulateCumalativeVales = {

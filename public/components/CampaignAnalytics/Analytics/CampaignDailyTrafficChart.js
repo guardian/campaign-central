@@ -22,6 +22,7 @@ class CampaignDailyTrafficChart extends React.Component {
               <YAxis label="Views"/>
               <Line type="linear" dataKey="count-total" stroke={getStrokeColour(0)}  name="Page Views"/>
               <Line type="linear" dataKey="unique-total" stroke={getStrokeColour(1)} name="Uniques"/>
+              <Line type="linear" dataKey="target-uniques" stroke={getStrokeColour(2)} name="Daily target uniques" dot={false}/>
               <Tooltip labelFormatter={formatMillisecondDate} />
               <Legend />
             </LineChart>
