@@ -5,6 +5,10 @@ import java.time.LocalDate
 import com.google.api.ads.dfp.axis.v201608.{DateTime, LineItem}
 import play.api.libs.json.{Json, Writes}
 import services.Config.conf._
+import services.{DfpFetcher, DfpFilter}
+import util.AnalyticsCache
+
+import scala.io.BufferedSource
 
 case class PerformanceStats(impressions: Int, clicks: Int) {
   val ctr: Double = if (impressions == 0) 0 else clicks.toDouble / impressions * 100
@@ -87,5 +91,76 @@ object TrafficDriverGroup {
         trafficDriverUrls = trafficDrivers.map(_.url)
       )
     )
+  }
+
+  def forCampaign(campaignId: String): Seq[TrafficDriverGroup] = {
+    val dfpSession = DfpFetcher.mkSession()
+
+    def trafficDrivers(orderId: Long): Seq[TrafficDriver] =
+      DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
+        DfpFilter.hasCampaignIdCustomFieldValue(campaignId)
+      } map TrafficDriver.fromDfpLineItem
+
+    Seq(
+      TrafficDriverGroup.fromTrafficDrivers("Native cards", trafficDrivers(dfpNativeCardOrderId)),
+      TrafficDriverGroup.fromTrafficDrivers("Merchandising", trafficDrivers(dfpMerchandisingOrderId))
+    ).flatten
+  }
+}
+
+case class DayStats(date: LocalDate, stats: PerformanceStats)
+
+object DayStats {
+
+  implicit val writes = Json.writes[DayStats]
+
+  def fromDfpReport(report: BufferedSource): Seq[DayStats] = {
+    report.getLines.toSeq.tail.map { line =>
+      val parts = line.split(",")
+      DayStats(LocalDate.parse(parts(0)), PerformanceStats(parts(1).toInt, parts(2).toInt))
+    }
+  }
+}
+
+case class TrafficDriverGroupStats(groupName: String, dayStats: Seq[DayStats])
+
+object TrafficDriverGroupStats {
+
+  implicit val writes = Json.writes[TrafficDriverGroupStats]
+
+  private val statsCache = new AnalyticsCache[String, Seq[TrafficDriverGroupStats]]
+
+  def forCampaign(campaignId: String): Seq[TrafficDriverGroupStats] = {
+    val cachedStats = statsCache.get(campaignId) getOrElse Nil
+    if (cachedStats.isEmpty) {
+      loadStatsForCampaign(campaignId)
+    }
+    cachedStats
+  }
+
+  private def loadStatsForCampaign(campaignId: String): Unit = {
+
+    val dfpSession = DfpFetcher.mkSession()
+
+    def groupStats(groupName: String, orderId: Long): TrafficDriverGroupStats = {
+
+      val lineItemIds = DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
+        DfpFilter.hasCampaignIdCustomFieldValue(campaignId)
+      } map (_.getId.toLong)
+
+      TrafficDriverGroupStats(
+        groupName,
+        DfpFetcher.fetchStatsReport(dfpSession, lineItemIds).map(DayStats.fromDfpReport) getOrElse Nil
+      )
+    }
+
+    val stats = Seq(
+      ("Native cards", dfpNativeCardOrderId),
+      ("Merchandising", dfpMerchandisingOrderId)
+    ).par.map { case (groupName, orderId) =>
+      groupStats(groupName, orderId)
+    }.toList
+
+    statsCache.put(campaignId, stats)
   }
 }

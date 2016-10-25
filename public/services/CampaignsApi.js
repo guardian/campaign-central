@@ -49,6 +49,14 @@ export function fetchCampaignTrafficDrivers(id) {
   });
 }
 
+export function fetchCampaignTrafficDriverStats(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/driverstats',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
 export function fetchCampaignNotes(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/notes',

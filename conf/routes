@@ -28,6 +28,7 @@ PUT /api/campaigns/:id/note/:date         controllers.CampaignApi.updateCampaign
 POST /api/campaigns/import                controllers.CampaignApi.importFromTag()
 POST /api/campaigns/:id/refreshFromCAPI   controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
 GET /api/campaigns/:id/drivers            controllers.CampaignApi.getCampaignTrafficDrivers(id: String)
+GET /api/campaigns/:id/driverstats        controllers.CampaignApi.getCampaignTrafficDriverStats(id: String)
 
 
 #Clients Api
