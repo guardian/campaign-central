@@ -43,6 +43,10 @@ class CampaignListItem extends React.Component {
         <div className="campaign-list__item__info">
           <span className="campaign-list__item__info-name">{this.props.campaign.name}</span>
           <span className="campaign-list__item__info-other">
+            <span className="campaign-list__item__info-other--info">Type: </span>
+            <span className="campaign-list__item__info-other--status">{this.props.campaign.type} </span>
+          </span>
+          <span className="campaign-list__item__info-other">
             <span className="campaign-list__item__info-other--info">Status: </span>
             <span className="campaign-list__item__info-other--status">{this.props.campaign.status} </span>
           </span>
