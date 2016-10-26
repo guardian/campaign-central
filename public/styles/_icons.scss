@@ -15,7 +15,7 @@
 
 .i-add-image-grey {
 	@extend %svg-common;
-	background-position: 60% 60%;
+	background-position: 80% 0;
 	width: 12px;
 	height: 12px;
 }
@@ -97,16 +97,23 @@
 	height: 12px;
 }
 
-.i-down-arrow {
+.i-dfp {
 	@extend %svg-common;
 	background-position: 20% 60%;
 	width: 12px;
 	height: 12px;
 }
 
-.i-failed-face-red {
+.i-down-arrow {
 	@extend %svg-common;
 	background-position: 40% 60%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-failed-face-red {
+	@extend %svg-common;
+	background-position: 60% 60%;
 	width: 12px;
 	height: 12px;
 }
@@ -120,105 +127,105 @@
 
 .i-info-grey {
 	@extend %svg-common;
-	background-position: 80% 0;
+	background-position: 80% 20%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-interactive {
 	@extend %svg-common;
-	background-position: 80% 20%;
+	background-position: 80% 40%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-live-site {
 	@extend %svg-common;
-	background-position: 80% 40%;
+	background-position: 80% 60%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-pen {
 	@extend %svg-common;
-	background-position: 80% 60%;
+	background-position: 0 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-plus {
 	@extend %svg-common;
-	background-position: 0 80%;
+	background-position: 20% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-preview-eye {
 	@extend %svg-common;
-	background-position: 20% 80%;
+	background-position: 40% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-publish {
 	@extend %svg-common;
-	background-position: 40% 80%;
+	background-position: 60% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-publish-disabled {
 	@extend %svg-common;
-	background-position: 60% 80%;
+	background-position: 80% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-refresh {
 	@extend %svg-common;
-	background-position: 80% 80%;
+	background-position: 100% 0;
 	width: 12px;
 	height: 12px;
 }
 
 .i-rollback-grey {
 	@extend %svg-common;
-	background-position: 100% 0;
+	background-position: 100% 20%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tag-white-30 {
 	@extend %svg-common;
-	background-position: 100% 20%;
+	background-position: 100% 40%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tick {
 	@extend %svg-common;
-	background-position: 100% 40%;
+	background-position: 100% 60%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tick-green {
 	@extend %svg-common;
-	background-position: 100% 60%;
+	background-position: 100% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tick-selected {
 	@extend %svg-common;
-	background-position: 100% 80%;
+	background-position: 0 100%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-video {
 	@extend %svg-common;
-	background-position: 0 100%;
+	background-position: 20% 100%;
 	width: 12px;
 	height: 12px;
 }

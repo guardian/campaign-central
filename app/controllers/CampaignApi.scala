@@ -2,17 +2,16 @@ package controllers
 
 import java.util.UUID
 
+import com.gu.pandomainauth.model.{User => PandaUser}
 import model._
 import model.command.CommandError._
-import model.command.ImportCampaignFromCAPICommand
+import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.libs.json.Json._
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, Controller}
-import com.gu.pandomainauth.model.{User => PandaUser}
-import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
-import model.command.CommandError._
+import play.api.mvc.Controller
 import repositories._
 import services.Config.conf._
 import services.{DfpFetcher, DfpFilter}
@@ -214,19 +213,20 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
   def getCampaignTrafficDrivers(id: String) = APIAuthAction { req =>
 
+    Logger.info(s"Loading traffic drivers for campaign $id")
+
     val dfpSession = DfpFetcher.mkSession()
 
-    def trafficDrivers(orderId: Long, driverType: String) =
+    def trafficDrivers(orderId: Long): Seq[TrafficDriver] =
       DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
         DfpFilter.hasCampaignIdCustomFieldValue(id)
-      } map {
-        TrafficDriver.fromDfpLineItem(driverType)
-      }
+      } map TrafficDriver.fromDfpLineItem
 
-    val drivers =
-      trafficDrivers(dfpNativeCardOrderId, "Native cards") ++
-      trafficDrivers(dfpMerchComponentOrderId, "Merch components")
+    val driverGroups: Seq[TrafficDriverGroup] = Seq(
+      TrafficDriverGroup.fromTrafficDrivers("Native cards", trafficDrivers(dfpNativeCardOrderId)),
+      TrafficDriverGroup.fromTrafficDrivers("Merchandising", trafficDrivers(dfpMerchandisingOrderId))
+    ).flatten
 
-    Ok(toJson(drivers))
+    Ok(toJson(driverGroups))
   }
 }
