@@ -6,36 +6,18 @@ class Campaigns extends Component {
   static propTypes = {
     campaigns: PropTypes.array.isRequired,
   }
-
-  applyRouteBasedFiltering = (campaigns) => {
-    const filterName = this.props.routeParams.filterName;
-
-    switch (filterName) {
-
-      case 'prospect':
-        return campaigns.filter((c) => c.status === 'prospect');
-
-      case 'production':
-        return campaigns.filter((c) => c.status === 'production');
-
-      case 'live':
-        return campaigns.filter((c) => c.status === 'live');
-
-      case 'dead':
-        return campaigns.filter((c) => c.status === 'dead');
-
-      default:
-        return campaigns;
-    }
-  }
-
-  applyCurrentFilters = (campaigns) => {
-    return campaigns;
-  }
-
+  
   filterCampaigns = (campaigns) => {
-    const routeFilteredCampaigns = this.applyRouteBasedFiltering(campaigns);
-    return this.applyCurrentFilters(routeFilteredCampaigns);
+    var filtered = campaigns;
+
+    if (this.props.campaignStateFilter) {
+      filtered = filtered.filter((c) => c.status === this.props.campaignStateFilter);
+    }
+
+    if (this.props.campaignTypeFilter) {
+      filtered = filtered.filter((c) => c.type === this.props.campaignTypeFilter);
+    }
+    return filtered;
   }
 
   componentDidMount() {
@@ -60,7 +42,9 @@ import * as getCampaigns from '../../actions/CampaignActions/getCampaigns';
 
 function mapStateToProps(state) {
   return {
-    campaigns: state.campaigns
+    campaigns: state.campaigns,
+    campaignStateFilter: state.campaignStateFilter,
+    campaignTypeFilter: state.campaignTypeFilter
   };
 }
 

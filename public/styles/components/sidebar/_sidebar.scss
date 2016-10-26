@@ -80,3 +80,38 @@
   }
 
 }
+
+.sidebar__filter-group {
+}
+
+.sidebar__filter-group__header {
+  text-transform: uppercase;
+
+  font-weight: bold;
+
+  font-size: 13px;
+
+  color: $c-grey-200;
+
+  padding: 10px 20px;
+}
+.sidebar__filter-group__link {
+
+  display: block;
+
+  text-transform: uppercase;
+
+  font-size: 12px;
+
+  padding: 5px 40px;
+
+
+  color: $c-grey-200;
+  border-bottom: 2px solid $c-grey-main;
+
+  &--active {
+    color: $c-highlight-main;
+  }
+
+}
+

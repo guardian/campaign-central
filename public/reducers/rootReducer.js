@@ -9,6 +9,8 @@ import client from './clientReducer';
 import campaignContent from './campaignContentReducer';
 import campaignTrafficDrivers from './campaignTrafficDriverReducer';
 import campaignNotes from './campaignNotesReducer';
+import campaignStateFilter from './campaignStateFilterReducer';
+import campaignTypeFilter from './campaignTypeFilterReducer';
 
 export default combineReducers({
   error,
@@ -20,5 +22,7 @@ export default combineReducers({
   client,
   campaignContent,
   campaignTrafficDrivers,
-  campaignNotes
+  campaignNotes,
+  campaignStateFilter,
+  campaignTypeFilter
 });
