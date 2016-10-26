@@ -3,6 +3,7 @@ package repositories
 import ai.x.play.json.Jsonx
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
+import com.google.api.client.http.{HttpRequest, HttpRequestInitializer}
 import com.google.api.services.analyticsreporting.v4.model._
 import com.google.api.services.analyticsreporting.v4.{AnalyticsReporting, AnalyticsReportingScopes}
 import model.Campaign
@@ -209,10 +210,16 @@ object GoogleAnalytics {
     new AnalyticsReporting.Builder(
         httpTransport,
         com.google.api.client.googleapis.util.Utils.getDefaultJsonFactory,
-        scoped)
+        new TimeoutRequestInitializer(scoped))
       .setApplicationName("campaign central")
       .build()
   }
 
-
+  private class TimeoutRequestInitializer(creds: HttpRequestInitializer) extends HttpRequestInitializer {
+    override def initialize(request: HttpRequest): Unit = {
+      creds.initialize(request);
+      request.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
+      request.setReadTimeout(3 * 60000);
+    }
+  }
 }
