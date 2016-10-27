@@ -36,6 +36,10 @@ class CampaignContent extends Component {
       contentTypeIcon = <i className="i-gallery" />
     } else if (content.type === 'Video') {
       contentTypeIcon = <i className="i-video" />
+    } else if (content.type === 'Interactive') {
+      contentTypeIcon = <i className="i-interactive" />
+    } else if (content.type === 'Audio') {
+      contentTypeIcon = <i className="i-audio" />
     }
 
     var status;
