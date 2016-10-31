@@ -1,5 +1,7 @@
 package repositories
 
+import java.util.concurrent.Executors
+
 import ai.x.play.json.Jsonx
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
@@ -16,6 +18,7 @@ import services.{AWS, Config}
 import util.AnalyticsCache
 
 import scala.collection.JavaConversions._
+import scala.concurrent.{ExecutionContext, Future}
 
 
 case class CampaignDailyCountsReport(seenPaths: Set[String], pageCountStats: List[Map[String, Long]])
@@ -36,26 +39,57 @@ object CampaignDailyCountsReport{
 
 object GoogleAnalytics {
 
+  implicit val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(10))
+
   val gaClient = initialiseGaClient
 
-  val dailyCountsReportCache = new AnalyticsCache[String, CampaignDailyCountsReport]
-
   def getAnalyticsForCampaign(campaignId: String): Option[CampaignDailyCountsReport] = {
-    dailyCountsReportCache.get(campaignId) orElse {
-      val campaign = CampaignRepository.getCampaign(campaignId)
 
-      val report = campaign match {
-        case Some(c) if c.`type` == "hosted" => loadAnalyticsForHostedCampaign(c)
-        case Some(c) => loadAnalyticsForCampaignContent(c)
-        case None => {
-          Logger.warn("could not provide analytics for missing campaign")
-          None
-        }
+    AnalyticsDataCache.getCampaignDailyCountsReport(campaignId) match {
+      case Hit(report) => {
+        Logger.debug(s"getting analytics for campaign $campaignId - cache hit")
+        Some(report)
       }
+      case Stale(report) => {
+        Logger.debug(s"getting analytics for campaign $campaignId - cache stale spawning async refresh")
 
-      report.foreach( dailyCountsReportCache.put(campaignId, _) )
-      report
+        Future{
+          Logger.debug(s"async refresh of analytics for campaign $campaignId")
+          fetchAndStoreAnalyticsForCampaign(campaignId)
+        } // serve stale but spawn refresh future
+        Some(report)
+      }
+      case Miss => {
+        Logger.debug(s"getting analytics for campaign $campaignId - cache miss fetching sync")
+        fetchAndStoreAnalyticsForCampaign(campaignId)
+      }
     }
+  }
+
+  private def fetchAndStoreAnalyticsForCampaign(campaignId: String): Option[CampaignDailyCountsReport] = {
+    val campaign = CampaignRepository.getCampaign(campaignId)
+
+    val report = campaign match {
+      case Some(c) if c.`type` == "hosted" => loadAnalyticsForHostedCampaign(c)
+      case Some(c) => loadAnalyticsForCampaignContent(c)
+      case None => {
+        Logger.warn("could not provide analytics for missing campaign")
+        None
+      }
+    }
+
+    report.foreach{ data =>
+      val campaignFinished = for (
+        c <- campaign;
+        d <- c.endDate
+      ) yield {d.isBeforeNow}
+
+      val expiry = if(campaignFinished.getOrElse(false)) None else { Some( DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis) }
+
+      AnalyticsDataCache.putCampaignDailyCountsReport(campaignId, data, expiry)
+    }
+
+    report
   }
 
   private def cleanAndConvertRawDailyCounts(rawDailyCounts: ParsedDailyCountsReport, dailyUniqueTargetValue: Option[Long]): CampaignDailyCountsReport = {

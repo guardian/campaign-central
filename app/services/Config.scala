@@ -35,6 +35,8 @@ sealed trait Config {
 
   def clientTableName = s"campaign-central-$stage-clients"
 
+  def analyticsDataCacheTableName = s"campaign-central-$stage-analytics"
+
   def tagManagerApiUrl: String
   def composerUrl: String
   def liveUrl: String
