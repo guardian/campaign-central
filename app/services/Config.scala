@@ -68,7 +68,7 @@ sealed trait Config {
   lazy val dfpRefreshToken = getRequiredRemoteStringProperty("dfp.refresh.token")
   def dfpNetworkCode: String
   def dfpNativeCardOrderId: Long
-  def dfpMerchComponentOrderId: Long
+  def dfpMerchandisingOrderId: Long
   def dfpCampaignFieldId: Long
 
   def googleServiceAccountJsonInputStream: InputStream = {
@@ -119,10 +119,10 @@ class DevConfig extends Config {
   override def mediaAtomMakerUrl = "https://media-atom-maker.local.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.local.dev-gutools.co.uk"
 
-  override val dfpNetworkCode = "59666047"
-  override val dfpNativeCardOrderId: Long = 353494647
-  override val dfpMerchComponentOrderId: Long = 345535767
-  override val dfpCampaignFieldId: Long = 9927
+  override val dfpNetworkCode = "158186692"
+  override val dfpNativeCardOrderId: Long = 550773372
+  override val dfpMerchandisingOrderId: Long = 550774092
+  override val dfpCampaignFieldId: Long = 26412
 }
 
 class CodeConfig extends Config {
@@ -140,10 +140,10 @@ class CodeConfig extends Config {
   override def mediaAtomMakerUrl = "https://media-atom-maker.code.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.code.dev-gutools.co.uk"
 
-  override val dfpNetworkCode = "59666047"
-  override val dfpNativeCardOrderId: Long = 353494647
-  override val dfpMerchComponentOrderId: Long = 345535767
-  override val dfpCampaignFieldId: Long = 9927
+  override val dfpNetworkCode = "158186692"
+  override val dfpNativeCardOrderId: Long = 550773372
+  override val dfpMerchandisingOrderId: Long = 550774092
+  override val dfpCampaignFieldId: Long = 26412
 }
 
 class ProdConfig extends Config {
@@ -163,6 +163,6 @@ class ProdConfig extends Config {
 
   override val dfpNetworkCode = "59666047"
   override val dfpNativeCardOrderId: Long = 353494647
-  override val dfpMerchComponentOrderId: Long = 345535767
+  override val dfpMerchandisingOrderId: Long = 345535767
   override val dfpCampaignFieldId: Long = 9927
 }
