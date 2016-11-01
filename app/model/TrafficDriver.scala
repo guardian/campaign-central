@@ -8,6 +8,8 @@ import services.Config.conf._
 import services.{DfpFetcher, DfpFilter}
 import util.AnalyticsCache
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.io.BufferedSource
 
 case class PerformanceStats(impressions: Int, clicks: Int) {
@@ -133,7 +135,7 @@ object TrafficDriverGroupStats {
   def forCampaign(campaignId: String): Seq[TrafficDriverGroupStats] = {
     val cachedStats = statsCache.get(campaignId) getOrElse Nil
     if (cachedStats.isEmpty) {
-      loadStatsForCampaign(campaignId)
+      Future(loadStatsForCampaign(campaignId))
     }
     cachedStats
   }
