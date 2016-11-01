@@ -11,3 +11,9 @@ export function shortFormatMillisecondDate(msDate) {
 
   return date.toLocaleDateString();
 }
+
+export function isoFormatMillisecondDate(msDate) {
+  const date = new Date(msDate);
+
+  return date.toISOString();
+}
