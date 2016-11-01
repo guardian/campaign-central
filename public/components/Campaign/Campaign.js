@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import {Link} from 'react-router';
 import CampaignEdit from '../CampaignInformationEdit/CampaignEdit';
 import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
 import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
@@ -8,6 +9,10 @@ class Campaign extends React.Component {
 
   componentWillMount() {
     this.props.campaignActions.getCampaign(this.props.params.id);
+  }
+
+  deleteCampaign = () => {
+    this.props.campaignActions.deleteCampaign(this.props.campaign.id);
   }
 
   render () {
@@ -20,6 +25,9 @@ class Campaign extends React.Component {
     return (
       <div className="campaign">
         <h2>{campaign.name}</h2>
+        <Link className="campaign-box__header__delete-campaign-button" to={"/campaigns"} onClick={this.deleteCampaign} >
+          Delete Campaign <i className="i-delete"/>
+        </Link>
         <div className="campaign__row">
           <CampaignEdit campaign={campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
           <CampaignAssets campaign={campaign}
@@ -39,6 +47,7 @@ import { bindActionCreators } from 'redux';
 import * as getCampaign from '../../actions/CampaignActions/getCampaign';
 import * as updateCampaign from '../../actions/CampaignActions/updateCampaign';
 import * as saveCampaign from '../../actions/CampaignActions/saveCampaign';
+import * as deleteCampaign from '../../actions/CampaignActions/deleteCampaign';
 import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
 
 function mapStateToProps(state) {
@@ -49,7 +58,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, getCampaignContent), dispatch)
+    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch)
   };
 }
 

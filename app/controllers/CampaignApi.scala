@@ -36,6 +36,11 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     }
   }
 
+  def deleteCampaign(id: String) = APIAuthAction { req =>
+    CampaignRepository.deleteCampaign(id)
+    NoContent
+  }
+
   def getCampaignAnalytics(id: String) = APIAuthAction { req =>
     GoogleAnalytics.getAnalyticsForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }

@@ -25,6 +25,14 @@ export function saveCampaign(id, campaign) {
   });
 }
 
+export function deleteCampaign(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id,
+    contentType: 'application/json',
+    method: 'delete'
+  });
+}
+
 export function fetchCampaignAnalytics(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/analytics',
