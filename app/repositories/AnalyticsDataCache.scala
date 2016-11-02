@@ -70,11 +70,29 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
+  def putCampaignSummary(campaignId: String, data: CampaignSummary, expires: Option[Long]): Unit = {
+    val entry = AnalyticsDataCacheEntry(campaignId, "CampaignSummary", Json.toJson(data).toString(), expires, System.currentTimeMillis())
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
   def getCampaignDailyCountsReport(campaignId: String): CacheResult[CampaignDailyCountsReport] = {
     val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", campaignId, "dataType", "CampaignDailyCountsReport"))
     item.map{ i =>
       val entry = AnalyticsDataCacheEntry.fromItem(i)
       val report = Json.parse(entry.data).as[CampaignDailyCountsReport]
+
+      entry.expires match {
+        case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
+        case _ => Hit(report)
+      }
+    }.getOrElse(Miss)
+  }
+
+  def getCampaignSummary(campaignId: String): CacheResult[CampaignSummary] = {
+    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", campaignId, "dataType", "CampaignSummary"))
+    item.map{ i =>
+      val entry = AnalyticsDataCacheEntry.fromItem(i)
+      val report = Json.parse(entry.data).as[CampaignSummary]
 
       entry.expires match {
         case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
