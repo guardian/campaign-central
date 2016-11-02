@@ -25,20 +25,27 @@ class CampaignTrafficDrivers extends React.Component {
   };
 
   renderTrafficDriverGroup = (group) => {
+
+    const dateFormat = (date) => {
+      return new Date(date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})
+    };
+
+    const href = '#' + group.groupName.toLowerCase().split(' ').join('-') + '-drivers';
+
     return (
       <div key={group.groupName} className="campaign-driver-list__item">
         <div className="campaign-driver-list__row">
           <div className="campaign-driver-list__type">{group.groupName}</div>
-          <div className="campaign-driver-list__date">{group.startDate}</div>
-          <div className="campaign-driver-list__date">{group.endDate}</div>
+          <div className="campaign-driver-list__date">{dateFormat(group.startDate)}</div>
+          <div className="campaign-driver-list__date">{dateFormat(group.endDate)}</div>
           <div className="campaign-driver-list__stat">
-            <a href="TODO">{group.summaryStats.impressions}</a>
+            <a href={href}>{group.summaryStats.impressions.toLocaleString()}</a>
           </div>
           <div className="campaign-driver-list__stat">
-            <a href="TODO">{group.summaryStats.clicks}</a>
+            <a href={href}>{group.summaryStats.clicks.toLocaleString()}</a>
           </div>
           <div className="campaign-driver-list__stat">
-            <a href="TODO">{group.summaryStats.ctr.toFixed(2)}%</a>
+            <a href={href}>{group.summaryStats.ctr.toFixed(2)}%</a>
           </div>
           <div className="campaign-driver-list__links">{group.trafficDriverUrls.map( this.renderLineItemLink )}</div>
         </div>
@@ -70,13 +77,14 @@ class CampaignTrafficDrivers extends React.Component {
     }
 
     return (
-      <span className="campaign-assets__field__value">No traffic drivers have been created yet</span>
+      <span className="campaign-assets__field__value">No traffic drivers have been created yet.</span>
     )
   };
 
   render() {
     return (
       <div className="campaign-info campaign-box">
+        <a name="driver-summary"/>
         <div className="campaign-box__header">Traffic Drivers</div>
         <div className="campaign-box__body">
           {this.renderTrafficDriverGroups()}
@@ -90,7 +98,7 @@ class CampaignTrafficDrivers extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    campaignTrafficDrivers: state.campaignTrafficDrivers,
+    campaignTrafficDrivers: state.campaignTrafficDrivers
   };
 }
 

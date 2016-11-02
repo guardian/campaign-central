@@ -2,7 +2,6 @@ package controllers
 
 import java.util.UUID
 
-import com.gu.pandomainauth.model.{User => PandaUser}
 import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
@@ -13,8 +12,6 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
 import repositories._
-import services.Config.conf._
-import services.{DfpFetcher, DfpFilter}
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -211,22 +208,13 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Ok("added 4 example campaigns and 2 example notes")
   }
 
-  def getCampaignTrafficDrivers(id: String) = APIAuthAction { req =>
+  def getCampaignTrafficDrivers(campaignId: String) = APIAuthAction { req =>
+    Logger.info(s"Loading traffic drivers for campaign $campaignId")
+    Ok(toJson(TrafficDriverGroup.forCampaign(campaignId)))
+  }
 
-    Logger.info(s"Loading traffic drivers for campaign $id")
-
-    val dfpSession = DfpFetcher.mkSession()
-
-    def trafficDrivers(orderId: Long): Seq[TrafficDriver] =
-      DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
-        DfpFilter.hasCampaignIdCustomFieldValue(id)
-      } map TrafficDriver.fromDfpLineItem
-
-    val driverGroups: Seq[TrafficDriverGroup] = Seq(
-      TrafficDriverGroup.fromTrafficDrivers("Native cards", trafficDrivers(dfpNativeCardOrderId)),
-      TrafficDriverGroup.fromTrafficDrivers("Merchandising", trafficDrivers(dfpMerchandisingOrderId))
-    ).flatten
-
-    Ok(toJson(driverGroups))
+  def getCampaignTrafficDriverStats(campaignId: String) = APIAuthAction { req =>
+    Logger.info(s"Loading traffic driver stats for campaign $campaignId")
+    Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))
   }
 }
