@@ -34,6 +34,17 @@ object CampaignRepository {
     }
   }
 
+  def deleteCampaign(campaignId: String) = {
+    try {
+      Dynamo.campaignTable.deleteItem("id", campaignId)
+    } catch {
+      case e: Error => {
+        Logger.error(s"failed to delete campaign $campaignId", e)
+        None
+      }
+    }
+  }
+
   def putCampaign(campaign: Campaign) = {
     try {
       Dynamo.campaignTable.putItem(campaign.toItem)

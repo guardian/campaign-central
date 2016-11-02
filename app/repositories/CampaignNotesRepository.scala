@@ -17,6 +17,17 @@ object CampaignNotesRepository {
     Option(Dynamo.campaignNotesTable.getItem("campaignId", campaignId, "created", created.getMillis)).map{ Note.fromItem }
   }
 
+  def deleteNotesForCampaign(campaignId: String) = {
+    try {
+      Dynamo.campaignNotesTable.deleteItem("campaignId", campaignId)
+    } catch {
+      case e: Error => {
+        Logger.error(s"failed to delete notes for campaign $campaignId", e)
+        None
+      }
+    }
+  }
+
   def putNote(note: Note) = {
     try {
       Dynamo.campaignNotesTable.putItem(note.toItem)

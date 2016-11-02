@@ -25,6 +25,14 @@ export function saveCampaign(id, campaign) {
   });
 }
 
+export function deleteCampaign(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id,
+    contentType: 'application/json',
+    method: 'delete'
+  });
+}
+
 export function fetchCampaignAnalytics(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/analytics',
@@ -44,6 +52,14 @@ export function fetchCampaignContent(id) {
 export function fetchCampaignTrafficDrivers(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/drivers',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
+export function fetchCampaignTrafficDriverStats(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/driverstats',
     contentType: 'application/json',
     method: 'get'
   });
