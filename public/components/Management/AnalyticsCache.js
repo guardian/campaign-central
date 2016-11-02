@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
-import {fetchAnalyticsCacheSummary, refreshItem, deleteItem} from '../../services/ManagementApi';
+import {fetchAnalyticsCacheSummary, refreshItem, refreshDataType, deleteItem} from '../../services/ManagementApi';
 import {isoFormatMillisecondDate} from '../../util/dateFormatter'
 
 class AnalyticsCache extends Component {
@@ -96,6 +96,10 @@ class AnalyticsCache extends Component {
       <div className="campaigns">
         <h2 className="campaigns__header">analytics cache management</h2>
         {this.renderCacheItems()}
+        <h3 className="campaigns__header">Refresh all stale items of type:</h3>
+        <ul>
+          <li onClick={() => refreshDataType('CampaignDailyCountsReport')}><i className="i-refresh-black" />CampaignDailyCountsReport</li>
+        </ul>
       </div>
     );
   }

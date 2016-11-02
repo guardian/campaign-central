@@ -19,13 +19,7 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with Pan
   }
 
   def refreshAnalyticsCacheEntry(dataType: String, key: String) = APIAuthAction { req =>
-    dataType match {
-      case "CampaignDailyCountsReport" => {
-        Logger.info(s"manually clearing GA analytics for $key")
-        Future{ GoogleAnalytics.getAnalyticsForCampaign(key) }
-      }
-      case s => Logger.warn(s"manual clear invoked for unexpected data type $dataType")
-    }
+    refreshEntry(dataType, key)
 
     NoContent
   }
@@ -36,4 +30,24 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with Pan
     NoContent
   }
 
+  def refreshAnalyticsCacheForType(dataType: String) = APIAuthAction { req =>
+    AnalyticsDataCache.summariseContents.filter{ e =>
+      val expired = e.expires.map(_ < System.currentTimeMillis).getOrElse(false)
+      e.dataType == dataType && expired
+    }.foreach{ e =>
+      refreshEntry(e.dataType, e.key)
+    }
+
+    NoContent
+  }
+
+  private def refreshEntry(dataType: String, key: String) = {
+    dataType match {
+      case "CampaignDailyCountsReport" => {
+        Logger.info(s"manually clearing GA analytics for $key")
+        Future {GoogleAnalytics.getAnalyticsForCampaign(key)}
+      }
+      case s => Logger.warn(s"manual clear invoked for unexpected data type $dataType")
+    }
+  }
 }

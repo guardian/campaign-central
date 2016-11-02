@@ -17,6 +17,15 @@ export function refreshItem(item) {
   });
 }
 
+export function refreshDataType(type) {
+  return AuthedReqwest({
+    url: '/management/api/analytics/' + type,
+    contentType: 'application/json',
+    method: 'post',
+    data: JSON.stringify(type)
+  });
+}
+
 export function deleteItem(item) {
   return AuthedReqwest({
     url: '/management/api/analytics/' + item.dataType + '/' + item.key,
