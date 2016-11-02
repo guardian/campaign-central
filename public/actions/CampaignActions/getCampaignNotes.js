@@ -8,9 +8,9 @@ function requestCampaignNotes(id) {
     };
 }
 
-function recieveCampaignNotes(notes) {
+function receiveCampaignNotes(notes) {
     return {
-        type:             'NOTES_GET_RECIEVE',
+        type:             'NOTES_GET_RECEIVE',
         campaignNotes:    notes,
         receivedAt:       Date.now()
     };
@@ -31,7 +31,7 @@ export function getCampaignNotes(id) {
       return fetchCampaignNotes(id)
         .catch(error => dispatch(errorRecievingCampaignNotes(error)))
         .then(res => {
-          dispatch(recieveCampaignNotes(res));
+          dispatch(receiveCampaignNotes(res));
         });
     };
 }

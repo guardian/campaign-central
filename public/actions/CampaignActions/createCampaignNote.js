@@ -9,7 +9,7 @@ function requestNoteCreate(note) {
 
 function receiveNoteCreate(note) {
     return {
-        type: 'NOTE_CREATE_RECIEVE',
+        type: 'NOTE_CREATE_RECEIVE',
         note: note,
         receivedAt: Date.now()
     };
