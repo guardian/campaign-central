@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import {Link} from 'react-router';
-import {fetchAnalyticsCacheSummary} from '../../services/ManagementApi';
+import {fetchAnalyticsCacheSummary, refreshItem, deleteItem} from '../../services/ManagementApi';
 import {isoFormatMillisecondDate} from '../../util/dateFormatter'
 
 class AnalyticsCache extends Component {
@@ -27,12 +27,28 @@ class AnalyticsCache extends Component {
   renderExpiry = (item) => {
     if (item.expires) {
       if (item.expires < Date.now()) {
-        return <div className="analytics-cache-list__expires--expired">{isoFormatMillisecondDate(item.expires)}</div>
+        return (
+          <div className="analytics-cache-list__expires--expired">
+            {isoFormatMillisecondDate(item.expires)}
+            <i className="i-delete campaign-box__header__refresh-asset-button" onClick={() => deleteItem(item)} />
+            <i className="i-refresh-black campaign-box__header__refresh-asset-button" onClick={() => refreshItem(item)} />
+          </div>
+        )
       }
-      return <div className="analytics-cache-list__expires">{isoFormatMillisecondDate(item.expires)}</div>
+      return (
+        <div className="analytics-cache-list__expires">
+          {isoFormatMillisecondDate(item.expires)}
+          <i className="i-delete campaign-box__header__refresh-asset-button" onClick={() => deleteItem(item)} />
+        </div>
+      )
     }
 
-    return <div className="analytics-cache-list__expires">never</div>
+    return (
+      <div className="analytics-cache-list__expires">
+        never
+        <i className="i-delete campaign-box__header__refresh-asset-button" onClick={() => deleteItem(item)} />
+      </div>
+    )
   }
 
   renderCacheItem = (item) => {

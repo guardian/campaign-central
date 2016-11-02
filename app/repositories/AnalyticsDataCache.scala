@@ -60,6 +60,10 @@ object AnalyticsDataCacheEntry {
 }
 
 object AnalyticsDataCache {
+  def deleteCacheEntry(key: String, dataType: String): Unit = {
+    Dynamo.analyticsDataCacheTable.deleteItem("key", key, "dataType", dataType)
+  }
+
 
   def putCampaignDailyCountsReport(campaignId: String, data: CampaignDailyCountsReport, expires: Option[Long]): Unit = {
     val entry = AnalyticsDataCacheEntry(campaignId, "CampaignDailyCountsReport", Json.toJson(data).toString(), expires, System.currentTimeMillis())

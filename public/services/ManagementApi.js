@@ -7,3 +7,20 @@ export function fetchAnalyticsCacheSummary() {
     method: 'get'
   });
 }
+
+export function refreshItem(item) {
+  return AuthedReqwest({
+    url: '/management/api/analytics/' + item.dataType + '/' + item.key,
+    contentType: 'application/json',
+    method: 'post',
+    data: JSON.stringify(item)
+  });
+}
+
+export function deleteItem(item) {
+  return AuthedReqwest({
+    url: '/management/api/analytics/' + item.dataType + '/' + item.key,
+    contentType: 'application/json',
+    method: 'delete'
+  });
+}

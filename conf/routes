@@ -36,7 +36,9 @@ PUT /api/clients/:id              controllers.ClientApi.updateClient(id: String)
 
 #Management Api
 
-GET /management/api/analytics             controllers.ManagementApi.getAnalyticsCacheSummary()
+GET    /management/api/analytics                        controllers.ManagementApi.getAnalyticsCacheSummary()
+POST   /management/api/analytics/:dataType/:key         controllers.ManagementApi.refreshAnalyticsCacheEntry(dataType: String, key: String)
+DELETE /management/api/analytics/:dataType/:key         controllers.ManagementApi.deleteAnalyticsCacheEntry(dataType: String, key: String)
 
 GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
