@@ -1,12 +1,13 @@
 target/
 project/boot/
+project/project/
 
 .idea/
 .idea_modules/
 
 node_modules/
 
-logs/*
+logs/
 
 .history
 

@@ -8,7 +8,7 @@
 }
 
 .campaign-driver-list__type,
-.campaign-driver-list__status,
+.campaign-driver-list__links,
 .campaign-driver-list__date,
 .campaign-driver-list__stat {
   @extend %table__cell;
@@ -30,9 +30,9 @@
   width: 20%;
 }
 
-.campaign-driver-list__status,
-.campaign-driver-list__status--header {
-  width: 20%;
+.campaign-driver-list__links,
+.campaign-driver-list__links--header {
+  width: 15%;
 }
 
 .campaign-driver-list__date,
@@ -43,4 +43,9 @@
 .campaign-driver-list__stat,
 .campaign-driver-list__stat--header {
   width: 15%;
+}
+
+.campaign-driver-list__link {
+  font-size: 75%;
+  float: right;
 }

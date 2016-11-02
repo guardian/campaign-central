@@ -1,5 +1,8 @@
 import React, {PropTypes} from "react";
-import ProgressSpinner from '../utils/ProgressSpinner';
+import ProgressSpinner from "../utils/ProgressSpinner";
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import * as getCampaignTrafficDrivers from "../../actions/CampaignActions/getCampaignTrafficDrivers";
 
 class CampaignTrafficDrivers extends React.Component {
 
@@ -13,31 +16,44 @@ class CampaignTrafficDrivers extends React.Component {
     }
   }
 
-  renderTrafficDriver = (driver) => {
+  renderLineItemLink = (url) => {
     return (
-      <div key={driver.id} className="campaign-driver-list__item">
+      <a key={url} href={url} target="_blank" title="DFP line item">
+        <i className="i-dfp"/>
+      </a>
+    );
+  };
+
+  renderTrafficDriverGroup = (group) => {
+
+    const dateFormat = (date) => {
+      return new Date(date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})
+    };
+
+    const href = '#' + group.groupName.toLowerCase().split(' ').join('-') + '-drivers';
+
+    return (
+      <div key={group.groupName} className="campaign-driver-list__item">
         <div className="campaign-driver-list__row">
-          <div className="campaign-driver-list__type">
-            <a href={driver.url}>{driver.driverType}</a>
-          </div>
-          <div className="campaign-driver-list__status">{driver.status}</div>
-          <div className="campaign-driver-list__date">{driver.startDate}</div>
-          <div className="campaign-driver-list__date">{driver.endDate}</div>
+          <div className="campaign-driver-list__type">{group.groupName}</div>
+          <div className="campaign-driver-list__date">{dateFormat(group.startDate)}</div>
+          <div className="campaign-driver-list__date">{dateFormat(group.endDate)}</div>
           <div className="campaign-driver-list__stat">
-            <a href="TODO">{driver.impressionsDelivered}</a>
+            <a href={href}>{group.summaryStats.impressions.toLocaleString()}</a>
           </div>
           <div className="campaign-driver-list__stat">
-            <a href="TODO">{driver.clicksDelivered}</a>
+            <a href={href}>{group.summaryStats.clicks.toLocaleString()}</a>
           </div>
           <div className="campaign-driver-list__stat">
-            <a href="TODO">{driver.ctrDelivered.toFixed(3)}</a>
+            <a href={href}>{group.summaryStats.ctr.toFixed(2)}%</a>
           </div>
+          <div className="campaign-driver-list__links">{group.trafficDriverUrls.map( this.renderLineItemLink )}</div>
         </div>
       </div>
     );
   };
 
-  renderTrafficDrivers = () => {
+  renderTrafficDriverGroups = () => {
 
     if(!this.props.campaignTrafficDrivers) {
       return (<ProgressSpinner />);
@@ -48,29 +64,30 @@ class CampaignTrafficDrivers extends React.Component {
         <div className="campaign-driver-list campaign-assets__field__value">
           <div className="campaign-driver-list__row">
             <div className="campaign-driver-list__type--header">Type</div>
-            <div className="campaign-driver-list__status--header">Status</div>
             <div className="campaign-driver-list__date--header">Start</div>
             <div className="campaign-driver-list__date--header">End</div>
             <div className="campaign-driver-list__stat--header">Impressions</div>
             <div className="campaign-driver-list__stat--header">Clicks</div>
             <div className="campaign-driver-list__stat--header">CTR</div>
+            <div className="campaign-driver-list__links--header">Line items</div>
           </div>
-          {this.props.campaignTrafficDrivers.map( this.renderTrafficDriver ) }
+          {this.props.campaignTrafficDrivers.map( this.renderTrafficDriverGroup ) }
         </div>
       );
     }
 
     return (
-      <span className="campaign-assets__field__value">No traffic drivers have been created yet</span>
+      <span className="campaign-assets__field__value">No traffic drivers have been created yet.</span>
     )
   };
 
   render() {
     return (
       <div className="campaign-info campaign-box">
+        <a name="driver-summary"/>
         <div className="campaign-box__header">Traffic Drivers</div>
         <div className="campaign-box__body">
-          {this.renderTrafficDrivers()}
+          {this.renderTrafficDriverGroups()}
         </div>
       </div>
     );
@@ -78,13 +95,10 @@ class CampaignTrafficDrivers extends React.Component {
 }
 
 //REDUX CONNECTIONS
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as getCampaignTrafficDrivers from '../../actions/CampaignActions/getCampaignTrafficDrivers';
 
 function mapStateToProps(state) {
   return {
-    campaignTrafficDrivers: state.campaignTrafficDrivers,
+    campaignTrafficDrivers: state.campaignTrafficDrivers
   };
 }
 

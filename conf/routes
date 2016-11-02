@@ -17,6 +17,7 @@ GET            /reauth            controllers.App.reauth
 GET /api/campaigns                        controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/:id                    controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id                    controllers.CampaignApi.updateCampaign(id: String)
+DELETE /api/campaigns/:id                 controllers.CampaignApi.deleteCampaign(id: String)
 GET /api/campaigns/:id/analytics          controllers.CampaignApi.getCampaignAnalytics(id: String)
 GET /api/campaigns/:id/content            controllers.CampaignApi.getCampaignContent(id: String)
 GET /api/campaigns/:id/notes              controllers.CampaignApi.getCampaignNotes(id: String)
@@ -25,6 +26,7 @@ PUT /api/campaigns/:id/note/:date         controllers.CampaignApi.updateCampaign
 POST /api/campaigns/import                controllers.CampaignApi.importFromTag()
 POST /api/campaigns/:id/refreshFromCAPI   controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
 GET /api/campaigns/:id/drivers            controllers.CampaignApi.getCampaignTrafficDrivers(id: String)
+GET /api/campaigns/:id/driverstats        controllers.CampaignApi.getCampaignTrafficDriverStats(id: String)
 
 
 #Clients Api
