@@ -37,6 +37,8 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def deleteCampaign(id: String) = APIAuthAction { req =>
+    CampaignNotesRepository.deleteNotesForCampaign(id)
+    CampaignContentRepository.deleteContentForCampaign(id)
     CampaignRepository.deleteCampaign(id)
     NoContent
   }
