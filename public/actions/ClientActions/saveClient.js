@@ -9,9 +9,9 @@ function requestClientSave(id, client) {
     };
 }
 
-function recieveClientSave(client) {
+function receiveClientSave(client) {
     return {
-        type:        'CLIENT_SAVE_RECIEVE',
+        type:        'CLIENT_SAVE_RECEIVE',
         client:    client,
         receivedAt:  Date.now()
     };
@@ -32,7 +32,7 @@ export function saveClient(id, client) {
       return saveClientApi(id, client)
         .catch(error => dispatch(errorSavingClient(error)))
         .then(res => {
-          dispatch(recieveClientSave(res));
+          dispatch(receiveClientSave(res));
         });
     };
 }

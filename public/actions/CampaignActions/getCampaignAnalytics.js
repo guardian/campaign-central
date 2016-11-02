@@ -8,9 +8,9 @@ function requestCampaignAnalytics(id) {
     };
 }
 
-function recieveCampaignAnalytics(campaignAnalytics) {
+function receiveCampaignAnalytics(campaignAnalytics) {
     return {
-        type:        'CAMPAIGN_ANALYTICS_GET_RECIEVE',
+        type:        'CAMPAIGN_ANALYTICS_GET_RECEIVE',
         campaignAnalytics:    campaignAnalytics,
         receivedAt:  Date.now()
     };
@@ -31,7 +31,7 @@ export function getCampaignAnalytics(id) {
       return fetchCampaignAnalytics(id)
         .catch(error => dispatch(errorRecievingCampaignAnalytics(error)))
         .then(res => {
-          dispatch(recieveCampaignAnalytics(res));
+          dispatch(receiveCampaignAnalytics(res));
         });
     };
 }

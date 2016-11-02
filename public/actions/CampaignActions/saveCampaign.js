@@ -9,9 +9,9 @@ function requestCampaignSave(id, campaign) {
     };
 }
 
-function recieveCampaignSave(campaign) {
+function receiveCampaignSave(campaign) {
     return {
-        type:        'CAMPAIGN_SAVE_RECIEVE',
+        type:        'CAMPAIGN_SAVE_RECEIVE',
         campaign:    campaign,
         receivedAt:  Date.now()
     };
@@ -32,7 +32,7 @@ export function saveCampaign(id, campaign) {
       return saveCampaignApi(id, campaign)
         .catch(error => dispatch(errorSavingCampaign(error)))
         .then(res => {
-          dispatch(recieveCampaignSave(res));
+          dispatch(receiveCampaignSave(res));
         });
     };
 }
