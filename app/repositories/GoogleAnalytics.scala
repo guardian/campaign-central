@@ -106,7 +106,16 @@ object GoogleAnalytics {
     val totalUniques = mostRecentStats.getOrElse("cumulative-unique-total", 0L)
     val targetToDate = mostRecentStats.getOrElse("cumulative-target-uniques", 0L)
 
-    AnalyticsDataCache.putCampaignSummary(campaignId, CampaignSummary(totalUniques, targetToDate), expiry)
+    val campaignSummary = CampaignSummary(totalUniques, targetToDate)
+    AnalyticsDataCache.putCampaignSummary(campaignId, campaignSummary, expiry)
+
+    updateOverallSummary(campaignId, campaignSummary)
+  }
+
+  private def updateOverallSummary(campaignId: String, campaignSummary: CampaignSummary): Unit = {
+    val overallSummary = AnalyticsDataCache.getOverallSummary().getOrElse(Map())
+
+    AnalyticsDataCache.putOverallSummary(overallSummary + (campaignId -> campaignSummary))
   }
 
   private def cleanAndConvertRawDailyCounts(rawDailyCounts: ParsedDailyCountsReport, dailyUniqueTargetValue: Option[Long]): CampaignDailyCountsReport = {

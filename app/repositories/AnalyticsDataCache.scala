@@ -10,7 +10,15 @@ import services.Dynamo
 import scala.util.control.NonFatal
 import scala.collection.JavaConversions._
 
-abstract sealed trait CacheResult[+A] extends Product
+abstract sealed trait CacheResult[+A] extends Product {
+
+  def isEmpty: Boolean
+
+  def get: A
+
+  def getOrElse[B >: A](default: => B): B =
+    if (isEmpty) default else this.get
+}
 
 case class Hit[+A](x: A) extends CacheResult[A] {
   def isEmpty = false
@@ -60,10 +68,10 @@ object AnalyticsDataCacheEntry {
 }
 
 object AnalyticsDataCache {
+
   def deleteCacheEntry(key: String, dataType: String): Unit = {
     Dynamo.analyticsDataCacheTable.deleteItem("key", key, "dataType", dataType)
   }
-
 
   def putCampaignDailyCountsReport(campaignId: String, data: CampaignDailyCountsReport, expires: Option[Long]): Unit = {
     val entry = AnalyticsDataCacheEntry(campaignId, "CampaignDailyCountsReport", Json.toJson(data).toString(), expires, System.currentTimeMillis())
@@ -72,6 +80,11 @@ object AnalyticsDataCache {
 
   def putCampaignSummary(campaignId: String, data: CampaignSummary, expires: Option[Long]): Unit = {
     val entry = AnalyticsDataCacheEntry(campaignId, "CampaignSummary", Json.toJson(data).toString(), expires, System.currentTimeMillis())
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
+  def putOverallSummary(data: Map[String, CampaignSummary]): Unit = {
+    val entry = AnalyticsDataCacheEntry("overall", "CampaignSummary", Json.toJson(data).toString(), None, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
@@ -99,6 +112,20 @@ object AnalyticsDataCache {
         case _ => Hit(report)
       }
     }.getOrElse(Miss)
+  }
+
+  def getOverallSummary(): CacheResult[Map[String, CampaignSummary]] = {
+    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", "overall", "dataType", "CampaignSummary"))
+    item.map{ i =>
+      val entry = AnalyticsDataCacheEntry.fromItem(i)
+      val report = Json.parse(entry.data).as[Map[String, CampaignSummary]]
+
+      entry.expires match {
+        case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
+        case _ => Hit(report)
+      }
+    }.getOrElse(Miss)
+
   }
 
   def summariseContents = {
