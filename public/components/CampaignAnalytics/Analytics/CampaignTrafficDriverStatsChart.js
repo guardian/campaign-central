@@ -11,6 +11,7 @@ import {
   ReferenceLine,
   Brush
 } from "recharts";
+import {ddmmFormatDate, dddddmmmFormatDate} from "../../../util/dateFormatter";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import * as getCampaignTrafficDriverStats from "../../../actions/CampaignActions/getCampaignTrafficDriverStats";
@@ -41,14 +42,6 @@ class CampaignTrafficDriverStatsChart extends React.Component {
     });
 
     const anchorName = group.groupName.toLowerCase().split(' ').join('-') + '-drivers';
-
-    const shortDateFormat = (date) => {
-      return new Date(date).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit'})
-    };
-
-    const longerDateFormat = (date) => {
-      return new Date(date).toLocaleDateString('en-GB', {weekday: 'short', day: '2-digit', month: 'short'})
-    };
 
     const numFormat = (num) => {
       return num.toLocaleString();
@@ -85,10 +78,10 @@ class CampaignTrafficDriverStatsChart extends React.Component {
           <ResponsiveContainer height={chartHeight} width={containerWidth}>
             <LineChart width={chartWidth} height={chartHeight} data={data} syncId={group.groupName}
                        margin={chartMargin}>
-              <XAxis dataKey="date" tickFormatter={shortDateFormat} padding={xPadding}/>
+              <XAxis dataKey="date" tickFormatter={ddmmFormatDate} padding={xPadding}/>
               <YAxis tickFormatter={numFormat}/>
               <CartesianGrid strokeDasharray="3 3"/>
-              <Tooltip labelFormatter={longerDateFormat} formatter={numFormat}/>
+              <Tooltip labelFormatter={dddddmmmFormatDate} formatter={numFormat}/>
               <Line type="monotone" dataKey="impressions" stroke="#8884d8" fill="#8884d8"/>
             </LineChart>
           </ResponsiveContainer>
@@ -96,10 +89,10 @@ class CampaignTrafficDriverStatsChart extends React.Component {
           <ResponsiveContainer height={chartHeight} width={containerWidth}>
             <LineChart width={chartWidth} height={chartHeight} data={data} syncId={group.groupName}
                        margin={chartMargin}>
-              <XAxis dataKey="date" tickFormatter={shortDateFormat} padding={xPadding}/>
+              <XAxis dataKey="date" tickFormatter={ddmmFormatDate} padding={xPadding}/>
               <YAxis tickFormatter={numFormat}/>
               <CartesianGrid strokeDasharray="3 3"/>
-              <Tooltip labelFormatter={longerDateFormat} formatter={numFormat}/>
+              <Tooltip labelFormatter={dddddmmmFormatDate} formatter={numFormat}/>
               <Line type="monotone" dataKey="clicks" stroke="#82ca9d" fill="#82ca9d"/>
             </LineChart>
           </ResponsiveContainer>
@@ -107,12 +100,12 @@ class CampaignTrafficDriverStatsChart extends React.Component {
           <ResponsiveContainer height={chartHeight} width={containerWidth}>
             <LineChart width={chartWidth} height={chartHeight} data={data} syncId={group.groupName}
                        margin={chartMargin}>
-              <XAxis dataKey="date" tickFormatter={shortDateFormat} padding={xPadding}/>
+              <XAxis dataKey="date" tickFormatter={ddmmFormatDate} padding={xPadding}/>
               <YAxis/>
               <CartesianGrid strokeDasharray="3 3"/>
-              <Tooltip labelFormatter={longerDateFormat} formatter={percentFormat}/>
+              <Tooltip labelFormatter={dddddmmmFormatDate} formatter={percentFormat}/>
               <Line type="monotone" dataKey="ctr" name="CTR" stroke="#993399" fill="#993399"/>
-              <Brush dataKey="date" tickFormatter={shortDateFormat} startIndex={data.length - 7}/>
+              <Brush dataKey="date" tickFormatter={ddmmFormatDate} startIndex={data.length - 7}/>
             </LineChart>
           </ResponsiveContainer>
         </div>
