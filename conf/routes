@@ -14,9 +14,6 @@ GET            /reauth            controllers.App.reauth
 
 #Campaign Api
 
-GET /api/campaigns/bootstrap      controllers.CampaignApi.bootstrapData
-
-
 GET /api/campaigns                        controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/:id                    controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id                    controllers.CampaignApi.updateCampaign(id: String)
@@ -34,8 +31,6 @@ GET /api/campaigns/:id/driverstats        controllers.CampaignApi.getCampaignTra
 
 #Clients Api
 
-GET /api/clients/bootstrap        controllers.ClientApi.bootstrapData
-
 GET /api/clients                  controllers.ClientApi.getAllClients
 GET /api/clients/:id              controllers.ClientApi.getClient(id: String)
 PUT /api/clients/:id              controllers.ClientApi.updateClient(id: String)
@@ -43,6 +38,10 @@ PUT /api/clients/:id              controllers.ClientApi.updateClient(id: String)
 
 
 GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
+
+# Migration
+GET /migration/addCampaignTypes   controllers.Migration.addCampaignType()
+
 
 # Management
 GET /management/healthcheck       controllers.Management.healthCheck

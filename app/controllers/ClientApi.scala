@@ -30,43 +30,4 @@ class ClientApi(override val wsClient: WSClient) extends Controller with PandaAu
     }
   }
 
-
-  def bootstrapData() = APIAuthAction { req =>
-
-    val user = User(req.user)
-    val now = new DateTime
-
-    val clients = List(
-      Client(
-        id = UUID.randomUUID().toString,
-        name = "Renault",
-        country = "UK"
-      ),
-      Client(
-        id = UUID.randomUUID().toString,
-        name = "Singapore Airlines",
-        country = "SG"
-      ),
-      Client(
-        id = UUID.randomUUID().toString,
-        name = "Ford",
-        country = "US"
-      ),
-      Client(
-        id = UUID.randomUUID().toString,
-        name = "Chester Zoo",
-        country = "UK"
-      ),
-      Client(
-        id = UUID.randomUUID().toString,
-        name = "Leffe",
-        country = "UK"
-      )
-    )
-
-    clients foreach( ClientRepository.putClient )
-
-    Ok("added 5 example clients")
-  }
-
 }
