@@ -10,9 +10,9 @@ function requestCampaignDelete(id, campaign) {
   };
 }
 
-function recieveCampaignDelete(campaign) {
+function receiveCampaignDelete(campaign) {
   return {
-    type:        'CAMPAIGN_DELETE_RECIEVE',
+    type:        'CAMPAIGN_DELETE_RECEIVE',
     campaign:    campaign,
     receivedAt:  Date.now()
   };
@@ -33,7 +33,7 @@ export function deleteCampaign(id) {
     return deleteCampaignApi(id)
       .catch(error => dispatch(errorDeletingCampaign(error)))
       .then(res => {
-        dispatch(recieveCampaignDelete(res));
+        dispatch(receiveCampaignDelete(res));
       });
   };
 }

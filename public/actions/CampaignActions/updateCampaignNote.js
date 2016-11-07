@@ -10,7 +10,7 @@ function requestNoteUpdate(note) {
 
 function receiveNoteUpdate(note) {
     return {
-        type: 'NOTE_UPDATE_RECIEVE',
+        type: 'NOTE_UPDATE_RECEIVE',
         receivedAt: Date.now()
     };
 }

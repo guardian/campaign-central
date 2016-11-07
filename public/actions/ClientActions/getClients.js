@@ -7,9 +7,9 @@ function requestClients() {
     };
 }
 
-function recieveClients(clients) {
+function receiveClients(clients) {
     return {
-        type:        'CLIENTS_GET_RECIEVE',
+        type:        'CLIENTS_GET_RECEIVE',
         clients:     clients,
         receivedAt:  Date.now()
     };
@@ -30,7 +30,7 @@ export function getClients() {
       return fetchClients()
         .catch(error => dispatch(errorRecievingClients(error)))
         .then(res => {
-          dispatch(recieveClients(res));
+          dispatch(receiveClients(res));
         });
     };
 }

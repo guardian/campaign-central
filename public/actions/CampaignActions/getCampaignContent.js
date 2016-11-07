@@ -8,9 +8,9 @@ function requestCampaignContent(id) {
     };
 }
 
-function recieveCampaignContent(content) {
+function receiveCampaignContent(content) {
     return {
-        type:             'CONTENT_GET_RECIEVE',
+        type:             'CONTENT_GET_RECEIVE',
         campaignContent:    content,
         receivedAt:       Date.now()
     };
@@ -31,7 +31,7 @@ export function getCampaignContent(id) {
       return fetchCampaignContent(id)
         .catch(error => dispatch(errorRecievingCampaignContent(error)))
         .then(res => {
-          dispatch(recieveCampaignContent(res));
+          dispatch(receiveCampaignContent(res));
         });
     };
 }
