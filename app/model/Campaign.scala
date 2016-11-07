@@ -11,13 +11,16 @@ import scala.util.control.NonFatal
 case class Campaign(
                    id: String,
                    name: String,
+                   `type`: String,
                    status: String,
-                   client: Client,
+                   clientId: String,
                    created: DateTime,
                    createdBy: User,
                    lastModified: DateTime,
                    lastModifiedBy: User,
                    tagId: Option[Long] = None,
+                   campaignLogo: Option[String] = None,
+                   pathPrefix: Option[String] = None,
                    callToActions: List[CallToAction] = Nil,
                    nominalValue: Option[Long] = None,
                    actualValue: Option[Long] = None,
@@ -30,7 +33,7 @@ case class Campaign(
 
   def toItem = Item.fromJSON(Json.toJson(this).toString())
 
-  def gaFilterExpression: Option[String] = Some("ga:pagePath=~/advertiser-content/visit-britain")
+  def gaFilterExpression: Option[String] = pathPrefix.map{path => s"ga:pagePath=~/$path"}
 }
 
 object Campaign {

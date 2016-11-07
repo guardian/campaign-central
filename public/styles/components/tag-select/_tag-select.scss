@@ -1,0 +1,44 @@
+.tag-select {
+
+  @extend %fs-data-3;
+
+  display: inline-block;
+  position: relative;
+
+  min-width: 200px;
+}
+
+.tag-select__input {
+  width: 100%;
+}
+
+.tag-select__suggestions {
+
+  position: absolute;
+  top: 20px;
+
+  border: 1px solid $c-grey-300;
+  background-color: $c-grey-100;
+
+  width: 100%;
+
+  z-index: 2;
+
+
+  li {
+    position: relative;
+    display: flex;
+    padding: $standard-padding/2 $standard-padding;
+
+    cursor: pointer;
+
+    &:nth-child(even) {
+      background-color: $c-white;
+    }
+  }
+}
+
+
+.tag-select__name {
+  flex-grow: 1;
+}

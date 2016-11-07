@@ -11,6 +11,9 @@ import Campaign from './components/Campaign/Campaign';
 import Clients from './components/Clients/Clients';
 import Client from './components/Client/Client';
 
+import CapiImport from './components/CapiImport/CapiImport';
+import AnalyticsCache from './components/Management/AnalyticsCache';
+
 function requirePermission(permissionName, nextState, replaceState) {
   if (!hasPermission(permissionName)) {
     replaceState(null, '/unauthorised');
@@ -26,6 +29,8 @@ export const router = (
       <Route path="/campaign/:id" component={Campaign} />
       <Route path="/clients" component={Clients} />
       <Route path="/clients/:id" component={Client} />
+      <Route path="/capiImport" component={CapiImport} />
+      <Route path="/management/analytics" component={AnalyticsCache} />
     </Route>
   </Router>
 );

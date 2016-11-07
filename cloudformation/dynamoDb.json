@@ -157,6 +157,46 @@
         }
       },
       "DeletionPolicy": "Retain"
+    },
+    "CampaignAnalyticsDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "key",
+            "AttributeType": "S"
+          }, {
+            "AttributeName": "dataType",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "key",
+            "KeyType": "HASH"
+          },{
+            "AttributeName": "dataType",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "10",
+          "WriteCapacityUnits": "10"
+        },
+        "TableName": {
+          "Fn::Join": [
+            "-",
+            [
+              "campaign-central",
+              {
+                "Ref": "Stage"
+              },
+              "analytics"
+            ]
+          ]
+        }
+      },
+      "DeletionPolicy": "Retain"
     }
   }
 }

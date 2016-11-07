@@ -1,5 +1,6 @@
 package repositories
 
+import com.amazonaws.services.dynamodbv2.document.ScanFilter
 import model.{Campaign, CampaignWithSubItems, Note}
 import org.joda.time.DateTime
 import play.api.Logger
@@ -11,6 +12,10 @@ object CampaignRepository {
 
   def getCampaign(campaignId: String) = {
     Option(Dynamo.campaignTable.getItem("id", campaignId)).map{ Campaign.fromItem }
+  }
+
+  def getCampaignByTag(tagId: Long) = {
+    Dynamo.campaignTable.scan(new ScanFilter("tagId").eq(tagId)).headOption.map( Campaign.fromItem )
   }
 
   def getAllCampaigns() = {
@@ -26,6 +31,17 @@ object CampaignRepository {
         content = CampaignContentRepository.getContentForCampaign(c.id),
         notes = CampaignNotesRepository.getNotesForCampaign(c.id)
       )
+    }
+  }
+
+  def deleteCampaign(campaignId: String) = {
+    try {
+      Dynamo.campaignTable.deleteItem("id", campaignId)
+    } catch {
+      case e: Error => {
+        Logger.error(s"failed to delete campaign $campaignId", e)
+        None
+      }
     }
   }
 

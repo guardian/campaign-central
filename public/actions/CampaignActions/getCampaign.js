@@ -8,9 +8,9 @@ function requestCampaign(id) {
     };
 }
 
-function recieveCampaign(campaign) {
+function receiveCampaign(campaign) {
     return {
-        type:        'CAMPAIGN_GET_RECIEVE',
+        type:        'CAMPAIGN_GET_RECEIVE',
         campaign:    campaign,
         receivedAt:  Date.now()
     };
@@ -31,7 +31,7 @@ export function getCampaign(id) {
       return fetchCampaign(id)
         .catch(error => dispatch(errorRecievingCampaign(error)))
         .then(res => {
-          dispatch(recieveCampaign(res));
+          dispatch(receiveCampaign(res));
         });
     };
 }

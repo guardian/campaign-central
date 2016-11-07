@@ -1,8 +1,10 @@
 package controllers
 
 import play.api.Configuration
+import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc._
+import services.Config
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -18,7 +20,16 @@ class App(override val wsClient: WSClient) extends Controller with PandaAuthActi
       case None => routes.Assets.versioned(jsFileName).toString
     }
 
-    Ok(views.html.Application.app("Campaign Central", jsLocation))
+    val clientConf = Map(
+      "tagManagerUrl" -> Config().tagManagerApiUrl,
+      "composerUrl" -> Config().composerUrl,
+      "liveUrl" -> Config().liveUrl,
+      "previewUrl" -> Config().previewUrl,
+      "mediaAtomMakerUrl" -> Config().mediaAtomMakerUrl,
+      "ctaAtomMakerUrl" -> Config().ctaAtomMakerUrl
+    )
+
+    Ok(views.html.Application.app("Campaign Central", jsLocation, Json.toJson(clientConf).toString()))
   }
 
   def reauth = AuthAction {

@@ -8,82 +8,117 @@
 
 .i-add-image {
 	@extend %svg-common;
-	background-position: 25% 0;
+	background-position: 20% 0;
 	width: 12px;
 	height: 12px;
 }
 
 .i-add-image-grey {
 	@extend %svg-common;
-	background-position: 75% 50%;
+	background-position: 80% 0;
 	width: 12px;
 	height: 12px;
 }
 
 .i-article {
 	@extend %svg-common;
-	background-position: 0 25%;
+	background-position: 0 20%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-atom {
+	@extend %svg-common;
+	background-position: 20% 20%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-audio {
+	@extend %svg-common;
+	background-position: 40% 0;
 	width: 12px;
 	height: 12px;
 }
 
 .i-clock {
 	@extend %svg-common;
-	background-position: 25% 25%;
+	background-position: 40% 20%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-composer {
+	@extend %svg-common;
+	background-position: 0 40%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-cross {
 	@extend %svg-common;
-	background-position: 50% 0;
+	background-position: 20% 40%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-cross-grey {
 	@extend %svg-common;
-	background-position: 50% 25%;
+	background-position: 40% 40%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-cross-red {
 	@extend %svg-common;
-	background-position: 0 50%;
+	background-position: 60% 0;
 	width: 12px;
 	height: 12px;
 }
 
 .i-cross-white {
 	@extend %svg-common;
-	background-position: 25% 50%;
+	background-position: 60% 20%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-delete {
 	@extend %svg-common;
-	background-position: 50% 50%;
+	background-position: 60% 40%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-delete-red {
 	@extend %svg-common;
-	background-position: 75% 0;
+	background-position: 0 60%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-dfp {
+	@extend %svg-common;
+	background-position: 20% 60%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-down-arrow {
 	@extend %svg-common;
-	background-position: 75% 25%;
+	background-position: 40% 60%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-failed-face-red {
+	@extend %svg-common;
+	background-position: 60% 60%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-gallery {
 	@extend %svg-common;
 	background-position: 0 0;
 	width: 12px;
@@ -92,77 +127,112 @@
 
 .i-info-grey {
 	@extend %svg-common;
-	background-position: 0 75%;
+	background-position: 80% 20%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-interactive {
+	@extend %svg-common;
+	background-position: 80% 40%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-live-site {
+	@extend %svg-common;
+	background-position: 80% 60%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-pen {
 	@extend %svg-common;
-	background-position: 25% 75%;
+	background-position: 0 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-plus {
 	@extend %svg-common;
-	background-position: 50% 75%;
+	background-position: 20% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-preview-eye {
 	@extend %svg-common;
-	background-position: 75% 75%;
+	background-position: 40% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-publish {
 	@extend %svg-common;
-	background-position: 100% 0;
+	background-position: 60% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-publish-disabled {
 	@extend %svg-common;
-	background-position: 100% 25%;
+	background-position: 80% 80%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-refresh {
+	@extend %svg-common;
+	background-position: 100% 0;
+	width: 12px;
+	height: 12px;
+}
+
+.i-refresh-black {
+	@extend %svg-common;
+	background-position: 100% 20%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-rollback-grey {
 	@extend %svg-common;
-	background-position: 100% 50%;
+	background-position: 100% 40%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tag-white-30 {
 	@extend %svg-common;
-	background-position: 100% 75%;
+	background-position: 100% 60%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tick {
 	@extend %svg-common;
-	background-position: 0 100%;
+	background-position: 100% 80%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tick-green {
 	@extend %svg-common;
-	background-position: 25% 100%;
+	background-position: 0 100%;
 	width: 12px;
 	height: 12px;
 }
 
 .i-tick-selected {
 	@extend %svg-common;
-	background-position: 50% 100%;
+	background-position: 20% 100%;
+	width: 12px;
+	height: 12px;
+}
+
+.i-video {
+	@extend %svg-common;
+	background-position: 40% 100%;
 	width: 12px;
 	height: 12px;
 }

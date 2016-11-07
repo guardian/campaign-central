@@ -16,6 +16,17 @@ object CampaignContentRepository {
     Option(Dynamo.campaignContentTable.getItem("campaignId", campaignId, "id", id)).map{ ContentItem.fromItem }
   }
 
+  def deleteContentForCampaign(campaignId: String) = {
+    try {
+      Dynamo.campaignContentTable.deleteItem("campaignId", campaignId)
+    } catch {
+      case e: Error => {
+        Logger.error(s"failed to delete content for campaign $campaignId", e)
+        None
+      }
+    }
+  }
+
   def putContent(content: ContentItem) = {
     try {
       Dynamo.campaignContentTable.putItem(content.toItem)

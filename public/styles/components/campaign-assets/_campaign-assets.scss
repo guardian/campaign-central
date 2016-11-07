@@ -1,0 +1,25 @@
+
+.campaign-assets__field {
+  label {
+
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 14px;
+
+    font-weight: bold;
+
+    padding: 5px 0;
+  }
+}
+
+.campaign-assets__field__value {
+  margin: 5px 15px;
+  display: block;
+}
+
+
+.campaign-assets__field__logo {
+  max-width: 50px;
+  margin-right: 10px;
+  vertical-align: middle;
+}

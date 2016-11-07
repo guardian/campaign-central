@@ -3,13 +3,15 @@ package controllers
 import java.util.UUID
 
 import model._
+import model.command.CommandError._
+import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import org.joda.time.DateTime
-import play.api.Configuration
+import play.api.Logger
+import play.api.libs.json.Json._
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import play.api.mvc.{Action, Controller}
-import com.gu.pandomainauth.model.{User => PandaUser}
-import repositories.{CampaignRepository, GoogleAnalytics}
+import play.api.mvc.Controller
+import repositories._
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -31,71 +33,108 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     }
   }
 
+  def deleteCampaign(id: String) = APIAuthAction { req =>
+    CampaignNotesRepository.deleteNotesForCampaign(id)
+    CampaignContentRepository.deleteContentForCampaign(id)
+    CampaignRepository.deleteCampaign(id)
+    NoContent
+  }
+
   def getCampaignAnalytics(id: String) = APIAuthAction { req =>
-    GoogleAnalytics.getAnalyticsForCampaign(id).flatten map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+    GoogleAnalytics.getAnalyticsForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
-  def bootstrapData() = APIAuthAction { req =>
+  def getCampaignContent(id: String) =  APIAuthAction { req =>
+    Ok(Json.toJson(CampaignContentRepository.getContentForCampaign(id)))
+  }
 
-    val user = loggedInUser(req.user)
-    val now = new DateTime
+  def getCampaignNotes(id: String) =  APIAuthAction { req =>
+    Ok(Json.toJson(CampaignNotesRepository.getNotesForCampaign(id)))
+  }
 
-    val campaigns = List(
-      Campaign(
-        id = UUID.randomUUID().toString,
-        name = "Something about cars",
-        status = "live",
-        client = Client(UUID.randomUUID().toString, "Carmaker", "UK", Some(Agency(UUID.randomUUID().toString, "OMG"))),
-        created = now,
-        createdBy = user,
-        lastModified = now,
-        lastModifiedBy = user,
-        nominalValue = Some(10000),
-        actualValue = Some(0),
-        targets = Map("uniques" -> 10000L)
-      ),Campaign(
-        id = UUID.randomUUID().toString,
-        name = "Pure hate",
-        status = "prospect",
-        client = Client(UUID.randomUUID().toString, "Nigel Trump", "UK", Some(Agency(UUID.randomUUID().toString, "Evil"))),
-        created = now,
-        createdBy = user,
-        lastModified = now,
-        lastModifiedBy = user,
-        nominalValue = Some(10000),
-        actualValue = Some(0),
-        targets = Map("uniques" -> 10000L)
-      ),Campaign(
-        id = UUID.randomUUID().toString,
-        name = "TBC",
-        status = "production",
-        client = Client(UUID.randomUUID().toString, "Babylon Zoo", "UK", Some(Agency(UUID.randomUUID().toString, "Local Host"))),
-        created = now,
-        createdBy = user,
-        lastModified = now,
-        lastModifiedBy = user,
-        nominalValue = Some(10000),
-        actualValue = Some(0),
-        targets = Map("uniques" -> 10000L)
-      ),Campaign(
-        id = UUID.randomUUID().toString,
-        name = "I love it when a plan comes together",
-        status = "dead",
-        client = Client(UUID.randomUUID().toString, "A Team", "UK", Some(Agency(UUID.randomUUID().toString, "AWOL"))),
-        created = now,
-        createdBy = user,
-        lastModified = now,
-        lastModifiedBy = user,
-        nominalValue = Some(10000),
-        actualValue = Some(0),
-        targets = Map("uniques" -> 10000L)
+  def addCampaignNote(id: String) = APIAuthAction { req =>
+
+    val content = (req.body.asJson.get \ "content").as[String]
+
+    if (content.isEmpty())
+      BadRequest("Cannot add a note with no content")
+    else {
+      val created = DateTime.now()
+      val lastModified = created
+      val createdBy = User(req.user)
+      val lastModifiedBy = createdBy
+
+      val newNote = Note(
+        campaignId = id,
+        created = created,
+        createdBy = createdBy,
+        lastModified = lastModified,
+        lastModifiedBy = lastModifiedBy,
+        content = content
       )
-    )
 
-    campaigns foreach( CampaignRepository.putCampaign )
-
-    Ok("added 4 example campaigns")
+      CampaignNotesRepository.putNote(newNote)
+      Ok(Json.toJson(newNote))
+    }
   }
 
-  def loggedInUser(pandaUser: PandaUser) = User(pandaUser.firstName, pandaUser.lastName, pandaUser.email)
+  def updateCampaignNote(id: String, date: String) = {
+
+    APIAuthAction { req =>
+
+      val dateCreated = new DateTime(date.toLong)
+
+      CampaignNotesRepository.getNote(id, dateCreated) match {
+        case None => NotFound
+        case Some(note) => {
+
+          val lastModified = DateTime.now()
+          val modifiedBy = User(req.user)
+          val content = (req.body.asJson.get \ "content").as[String]
+
+          val updatedNote = note.copy(
+            lastModified = lastModified,
+            lastModifiedBy = modifiedBy,
+            content = content
+          )
+
+          CampaignNotesRepository.putNote(updatedNote)
+          Ok(Json.toJson(updatedNote))
+        }
+      }
+    }
+  }
+
+  def importFromTag() = APIAuthAction { req =>
+    implicit val user = Option(User(req.user))
+    req.body.asJson.map { json =>
+      try {
+        json.as[ImportCampaignFromCAPICommand].process.map{ t => Ok(Json.toJson(t)) } getOrElse NotFound
+      } catch {
+        commandErrorAsResult
+      }
+    }.getOrElse {
+      BadRequest("Expecting Json data")
+    }
+  }
+
+  def refreshCampaignFromCAPI(campaignId: String) = APIAuthAction { req =>
+    implicit val user = Option(User(req.user))
+    try {
+      RefreshCampaignFromCAPICommand(campaignId).process.map{ t => Ok(Json.toJson(t)) } getOrElse NotFound
+    } catch {
+      commandErrorAsResult
+    }
+  }
+
+
+  def getCampaignTrafficDrivers(campaignId: String) = APIAuthAction { req =>
+    Logger.info(s"Loading traffic drivers for campaign $campaignId")
+    Ok(toJson(TrafficDriverGroup.forCampaign(campaignId)))
+  }
+
+  def getCampaignTrafficDriverStats(campaignId: String) = APIAuthAction { req =>
+    Logger.info(s"Loading traffic driver stats for campaign $campaignId")
+    Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))
+  }
 }
