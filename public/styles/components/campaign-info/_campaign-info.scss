@@ -16,6 +16,11 @@
   margin: 0 5px;
 }
 
+.campaign-info__field__error {
+  color: $c-red;
+  padding-left: 10px;
+}
+
 .campaign-info__button {
 
   display: inline-block;

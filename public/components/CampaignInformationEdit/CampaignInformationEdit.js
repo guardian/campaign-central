@@ -9,7 +9,11 @@ class CampaignInformationEdit extends React.Component {
 
   static propTypes = {
     updateCampaign: PropTypes.func.isRequired
-  };
+  }
+
+  state = {
+    error: ''
+  }
 
   updateCampaignName = (e) => {
     this.props.updateCampaign(Object.assign({}, this.props.campaign, {
@@ -26,8 +30,17 @@ class CampaignInformationEdit extends React.Component {
   updateCampaignValue = (e) => {
     const fieldValue = e.target.value;
     const value = fieldValue[0] === '£' ? fieldValue.substr(1, fieldValue.length) : fieldValue; //Strip out £
+    const numValue = parseInt(value);
 
-    const numValue = parseInt(value) === NaN ? undefined : parseInt(value);
+    if (isNaN(numValue) || numValue != value) {
+        this.setState({
+            error: 'Campaign value has to be a number!'
+        });
+    } else {
+        this.setState({
+            error: ''
+        });
+    }
 
     this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       actualValue: numValue
@@ -71,7 +84,7 @@ class CampaignInformationEdit extends React.Component {
           </div>
           <div className="campaign-info__field">
             <label>Value</label>
-            <EditableText value={this.props.campaign.actualValue ? "£" + this.props.campaign.actualValue : ""} onChange={this.updateCampaignValue} />
+            <EditableText value={this.props.campaign.actualValue ? "£" + this.props.campaign.actualValue : ""} onChange={this.updateCampaignValue} error={this.state.error}/>
           </div>
           <div className="campaign-info__field">
             <label>Status</label>
