@@ -4,7 +4,8 @@ class EditableText extends React.Component {
 
   static propTypes = {
     value: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    error: PropTypes.string
   };
 
   static defaultProps = {
@@ -16,17 +17,14 @@ class EditableText extends React.Component {
   }
 
   enableEditing = () => {
-
     window.addEventListener('click', this.disableEditing, true);
 
     this.setState({
       editable: true
     });
-
   }
 
   disableEditing = (event) => {
-
     if (event.target !== this.refs.editableInput) {
         window.removeEventListener('click', this.disableEditing, true);
 
@@ -41,7 +39,6 @@ class EditableText extends React.Component {
   }
 
   render () {
-
     if (!this.state.editable) {
       return (
         <div className="editable-text" onClick={this.enableEditing} >
@@ -54,8 +51,10 @@ class EditableText extends React.Component {
     }
 
     return (
+
       <div className="editable-text">
         <input ref="editableInput" className="editable-text__input" value={this.props.value || ""} onChange={this.props.onChange} />
+        <span className="campaign-info__field__error">{this.props.error}</span>
       </div>
     );
   }
