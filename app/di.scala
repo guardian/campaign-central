@@ -26,6 +26,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
   val appController = new App(wsClient)
   val campaignApiController = new CampaignApi(wsClient)
   val clientApiController = new ClientApi(wsClient)
+  val managementApiController = new ManagementApi(wsClient)
   val migrationController = new Migration(wsClient)
   val managementController = new Management()
   val assetsController = new Assets(httpErrorHandler)
@@ -35,6 +36,7 @@ class AppComponents(context: Context) extends BuiltInComponentsFromContext(conte
     appController,
     campaignApiController,
     clientApiController,
+    managementApiController,
     assetsController,
     migrationController,
     managementController

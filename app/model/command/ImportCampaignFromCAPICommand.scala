@@ -24,7 +24,7 @@ trait CAPIImportCommand extends Command {
   override type T = Campaign
 
   def deriveHostedTagFromContent(content: List[ApiContent]) = {
-    content.flatMap(_.tags).find{t => t.`type` == TagType.PaidContent && t.paidContentType == Some("HostedContent")}
+    content.flatMap(_.tags).find{t => t.`type` == TagType.PaidContent}
   }
 
   def deriveContentType(apiContent: ApiContent) = {
@@ -117,11 +117,17 @@ case class ImportCampaignFromCAPICommand(
     val apiContent = ContentApi.loadAllContentInSection(section.pathPrefix)
     val hostedTag = deriveHostedTagFromContent(apiContent) getOrElse (CampaignTagNotFound)
 
+    val campaignType = hostedTag.paidContentType match {
+      case Some("HostedContent") => "hosted"
+      case Some(_) => "paidContent"
+      case None => InvalidCampaignTagType
+    }
+
     val campaign = CampaignRepository.getCampaignByTag(id) getOrElse {
       Campaign(
         id = UUID.randomUUID().toString,
         name = externalName,
-        `type` = Some("hosted"),
+        `type` = campaignType,
         status = "pending",
         tagId = Some(id),
         pathPrefix = Some(section.pathPrefix),

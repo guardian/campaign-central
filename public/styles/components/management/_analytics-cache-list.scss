@@ -1,0 +1,58 @@
+.analytics-cache-list__row {
+  @extend %table__row;
+  border-bottom: none;
+}
+
+.analytics-cache-list__item {
+  border-bottom: 1px solid $c-grey-300;
+}
+
+.analytics-cache-list__key,
+.analytics-cache-list__type,
+.analytics-cache-list__written,
+.analytics-cache-list__expires {
+  @extend %table__cell;
+  white-space: normal;
+
+  position: relative;
+
+  overflow: auto;
+
+  border-bottom: none;
+
+  &--header {
+    @extend %table__cell;
+
+    background-color: $c-grey-200;
+
+    font-weight: bold;
+    white-space: normal;
+  }
+
+  &--expired {
+    @extend %table__cell;
+
+    background-color: $c-orange;
+  }
+}
+
+.analytics-cache-list__key,
+.analytics-cache-list__key--header {
+  width: 25%;
+}
+
+.analytics-cache-list__type,
+.analytics-cache-list__type--header {
+  width: 25%;
+}
+
+.analytics-cache-list__written,
+.analytics-cache-list__written--header {
+  width: 25%;
+}
+
+.analytics-cache-list__expires,
+.analytics-cache-list__expires--expired,
+.analytics-cache-list__expires--header {
+  width: 25%;
+}

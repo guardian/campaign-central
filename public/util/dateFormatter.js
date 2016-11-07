@@ -12,6 +12,12 @@ export function shortFormatMillisecondDate(msDate) {
   return date.toLocaleDateString();
 }
 
+export function isoFormatMillisecondDate(msDate) {
+  const date = new Date(msDate);
+
+  return date.toISOString();
+}
+
 // 'dd/mm' eg '02/11'
 export function ddmmFormatDate(date) {
   return new Date(date).toLocaleDateString('en-GB', {day: '2-digit', month: '2-digit'})

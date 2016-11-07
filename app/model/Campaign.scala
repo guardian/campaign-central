@@ -11,7 +11,7 @@ import scala.util.control.NonFatal
 case class Campaign(
                    id: String,
                    name: String,
-                   `type`: Option[String] = Some("hosted"),
+                   `type`: String,
                    status: String,
                    clientId: String,
                    created: DateTime,

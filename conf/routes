@@ -6,6 +6,7 @@ GET	/campaign/:id		              controllers.App.index(id)
 GET	/clients		                  controllers.App.index(id = "")
 GET	/clients/:id		              controllers.App.index(id)
 GET	/capiImport		                controllers.App.index(id = "")
+GET	/management/analytics         controllers.App.index(id = "")
 
 
 GET            /oauthCallback     controllers.App.oauthCallback
@@ -35,7 +36,12 @@ GET /api/clients                  controllers.ClientApi.getAllClients
 GET /api/clients/:id              controllers.ClientApi.getClient(id: String)
 PUT /api/clients/:id              controllers.ClientApi.updateClient(id: String)
 
+#Management Api
 
+GET    /management/api/analytics                        controllers.ManagementApi.getAnalyticsCacheSummary()
+POST   /management/api/analytics/:dataType/:key         controllers.ManagementApi.refreshAnalyticsCacheEntry(dataType: String, key: String)
+DELETE /management/api/analytics/:dataType/:key         controllers.ManagementApi.deleteAnalyticsCacheEntry(dataType: String, key: String)
+POST   /management/api/analytics/:dataType              controllers.ManagementApi.refreshAnalyticsCacheForType(dataType: String)
 
 GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 

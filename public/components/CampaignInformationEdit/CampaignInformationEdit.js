@@ -66,12 +66,8 @@ class CampaignInformationEdit extends React.Component {
             <EditableText value={this.props.campaign.name} onChange={this.updateCampaignName} />
           </div>
           <div className="campaign-info__field">
-            <label>Created</label>
-            <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.created)} by {this.props.campaign.createdBy.firstName} {this.props.campaign.createdBy.lastName}</span>
-          </div>
-          <div className="campaign-info__field">
-            <label>Last modified</label>
-            <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.lastModified)} by {this.props.campaign.lastModifiedBy.firstName} {this.props.campaign.lastModifiedBy.lastName}</span>
+            <label>Campaign type</label>
+            <span className="campaign-info__field__value">{this.props.campaign.type}</span>
           </div>
           <div className="campaign-info__field">
             <label>Value</label>
@@ -88,6 +84,14 @@ class CampaignInformationEdit extends React.Component {
           <div className="campaign-info__field">
             <label>End date</label>
             <span className="campaign-info__field__value">{endDate}{daysLeft}</span>
+          </div>
+          <div className="campaign-info__field">
+            <label>Created</label>
+            <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.created)} by {this.props.campaign.createdBy.firstName} {this.props.campaign.createdBy.lastName}</span>
+          </div>
+          <div className="campaign-info__field">
+            <label>Last modified</label>
+            <span className="campaign-info__field__value">{formatMillisecondDate(this.props.campaign.lastModified)} by {this.props.campaign.lastModifiedBy.firstName} {this.props.campaign.lastModifiedBy.lastName}</span>
           </div>
         </div>
       </div>

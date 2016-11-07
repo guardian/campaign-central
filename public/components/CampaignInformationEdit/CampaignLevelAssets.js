@@ -43,16 +43,25 @@ class CampaignLevelAssets extends React.Component {
   }
 
   render () {
+
+    var ctaBlock;
+    if(this.props.campaign.type === 'hosted') {
+      ctaBlock = (
+        <div className="campaign-assets__field">
+          <label>Call to actions</label>
+          {this.renderCtaInformation()}
+        </div>
+      );
+    }
+
     return (
       <div className="campaign-assets">
         <div className="campaign-assets__field">
           <label>Tag</label>
           {this.renderTagInformation()}
         </div>
-        <div className="campaign-assets__field">
-          <label>Call to actions</label>
-          {this.renderCtaInformation()}
-        </div>
+
+        {ctaBlock}
       </div>
     );
   }
