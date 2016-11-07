@@ -1,91 +1,48 @@
-@keyframes slideup {
-  from {
-    height: 60px;
-  }
-
-  to {
-    height: 100%;
-  }
+.campaign-list {
+  border-collapse: collapse;
 }
 
-@keyframes slidedown {
-  from {
-    height: 100%;
-  }
+.campaign-list__header {
+  padding: 15px;
 
-  to {
-    height: 60px;
-  }
+  background: $c-grey-main;
+  border-bottom: 4px solid $c-highlight-main;
+  border-right: 1px solid $c-highlight-main;
+
+  color: $c-grey-200;
+  font-size: 18px;
+}
+
+.campaign-list__header:last-child {
+  border-right: none;
+}
+
+.campaign-list__row {
+  background-color: $c-grey-200;
+  border-bottom: 1px solid $c-grey-400;
+
+  cursor: pointer;
+}
+
+.campaign-list__row:nth-child(odd) {
+  background-color: $c-grey-100;
+}
+
+.campaign-list__row:last-child {
+  border-bottom: none;
 }
 
 .campaign-list__item {
-  display: inline-block;
-  position: relative;
-
-  width: calc(25% - 40px);
-  max-width: 250px;
-  min-width: 150px;
-
-  height: 160px;
-  overflow: hidden;
-
   margin-right: 20px;
   margin-bottom: 20px;
+  padding: 15px;
 
-  background-color: $c-grey-200;
-  border: 1px solid $c-grey-300;
+  border-top: 1px solid $c-grey-400;
+  border-right: 1px solid $c-grey-400;
 
   color: $c-grey-main;
-
-  &:hover {
-    .campaign-list__item__info {
-      animation-duration: 1s;
-      animation-name: slideup;
-      animation-fill-mode: forwards;
-    }
-  }
 }
 
-.campaign-list__item__logo {
-  height: 100px;
-  display: block;
-  margin: 0 auto;
-}
-
-.campaign-list__item__info {
-  position: absolute;
-
-  bottom: 0;
-  left: 0;
-
-  width: 100%;
-  height: 60px;
-  padding: 10px;
-  background-color: $c-grey-secondary;
-
-  color: $c-bluegrey;
-
-  animation-duration: 1s;
-  animation-name: slidedown;
-  animation-fill-mode: forwards;
-}
-
-.campaign-list__item__info-name {
-  display: block;
-
-  padding-bottom: 36px;
-}
-
-.campaign-list__item__info-other {
-  display: block;
-
-  padding-bottom: 6px;
-
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.campaign-list__item__info-other--status,
-.campaign-list__item__info-other--value {
-  color: $c-highlight-main;
+.campaign-list__item:last-child {
+  border-right: none;
 }
