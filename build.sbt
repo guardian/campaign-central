@@ -18,6 +18,7 @@ lazy val dependencies = Seq(
   "com.google.apis" % "google-api-services-analyticsreporting" % "v4-rev10-1.22.0",
   "com.squareup.okhttp3" % "okhttp" % "3.4.1",
   ws,
+  "commons-io" % "commons-io" % "2.5",
   "net.logstash.logback" % "logstash-logback-encoder" % "4.7",
   "com.gu" % "kinesis-logback-appender" % "1.3.0",
   "org.slf4j" % "slf4j-api" % slf4jVersion,
