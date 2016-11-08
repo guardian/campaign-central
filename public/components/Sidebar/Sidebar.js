@@ -19,7 +19,7 @@ class Sidebar extends React.Component {
     }
 
     return(
-      <Link to="/campaigns" className={className} onClick={() => {this.setCampaignStateFilter(stateValue)}}>{displayName}</Link>
+      <Link to="/campaigns" className={className} onClick={() => this.setCampaignStateFilter(stateValue)}>{displayName}</Link>
     )
   };
 
