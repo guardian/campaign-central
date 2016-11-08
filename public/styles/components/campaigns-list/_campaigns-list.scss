@@ -51,3 +51,8 @@
 .campaign-list__item:last-child {
   border-right: none;
 }
+
+.campaign-list__item__logo {
+  max-width: 100px;
+  padding-top: 10px;
+}
