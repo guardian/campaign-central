@@ -21,9 +21,21 @@ class CampaignList extends React.Component {
     }
 
     return (
-      <div className="campaign-list">
-        {this.props.campaigns.map((c) => <CampaignListItem campaign={c} key={c.id} />)}
-      </div>
+      <table className="campaign-list">
+        <thead>
+          <tr>
+            <th className="campaign-list__header">Name</th>
+            <th className="campaign-list__header">Type</th>
+            <th className="campaign-list__header">Status</th>
+            <th className="campaign-list__header">Value</th>
+            <th className="campaign-list__header">Start date</th>
+            <th className="campaign-list__header">Finish date</th>
+          </tr>
+        </thead>
+          <tbody>
+            {this.props.campaigns.map((c) => <CampaignListItem campaign={c} key={c.id} />)}
+          </tbody>
+      </table>
     );
   }
 }
