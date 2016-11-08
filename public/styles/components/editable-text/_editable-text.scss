@@ -31,8 +31,13 @@
 
   border-radius: 4px;
 
+  cursor: pointer;
+
   i {
     transform: scale(0.9);
   }
 
+  &:hover i {
+    transform: scale(1.1);
+  }
 }

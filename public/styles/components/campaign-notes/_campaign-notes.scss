@@ -11,5 +11,11 @@
 
 .note-add {
   padding-top: 5px;
+
+  cursor: pointer;
+
+  &:hover i {
+    transform: scale(1.2);
+  }
 }
 

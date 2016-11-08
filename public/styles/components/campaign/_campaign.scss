@@ -37,6 +37,12 @@
   cursor: pointer;
 }
 
+.campaign-box__header__delete-campaign-button:hover i,
+.campaign-box__header__refresh-asset-button:hover {
+  transform: scale(1.2);
+}
+
+
 .campaign-box__body {
   padding: 20px;
 
@@ -49,7 +55,7 @@
   background-color: $c-grey-100;
 
   border: 1px solid $c-grey-300;
-  border-top-width: 0px;
+  border-top-width: 0;
 
   padding: 5px 10px;
 
