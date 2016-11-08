@@ -78,7 +78,11 @@ trait CAPIImportCommand extends Command {
       startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
       endDate = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1))),
       status = if(startDate.isDefined) "live" else campaign.status,
-      callToActions = ctaAtoms.map(ctaAtom => CallToAction(Some(ctaAtom.id))).distinct,
+      callToActions = ctaAtoms.map{ atomData =>
+        val ctaAtom = atomData.data.asInstanceOf[AtomData.Cta]
+        ctaAtom.cta.trackingCode
+        CallToAction(Some(atomData.id), ctaAtom.cta.trackingCode)
+      }.distinct,
       campaignLogo = deriveTagLogo(hostedTag)
     )
 
