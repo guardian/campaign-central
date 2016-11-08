@@ -6,6 +6,7 @@ import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
 import play.api.Logger
 import play.api.libs.json.{Format, Json}
 import services.Dynamo
+import util.Compression
 
 import scala.util.control.NonFatal
 import scala.collection.JavaConversions._
@@ -43,14 +44,37 @@ object AnalyticsDataCacheEntrySummary {
 }
 
 case class AnalyticsDataCacheEntry(key: String, dataType: String, data: String, expires: Option[Long], written: Long) {
-  def toItem = Item.fromJSON(Json.toJson(this).toString())
+  //def toItem = Item.fromJSON(Json.toJson(this).toString())
+
+  def toItem = {
+    val item = new Item()
+      .withString("key", key)
+      .withString("dataType", dataType)
+      .withBinary("compressedData", Compression.compress(data))
+      .withLong("written", written)
+
+    expires.foreach(item.withLong("expires", _))
+
+    item
+  }
+
 }
 
 object AnalyticsDataCacheEntry {
   implicit val analyticsDataCacheEntryFormat: Format[AnalyticsDataCacheEntry] = Jsonx.formatCaseClass[AnalyticsDataCacheEntry]
 
   def fromItem(item: Item) = try {
-    Json.parse(item.toJSON).as[AnalyticsDataCacheEntry]
+    if (item.isPresent("compressedData")) {
+      AnalyticsDataCacheEntry(
+        key = item.getString("key"),
+        dataType = item.getString("dataType"),
+        data = Compression.decompress(item.getBinary("compressedData")),
+        expires = if(item.isPresent("expires")) Some(item.getLong("expires")) else None,
+        written = item.getLong("written")
+      )
+    } else {
+      Json.parse(item.toJSON).as[AnalyticsDataCacheEntry]
+    }
   } catch {
     case NonFatal(e) => {
       Logger.error(s"failed to parse analytics data cache item ${item.toJSON}", e)
@@ -66,6 +90,7 @@ object AnalyticsDataCache {
 
 
   def putCampaignDailyCountsReport(campaignId: String, data: CampaignDailyCountsReport, expires: Option[Long]): Unit = {
+    
     val entry = AnalyticsDataCacheEntry(campaignId, "CampaignDailyCountsReport", Json.toJson(data).toString(), expires, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
