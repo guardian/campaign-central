@@ -105,6 +105,11 @@
 
   padding: 5px 40px;
 
+  cursor: pointer;
+
+  &:hover {
+    opacity: .7;
+  }
 
   color: $c-grey-200;
   border-bottom: 2px solid $c-grey-main;

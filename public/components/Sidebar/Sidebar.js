@@ -19,7 +19,7 @@ class Sidebar extends React.Component {
     }
 
     return(
-      <div className={className} onClick={() => this.setCampaignStateFilter(stateValue)}>{displayName}</div>
+      <Link to="/campaigns" className={className} onClick={() => this.setCampaignStateFilter(stateValue)}>{displayName}</Link>
     )
   };
 
@@ -31,7 +31,7 @@ class Sidebar extends React.Component {
     }
 
     return(
-      <div className={className} onClick={() => this.setCampaignTypeFilter(stateValue)}>{displayName}</div>
+      <Link to="/campaigns" className={className} onClick={() => this.setCampaignTypeFilter(stateValue)}>{displayName}</Link>
     )
   };
 
