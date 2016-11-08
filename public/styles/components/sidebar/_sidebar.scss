@@ -109,6 +109,8 @@
   color: $c-grey-200;
   border-bottom: 2px solid $c-grey-main;
 
+  cursor: pointer;
+
   &--active {
     color: $c-highlight-main;
   }
