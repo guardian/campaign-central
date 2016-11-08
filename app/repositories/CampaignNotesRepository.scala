@@ -19,7 +19,9 @@ object CampaignNotesRepository {
 
   def deleteNotesForCampaign(campaignId: String) = {
     try {
-      Dynamo.campaignNotesTable.deleteItem("campaignId", campaignId)
+      for (note <- Dynamo.campaignNotesTable.query("campaignId", campaignId)) {
+        Dynamo.campaignNotesTable.deleteItem("campaignId", campaignId, "created", note.getNumber("created"))
+      }
     } catch {
       case e: Error => {
         Logger.error(s"failed to delete notes for campaign $campaignId", e)

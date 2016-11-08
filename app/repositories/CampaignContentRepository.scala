@@ -18,7 +18,9 @@ object CampaignContentRepository {
 
   def deleteContentForCampaign(campaignId: String) = {
     try {
-      Dynamo.campaignContentTable.deleteItem("campaignId", campaignId)
+      for (content <- Dynamo.campaignContentTable.query("campaignId", campaignId)) {
+        Dynamo.campaignContentTable.deleteItem("campaignId", campaignId, "id", content.getString("id"))
+      }
     } catch {
       case e: Error => {
         Logger.error(s"failed to delete content for campaign $campaignId", e)
