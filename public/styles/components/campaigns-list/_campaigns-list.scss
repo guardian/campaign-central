@@ -32,6 +32,11 @@
   border-bottom: none;
 }
 
+.campaign-list__row:hover,
+.campaign-list__row:nth-child(odd):hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
 .campaign-list__item {
   margin-right: 20px;
   margin-bottom: 20px;

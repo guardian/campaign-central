@@ -11,6 +11,10 @@ class CampaignListItem extends React.Component {
     }).isRequired
   };
 
+  redirectToCampaign = () => {
+    window.document.location = "/campaign/" + this.props.campaign.id;
+  };
+
   render () {
 
     var image;
@@ -38,7 +42,7 @@ class CampaignListItem extends React.Component {
     }
 
     return (
-      <tr className="campaign-list__row" data-href='{"/campaign/" + this.props.campaign.id}'>
+      <tr className="campaign-list__row" onClick={this.redirectToCampaign}>
         <td className="campaign-list__item">{this.props.campaign.name}<br/>{image}</td>
         <td className="campaign-list__item">{this.props.campaign.type}</td>
         <td className="campaign-list__item">{this.props.campaign.status}</td>
