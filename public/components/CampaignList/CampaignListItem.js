@@ -11,6 +11,10 @@ class CampaignListItem extends React.Component {
     }).isRequired
   };
 
+  redirectToCampaign = () => {
+    window.document.location = "/campaign/" + this.props.campaign.id;
+  };
+
   render () {
 
     var image;
@@ -38,32 +42,14 @@ class CampaignListItem extends React.Component {
     }
 
     return (
-      <Link className="campaign-list__item" to={"/campaign/" + this.props.campaign.id}>
-          {image}
-        <div className="campaign-list__item__info">
-          <span className="campaign-list__item__info-name">{this.props.campaign.name}</span>
-          <span className="campaign-list__item__info-other">
-            <span className="campaign-list__item__info-other--info">Type: </span>
-            <span className="campaign-list__item__info-other--status">{this.props.campaign.type} </span>
-          </span>
-          <span className="campaign-list__item__info-other">
-            <span className="campaign-list__item__info-other--info">Status: </span>
-            <span className="campaign-list__item__info-other--status">{this.props.campaign.status} </span>
-          </span>
-          <span className="campaign-list__item__info-other">
-            <span className="campaign-list__item__info-other--info">Value: </span>
-            <span className="campaign-list__item__info-other--value">{this.props.campaign.actualValue} </span>
-          </span>
-          <span className="campaign-list__item__info-other">
-            <span className="campaign-list__item__info-other--info">Start date: </span>
-            <span className="campaign-list__item__info-other--value">{startDate}</span>
-          </span>
-          <span className="campaign-list__item__info-other">
-                <span className="campaign-list__item__info-other--info">Finish date: </span>
-                <span className="campaign-list__item__info-other--value">{endDate}{daysLeft}</span>
-          </span>
-        </div>
-      </Link>
+      <tr className="campaign-list__row" onClick={this.redirectToCampaign}>
+        <td className="campaign-list__item">{this.props.campaign.name}<br/>{image}</td>
+        <td className="campaign-list__item">{this.props.campaign.type}</td>
+        <td className="campaign-list__item">{this.props.campaign.status}</td>
+        <td className="campaign-list__item">{this.props.campaign.actualValue}</td>
+        <td className="campaign-list__item">{startDate}</td>
+        <td className="campaign-list__item">{endDate} {daysLeft}</td>
+      </tr>
     );
   }
 }
