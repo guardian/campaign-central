@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.Item
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
 import model.{CampaignDailyCountsReport, CampaignSummary}
 import play.api.Logger
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, Reads}
 import services.Dynamo
 import util.Compression
 
@@ -118,57 +118,34 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
-  def getCampaignDailyCountsReport(campaignId: String): CacheResult[CampaignDailyCountsReport] = {
-    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", campaignId, "dataType", "CampaignDailyCountsReport"))
+  private def getEntry[T](key: String, dataType: String)(implicit fjs: Reads[T]): CacheResult[T] = {
+    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", key, "dataType", dataType))
     item.map{ i =>
       val entry = AnalyticsDataCacheEntry.fromItem(i)
-      val report = Json.parse(entry.data).as[CampaignDailyCountsReport]
+      val report = Json.parse(entry.data).as[T]
 
       entry.expires match {
         case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
         case _ => Hit(report)
       }
     }.getOrElse(Miss)
+  }
+
+  def getCampaignDailyCountsReport(campaignId: String): CacheResult[CampaignDailyCountsReport] = {
+    getEntry[CampaignDailyCountsReport](campaignId, "CampaignDailyCountsReport")
   }
 
   def getCampaignSummary(campaignId: String): CacheResult[CampaignSummary] = {
-    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", campaignId, "dataType", "CampaignSummary"))
-    item.map{ i =>
-      val entry = AnalyticsDataCacheEntry.fromItem(i)
-      val report = Json.parse(entry.data).as[CampaignSummary]
-
-      entry.expires match {
-        case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
-        case _ => Hit(report)
-      }
-    }.getOrElse(Miss)
+    getEntry[CampaignSummary](campaignId, "CampaignSummary")
   }
 
   def getOverallSummary(): CacheResult[Map[String, CampaignSummary]] = {
-    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", "overall", "dataType", "CampaignSummary"))
-    item.map{ i =>
-      val entry = AnalyticsDataCacheEntry.fromItem(i)
-      val report = Json.parse(entry.data).as[Map[String, CampaignSummary]]
-
-      entry.expires match {
-        case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
-        case _ => Hit(report)
-      }
-    }.getOrElse(Miss)
+    getEntry[Map[String, CampaignSummary]]("overall", "CampaignSummary")
 
   }
 
   def getCampaignCtaClicksReport(campaignId: String): CacheResult[Map[String, Long]] = {
-    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", campaignId, "dataType", "CtaClicksReport"))
-    item.map{ i =>
-      val entry = AnalyticsDataCacheEntry.fromItem(i)
-      val report = Json.parse(entry.data).as[Map[String, Long]]
-
-      entry.expires match {
-        case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
-        case _ => Hit(report)
-      }
-    }.getOrElse(Miss)
+    getEntry[Map[String, Long]](campaignId, "CtaClicksReport")
   }
 
   def summariseContents = {
