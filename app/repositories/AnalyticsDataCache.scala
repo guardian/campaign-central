@@ -3,6 +3,7 @@ package repositories
 import ai.x.play.json.Jsonx
 import com.amazonaws.services.dynamodbv2.document.Item
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
+import model.{CampaignDailyCountsReport, CampaignSummary}
 import play.api.Logger
 import play.api.libs.json.{Format, Json}
 import services.Dynamo
@@ -98,7 +99,6 @@ object AnalyticsDataCache {
   }
 
   def putCampaignDailyCountsReport(campaignId: String, data: CampaignDailyCountsReport, validToTimestamp: Option[Long]): Unit = {
-
     val entry = AnalyticsDataCacheEntry(campaignId, "CampaignDailyCountsReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
@@ -110,6 +110,11 @@ object AnalyticsDataCache {
 
   def putOverallSummary(data: Map[String, CampaignSummary]): Unit = {
     val entry = AnalyticsDataCacheEntry("overall", "CampaignSummary", Json.toJson(data).toString(), None, System.currentTimeMillis())
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
+  def putCampaignCtaClicksReport(campaignId: String, data: Map[String, Long], validToTimestamp: Option[Long]): Unit = {
+    val entry = AnalyticsDataCacheEntry(campaignId, "CtaClicksReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
@@ -151,6 +156,19 @@ object AnalyticsDataCache {
       }
     }.getOrElse(Miss)
 
+  }
+
+  def getCampaignCtaClicksReport(campaignId: String): CacheResult[Map[String, Long]] = {
+    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", campaignId, "dataType", "CtaClicksReport"))
+    item.map{ i =>
+      val entry = AnalyticsDataCacheEntry.fromItem(i)
+      val report = Json.parse(entry.data).as[Map[String, Long]]
+
+      entry.expires match {
+        case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
+        case _ => Hit(report)
+      }
+    }.getOrElse(Miss)
   }
 
   def summariseContents = {

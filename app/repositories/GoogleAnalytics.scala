@@ -2,46 +2,22 @@ package repositories
 
 import java.util.concurrent.Executors
 
-import ai.x.play.json.Jsonx
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.{HttpRequest, HttpRequestInitializer}
 import com.google.api.services.analyticsreporting.v4.model._
 import com.google.api.services.analyticsreporting.v4.{AnalyticsReporting, AnalyticsReportingScopes}
-import model.Campaign
+import model.{Campaign, CampaignDailyCountsReport, CampaignSummary}
 import org.joda.time.{DateTime, Duration}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.Logger
-import play.api.libs.json.Format
-import repositories.GoogleAnalytics.ParsedDailyCountsReport
-import services.{AWS, Config}
-import util.AnalyticsCache
+import services.Config
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
 
 
-case class CampaignDailyCountsReport(seenPaths: Set[String], pageCountStats: List[Map[String, Long]])
 
-object CampaignDailyCountsReport{
-  implicit val campaignDailyCountsReportFormat: Format[CampaignDailyCountsReport] = Jsonx.formatCaseClass[CampaignDailyCountsReport]
-
-  def apply(parsedDailyCountsReport: ParsedDailyCountsReport): CampaignDailyCountsReport = {
-    CampaignDailyCountsReport(
-      parsedDailyCountsReport.seenPaths,
-      parsedDailyCountsReport.dayStats.keySet.toList.sortBy(_.getMillis).map{ dt =>
-        val stats = parsedDailyCountsReport.dayStats(dt)
-        stats + ("date" -> dt.getMillis)
-      }
-    )
-  }
-}
-
-case class CampaignSummary(totalUniques: Long, targetToDate: Long)
-
-object CampaignSummary{
-  implicit val campaignSummaryFormat: Format[CampaignSummary] = Jsonx.formatCaseClass[CampaignSummary]
-}
 
 object GoogleAnalytics {
 
@@ -85,15 +61,10 @@ object GoogleAnalytics {
     }
 
     report.foreach{ data =>
-      val campaignFinished = for (
-        c <- campaign;
-        d <- c.endDate
-      ) yield {d.isBeforeNow}
 
-      val expiry = if(campaignFinished.getOrElse(false)) None else { Some( DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis) }
+      val expiry = campaign.flatMap(calculateValidToDateForDailyStats)
 
       AnalyticsDataCache.putCampaignDailyCountsReport(campaignId, data, expiry)
-
       storeSummaryForCampaign(campaignId, data, expiry)
     }
 
@@ -313,6 +284,94 @@ object GoogleAnalytics {
 
       ParsedDailyCountsReport(seenPaths, dayStats)
     }
+  }
+
+
+  // CTA clicks functions
+
+  def getCtaClicksForCampaign(campaignId: String): Option[Map[String, Long]] = {
+
+    AnalyticsDataCache.getCampaignCtaClicksReport(campaignId) match {
+      case Hit(report) => {
+        Logger.debug(s"getting CTA clicks for campaign $campaignId - cache hit")
+        Some(report)
+      }
+      case Stale(report) => {
+        Logger.debug(s"getting CTA clicks for campaign $campaignId - cache stale spawning async refresh")
+
+        Future{
+          Logger.debug(s"async refresh of CTA clicks for campaign $campaignId")
+          fetchAndStoreCtaClicksForCampaign(campaignId)
+        } // serve stale but spawn refresh future
+        Some(report)
+      }
+      case Miss => {
+        Logger.debug(s"getting CTA clicks for campaign $campaignId - cache miss fetching sync")
+        fetchAndStoreCtaClicksForCampaign(campaignId)
+      }
+    }
+  }
+
+  private def fetchAndStoreCtaClicksForCampaign(campaignId: String): Option[Map[String, Long]] = {
+    CampaignRepository.getCampaign(campaignId) map { campaign =>
+      val reportLines = for (
+        cta <- campaign.callToActions;
+        startDate <- campaign.startDate;
+        builderId <- cta.builderId;
+        trackingCode <- cta.trackingCode
+      ) yield {
+        builderId -> loadCtaClicks(trackingCode, startDate, campaign.endDate)
+      }
+
+      val report = reportLines.toMap
+
+      AnalyticsDataCache.putCampaignCtaClicksReport(campaignId, report, calculateValidToDateForDailyStats(campaign))
+
+      report
+    }
+
+  }
+
+  private def loadCtaClicks(trackingCode: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
+
+    Logger.info(s"fetch CTa clicks for cta $trackingCode")
+
+    val endOfRange = endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
+    val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
+
+    val totalEvents = new Metric().setExpression("ga:totalEvents").setAlias("totalEvents")
+
+    val viewsReportRequest = new ReportRequest()
+      .setDateRanges(List(dateRange))
+      .setMetrics(List(totalEvents))
+      .setFiltersExpression(s"ga:eventCategory==Click;ga:eventAction==External;ga:eventLabel==$trackingCode")
+      .setIncludeEmptyRows(true)
+      .setSamplingLevel("LARGE")
+      .setViewId(Config().googleAnalyticsViewId)
+
+    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
+
+    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+
+    // this report has a single value, so just dive in grabbing the first entry at each level
+    val clickCount = for(
+      report <- reportResponse.getReports.headOption;
+      row <- report.getData.getRows.headOption;
+      metrics <- row.getMetrics.headOption;
+      value <- metrics.getValues.headOption
+    ) yield { value.toLong}
+
+    clickCount.getOrElse(0L)
+  }
+
+  // general GA connection stuff
+
+  def calculateValidToDateForDailyStats(campaign: Campaign): Option[Long] = {
+    val campaignFinished = for (
+      d <- campaign.endDate
+    ) yield {d.isBeforeNow}
+
+    if(campaignFinished.getOrElse(false)) None else { Some( DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis) }
   }
 
   private def initialiseGaClient = {
