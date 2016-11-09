@@ -29,7 +29,10 @@ class CampaignLevelAssets extends React.Component {
       return (
         <span className="campaign-assets__field__value">
           <ul>
-            {this.props.campaign.callToActions.map( cta => <li key={cta.builderId}><a href={ctaEditUrl(cta.builderId)} target="_blank">{cta.builderId}</a></li> )}
+            {this.props.campaign.callToActions.map( cta => {
+              var ctaName = cta.trackingCode ? cta.trackingCode : cta.builderId;
+              return (<li key={cta.builderId}><a href={ctaEditUrl(cta.builderId)} target="_blank">{ctaName}</a></li>)
+            })}
           </ul>
         </span>
       )
