@@ -54,7 +54,7 @@ class AnalyticsCache extends Component {
   renderCacheItem = (item) => {
 
     return (
-      <div key={item.key + item.dateType} className="analytics-cache-list__item">
+      <div key={item.key + item.dataType} className="analytics-cache-list__item">
         <div className="analytics-cache-list__row">
           <div className="analytics-cache-list__key">
             <Link to={"/campaign/" + item.key}>{item.key}</Link>
