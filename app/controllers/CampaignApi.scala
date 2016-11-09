@@ -19,6 +19,10 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Ok(Json.toJson(CampaignRepository.getAllCampaigns()))
   }
 
+  def getAnalyticsSummary() = APIAuthAction { req =>
+    Ok(Json.toJson(AnalyticsDataCache.getOverallSummary().getOrElse(Map())))
+  }
+
   def getCampaign(id: String) = APIAuthAction { req =>
     CampaignRepository.getCampaign(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
   }

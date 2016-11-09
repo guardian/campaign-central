@@ -37,6 +37,12 @@ object CampaignDailyCountsReport{
   }
 }
 
+case class CampaignSummary(totalUniques: Long, targetToDate: Long)
+
+object CampaignSummary{
+  implicit val campaignSummaryFormat: Format[CampaignSummary] = Jsonx.formatCaseClass[CampaignSummary]
+}
+
 object GoogleAnalytics {
 
   implicit val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(10))
@@ -87,9 +93,29 @@ object GoogleAnalytics {
       val expiry = if(campaignFinished.getOrElse(false)) None else { Some( DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis) }
 
       AnalyticsDataCache.putCampaignDailyCountsReport(campaignId, data, expiry)
+
+      storeSummaryForCampaign(campaignId, data, expiry)
     }
 
     report
+  }
+
+  private def storeSummaryForCampaign(campaignId: String, report: CampaignDailyCountsReport, expiry: Option[Long]) {
+    val mostRecentStats = report.pageCountStats.last
+
+    val totalUniques = mostRecentStats.getOrElse("cumulative-unique-total", 0L)
+    val targetToDate = mostRecentStats.getOrElse("cumulative-target-uniques", 0L)
+
+    val campaignSummary = CampaignSummary(totalUniques, targetToDate)
+    AnalyticsDataCache.putCampaignSummary(campaignId, campaignSummary, expiry)
+
+    updateOverallSummary(campaignId, campaignSummary)
+  }
+
+  private def updateOverallSummary(campaignId: String, campaignSummary: CampaignSummary): Unit = {
+    val overallSummary = AnalyticsDataCache.getOverallSummary().getOrElse(Map())
+
+    AnalyticsDataCache.putOverallSummary(overallSummary + (campaignId -> campaignSummary))
   }
 
   private def cleanAndConvertRawDailyCounts(rawDailyCounts: ParsedDailyCountsReport, dailyUniqueTargetValue: Option[Long]): CampaignDailyCountsReport = {
