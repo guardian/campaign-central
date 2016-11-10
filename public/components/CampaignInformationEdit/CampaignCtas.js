@@ -20,7 +20,19 @@ class CampaignCtas extends React.Component {
     }
 
     return '-';
-  }
+  };
+
+  getTotalClickCount = () => {
+    if(this.props.campaignCtaStats) {
+      var keys = Object.keys(this.props.campaignCtaStats);
+      var total = 0;
+
+      keys.forEach( (k) => total = total + this.props.campaignCtaStats[k]);
+      return total;
+    }
+
+    return '-';
+  };
 
   getCtr = (ctaId) => {
     if(this.props.campaignCtaStats && this.props.campaignAnalytics) {
@@ -36,7 +48,25 @@ class CampaignCtas extends React.Component {
     }
 
     return '-';
-  }
+  };
+
+  getTotalCtr = () => {
+    if(this.props.campaignCtaStats && this.props.campaignAnalytics) {
+      var keys = Object.keys(this.props.campaignCtaStats);
+      var total = 0;
+
+      keys.forEach( (k) => total = total + this.props.campaignCtaStats[k]);
+
+      var latestStats = this.props.campaignAnalytics.pageCountStats[this.props.campaignAnalytics.pageCountStats.length - 1];
+      var uniqueCount = latestStats["cumulative-unique-total"];
+
+      if (uniqueCount && uniqueCount !== 0) {
+        return ((total / uniqueCount) * 100 ).toFixed(2) + '%'
+      }
+    }
+
+    return '-';
+  };
 
   renderCtaItem = (cta) => {
 
@@ -53,6 +83,22 @@ class CampaignCtas extends React.Component {
     );
   }
 
+  renderOverallStats = () => {
+    if(this.props.campaign.callToActions.length > 1) {
+      return (
+        <div className="campaign-cta-list__item">
+          <div className="campaign-cta-list__row">
+            <div className="campaign-cta-list__cta-tracking">total</div>
+            <div className="campaign-cta-list__cta-clicks">{this.getTotalClickCount()}</div>
+            <div className="campaign-cta-list__cta-ctr">{this.getTotalCtr()}</div>
+          </div>
+        </div>
+      );
+    }
+
+    return;
+  }
+
   renderCtaInformation = () => {
 
     if(this.props.campaign.callToActions && this.props.campaign.callToActions.length > 0) {
@@ -64,6 +110,7 @@ class CampaignCtas extends React.Component {
             <div className="campaign-cta-list__cta-ctr--header">CTR</div>
           </div>
           {this.props.campaign.callToActions.map( this.renderCtaItem ) }
+          {this.renderOverallStats()}
         </div>
       )
     }
