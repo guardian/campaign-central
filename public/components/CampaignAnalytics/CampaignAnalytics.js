@@ -7,22 +7,6 @@ import CampaignTrafficDriverStatsChart from "./Analytics/CampaignTrafficDriverSt
 
 class CampaignAnalytics extends React.Component {
 
-  componentWillMount() {
-    this.props.campaignAnalyticsActions.clearCampaignAnalytics();
-    if (this.isAnalysisAvailable(this.props.campaign)) {
-      this.props.campaignAnalyticsActions.getCampaignAnalytics(this.props.campaign.id);
-    }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign.id !== this.props.campaign.id) {
-      this.props.campaignAnalyticsActions.clearCampaignAnalytics();
-      if (this.isAnalysisAvailable(nextProps.campaign)) {
-        this.props.campaignAnalyticsActions.getCampaignAnalytics(nextProps.campaign.id)
-      }
-    }
-  }
-
   isAnalysisAvailable(campaign) {
     return (campaign.status === 'live' && campaign.startDate && campaign.pathPrefix );
   }
@@ -69,8 +53,6 @@ class CampaignAnalytics extends React.Component {
 //REDUX CONNECTIONS
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as getCampaignAnalytics from '../../actions/CampaignActions/getCampaignAnalytics';
-import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
 
 function mapStateToProps(state) {
   return {
@@ -78,10 +60,4 @@ function mapStateToProps(state) {
   };
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignAnalytics, clearCampaignAnalytics), dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignAnalytics);
+export default connect(mapStateToProps)(CampaignAnalytics);

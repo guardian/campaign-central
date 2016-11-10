@@ -11,6 +11,19 @@ class Campaign extends React.Component {
     this.props.campaignActions.getCampaign(this.props.params.id);
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.campaign && (!this.props.campaign || nextProps.campaign.id !== this.props.campaign.id)) {
+      this.props.campaignAnalyticsActions.clearCampaignAnalytics();
+      if (this.isAnalysisAvailable(nextProps.campaign)) {
+        this.props.campaignAnalyticsActions.getCampaignAnalytics(nextProps.campaign.id)
+      }
+    }
+  }
+
+  isAnalysisAvailable(campaign) {
+    return (campaign.status === 'live' && campaign.startDate && campaign.pathPrefix );
+  }
+
   deleteCampaign = () => {
     this.props.campaignActions.deleteCampaign(this.props.campaign.id);
   }
@@ -49,6 +62,8 @@ import * as updateCampaign from '../../actions/CampaignActions/updateCampaign';
 import * as saveCampaign from '../../actions/CampaignActions/saveCampaign';
 import * as deleteCampaign from '../../actions/CampaignActions/deleteCampaign';
 import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
+import * as getCampaignAnalytics from '../../actions/CampaignActions/getCampaignAnalytics';
+import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
 
 function mapStateToProps(state) {
   return {
@@ -58,7 +73,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch)
+    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
+    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignAnalytics, clearCampaignAnalytics), dispatch)
   };
 }
 
