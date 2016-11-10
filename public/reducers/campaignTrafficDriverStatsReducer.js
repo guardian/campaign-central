@@ -1,4 +1,4 @@
-export default function campaignTrafficDriverStats(state = null, action) {
+export default function campaignTrafficDriverStats(state = [], action) {
   switch (action.type) {
 
     case 'TRAFFIC_DRIVER_STATS_GET_RECEIVE':
