@@ -1,0 +1,47 @@
+.campaign-cta-list__row {
+  @extend %table__row;
+  border-bottom: none;
+}
+
+.campaign-cta-list__item {
+  border-bottom: 1px solid $c-grey-300;
+}
+
+.campaign-cta-list__cta-tracking,
+.campaign-cta-list__cta-clicks,
+.campaign-cta-list__cta-ctr {
+  @extend %table__cell;
+  white-space: normal;
+
+  position: relative;
+
+  overflow: auto;
+
+  border-bottom: none;
+
+  &--header {
+    @extend %table__cell;
+
+    background-color: $c-grey-200;
+
+    font-weight: bold;
+    white-space: normal;
+  }
+}
+
+.campaign-cta-list__cta-tracking,
+.campaign-cta-list__cta-tracking--header {
+  width: 50%;
+}
+
+.campaign-cta-list__cta-clicks,
+.campaign-cta-list__cta-clicks--header {
+  width: 25%;
+}
+
+.campaign-cta-list__cta-ctr,
+.campaign-cta-list__cta-ctr--header {
+  width: 25%;
+}
+
+

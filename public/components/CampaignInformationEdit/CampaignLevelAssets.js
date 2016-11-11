@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
-import {tagEditUrl, ctaEditUrl} from '../../util/urlBuilder'
+import CampaignCtas from "./CampaignCtas";
+import {tagEditUrl} from '../../util/urlBuilder';
 
 class CampaignLevelAssets extends React.Component {
 
@@ -23,34 +24,12 @@ class CampaignLevelAssets extends React.Component {
     )
   }
 
-  renderCtaInformation = () => {
-
-    if(this.props.campaign.callToActions && this.props.campaign.callToActions.length > 0) {
-      return (
-        <span className="campaign-assets__field__value">
-          <ul>
-            {this.props.campaign.callToActions.map( cta => <li key={cta.builderId}><a href={ctaEditUrl(cta.builderId)} target="_blank">{cta.builderId}</a></li> )}
-          </ul>
-        </span>
-      )
-    }
-
-    return (
-      <span className="campaign-assets__field__value">
-        No call to actions configured yet
-      </span>
-    )
-  }
-
   render () {
 
     var ctaBlock;
     if(this.props.campaign.type === 'hosted') {
       ctaBlock = (
-        <div className="campaign-assets__field">
-          <label>Call to actions</label>
-          {this.renderCtaInformation()}
-        </div>
+        <CampaignCtas campaign={this.props.campaign} />
       );
     }
 
