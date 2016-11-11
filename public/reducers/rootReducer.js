@@ -13,6 +13,7 @@ import campaignTrafficDriverStats from './campaignTrafficDriverStatsReducer';
 import campaignNotes from './campaignNotesReducer';
 import campaignStateFilter from './campaignStateFilterReducer';
 import campaignTypeFilter from './campaignTypeFilterReducer';
+import overallAnalyticsSummary from './overallAnalyticsSummaryReducer';
 
 export default combineReducers({
   error,
@@ -28,5 +29,6 @@ export default combineReducers({
   campaignTrafficDriverStats,
   campaignNotes,
   campaignStateFilter,
-  campaignTypeFilter
+  campaignTypeFilter,
+  overallAnalyticsSummary
 });

@@ -33,6 +33,14 @@ export function deleteCampaign(id) {
   });
 }
 
+export function fetchOverallAnalyticsSummary() {
+  return AuthedReqwest({
+    url: '/api/campaigns/analytics',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
 export function fetchCampaignAnalytics(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/analytics',

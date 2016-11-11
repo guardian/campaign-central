@@ -9,7 +9,7 @@ class CampaignList extends React.Component {
 
   static defaultProps = {
     campaigns: []
-  }
+  };
 
   render () {
     if (!this.props.campaigns.length) {
@@ -30,10 +30,11 @@ class CampaignList extends React.Component {
             <th className="campaign-list__header">Value</th>
             <th className="campaign-list__header">Start date</th>
             <th className="campaign-list__header">Finish date</th>
+            <th className="campaign-list__header">Uniques</th>
           </tr>
         </thead>
           <tbody>
-            {this.props.campaigns.map((c) => <CampaignListItem campaign={c} key={c.id} />)}
+            {this.props.campaigns.map((c) => <CampaignListItem campaign={c} analyticsSummary={this.props.overallAnalyticsSummary[c.id]} key={c.id} />)}
           </tbody>
       </table>
     );
