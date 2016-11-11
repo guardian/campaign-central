@@ -141,4 +141,8 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Logger.info(s"Loading traffic driver stats for campaign $campaignId")
     Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))
   }
+
+  def getCampaignCtaStats(campaignId: String) = APIAuthAction { req =>
+    Ok(toJson(GoogleAnalytics.getCtaClicksForCampaign(campaignId)))
+  }
 }
