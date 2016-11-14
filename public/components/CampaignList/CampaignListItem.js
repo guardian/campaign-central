@@ -15,6 +15,24 @@ class CampaignListItem extends React.Component {
     window.document.location = "/campaign/" + this.props.campaign.id;
   };
 
+  renderProgressSummary = () => {
+    var targetUniques = this.props.campaign.targets ? this.props.campaign.targets.uniques : '';
+
+    if (this.props.analyticsSummary) {
+      const progressClass = (this.props.analyticsSummary.totalUniques < this.props.analyticsSummary.targetToDate) ? 'campaign-list__item--behind' : 'campaign-list__item--ahead';
+
+      return(<td className={'campaign-list__item '+ progressClass}>
+        target: {targetUniques}<br />
+        progress: {this.props.analyticsSummary.totalUniques} uniques<br/>
+        against: {this.props.analyticsSummary.targetToDate} expected
+      </td>);
+    }
+
+    return(<td className="campaign-list__item">
+      target: {targetUniques}
+    </td>);
+  };
+
   render () {
 
     var image;
@@ -49,6 +67,7 @@ class CampaignListItem extends React.Component {
         <td className="campaign-list__item">{this.props.campaign.actualValue}</td>
         <td className="campaign-list__item">{startDate}</td>
         <td className="campaign-list__item">{endDate} {daysLeft}</td>
+        {this.renderProgressSummary()}
       </tr>
     );
   }

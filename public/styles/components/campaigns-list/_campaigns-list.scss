@@ -45,7 +45,17 @@
   border-top: 1px solid $c-grey-400;
   border-right: 1px solid $c-grey-400;
 
+  font-size: 14px;
+
   color: $c-grey-main;
+}
+
+.campaign-list__item--ahead {
+  color: $c-green;
+}
+
+.campaign-list__item--behind {
+  color: $c-red;
 }
 
 .campaign-list__item:last-child {
