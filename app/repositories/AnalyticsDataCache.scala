@@ -3,14 +3,15 @@ package repositories
 import ai.x.play.json.Jsonx
 import com.amazonaws.services.dynamodbv2.document.Item
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
-import model.{CampaignDailyCountsReport, CampaignSummary}
+import model.{CampaignDailyCountsReport, CampaignSummary, TrafficDriverGroupStats}
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.{Format, Json, Reads}
 import services.Dynamo
 import util.Compression
 
-import scala.util.control.NonFatal
 import scala.collection.JavaConversions._
+import scala.util.control.NonFatal
 
 sealed trait CacheResult[+A] extends Product {
 
@@ -118,6 +119,17 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
+  def putCampaignTrafficDriverGroupStats( campaignId: String, data: Seq[TrafficDriverGroupStats]): Unit = {
+    val entry = AnalyticsDataCacheEntry(
+      key = campaignId,
+      dataType = "TrafficDriverGroupStats",
+      data = Json.toJson(data).toString(),
+      expires = Some(DateTime.now().withTimeAtStartOfDay().plusDays(1).plusSeconds(1).getMillis),
+      written = System.currentTimeMillis()
+    )
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
   private def getEntry[T](key: String, dataType: String)(implicit fjs: Reads[T]): CacheResult[T] = {
     val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", key, "dataType", dataType))
     item.map{ i =>
@@ -153,4 +165,7 @@ object AnalyticsDataCache {
       new ScanSpec().withAttributesToGet("key", "dataType", "expires", "written")
     ).map( AnalyticsDataCacheEntrySummary.fromItem ).toList.sortBy(_.key)
   }
+
+  def getCampaignTrafficDriverGroupStats( campaignId: String): CacheResult[Seq[TrafficDriverGroupStats]] =
+    getEntry[Seq[TrafficDriverGroupStats]](campaignId, "TrafficDriverGroupStats")
 }
