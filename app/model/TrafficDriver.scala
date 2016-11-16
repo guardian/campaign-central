@@ -3,10 +3,11 @@ package model
 import java.time.LocalDate
 
 import com.google.api.ads.dfp.axis.v201608.{DateTime, LineItem}
+import play.api.Logger
 import play.api.libs.json.{Json, Writes}
+import repositories.{AnalyticsDataCache, Hit, Miss, Stale}
 import services.Config.conf._
 import services.{DfpFetcher, DfpFilter}
-import util.AnalyticsCache
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -18,7 +19,9 @@ case class PerformanceStats(impressions: Int, clicks: Int) {
 
 object PerformanceStats {
 
-  implicit val writes = new Writes[PerformanceStats] {
+  implicit val jsonReads = Json.reads[PerformanceStats]
+
+  implicit val jsonWrites = new Writes[PerformanceStats] {
     def writes(stats: PerformanceStats) = Json.obj(
       "impressions" -> stats.impressions,
       "clicks" -> stats.clicks,
@@ -114,7 +117,7 @@ case class DayStats(date: LocalDate, stats: PerformanceStats)
 
 object DayStats {
 
-  implicit val writes = Json.writes[DayStats]
+  implicit val jsonFormat = Json.format[DayStats]
 
   def fromDfpReport(report: BufferedSource): Seq[DayStats] = {
     report.getLines.toSeq.tail.map { line =>
@@ -128,23 +131,35 @@ case class TrafficDriverGroupStats(groupName: String, dayStats: Seq[DayStats])
 
 object TrafficDriverGroupStats {
 
-  implicit val writes = Json.writes[TrafficDriverGroupStats]
-
-  private val statsCache = new AnalyticsCache[String, Seq[TrafficDriverGroupStats]]
+  implicit val jsonFormat = Json.format[TrafficDriverGroupStats]
 
   def forCampaign(campaignId: String): Seq[TrafficDriverGroupStats] = {
-    val cachedStats = statsCache.get(campaignId) getOrElse Nil
-    if (cachedStats.isEmpty) {
-      Future(loadStatsForCampaign(campaignId))
+
+    AnalyticsDataCache.getCampaignTrafficDriverGroupStats(campaignId) match {
+
+      case Hit(report) =>
+        Logger.debug(s"getting traffic driver stats for campaign $campaignId - cache hit")
+        report
+
+      case Stale(report) =>
+        Logger.debug(s"getting traffic driver stats for campaign $campaignId - cache stale spawning async refresh")
+        Future {
+          Logger.debug(s"async refresh of traffic driver stats for campaign $campaignId")
+          fetchAndStoreStats(campaignId)
+        }
+        report
+
+      case Miss =>
+        Logger.debug(s"getting traffic driver stats for campaign $campaignId - cache miss fetching sync")
+        fetchAndStoreStats(campaignId)
     }
-    cachedStats
   }
 
-  private def loadStatsForCampaign(campaignId: String): Unit = {
+  private def fetchAndStoreStats(campaignId: String): Seq[TrafficDriverGroupStats] = {
 
     val dfpSession = DfpFetcher.mkSession()
 
-    def groupStats(groupName: String, orderId: Long): TrafficDriverGroupStats = {
+    def fetchStats(groupName: String, orderId: Long): TrafficDriverGroupStats = {
 
       val lineItemIds = DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
         DfpFilter.hasCampaignIdCustomFieldValue(campaignId)
@@ -160,9 +175,11 @@ object TrafficDriverGroupStats {
       ("Native cards", dfpNativeCardOrderId),
       ("Merchandising", dfpMerchandisingOrderId)
     ).par.map { case (groupName, orderId) =>
-      groupStats(groupName, orderId)
+      fetchStats(groupName, orderId)
     }.toList
 
-    statsCache.put(campaignId, stats)
+    AnalyticsDataCache.putCampaignTrafficDriverGroupStats(campaignId, stats)
+
+    stats
   }
 }
