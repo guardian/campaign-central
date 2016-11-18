@@ -2,6 +2,7 @@ package controllers
 
 import java.util.concurrent.Executors
 
+import model.TrafficDriverGroupStats
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
@@ -46,6 +47,14 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with Pan
       case "CampaignDailyCountsReport" => {
         Logger.info(s"manually clearing GA analytics for $key")
         Future {GoogleAnalytics.getAnalyticsForCampaign(key)}
+      }
+      case "CtaClicksReport" => {
+        Logger.info(s"manually clearing GA CTA CTR analytics for $key")
+        Future {GoogleAnalytics.getCtaClicksForCampaign(key)}
+      }
+      case "TrafficDriverGroupStats" => {
+        Logger.info(s"manually clearing Traffic driver stats for $key")
+        Future {TrafficDriverGroupStats.forCampaign(key)}
       }
       case s => Logger.warn(s"manual clear invoked for unexpected data type $dataType")
     }
