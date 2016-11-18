@@ -67,8 +67,8 @@ sealed trait Config {
   lazy val dfpClientSecret = getRequiredRemoteStringProperty("dfp.client.secret")
   lazy val dfpRefreshToken = getRequiredRemoteStringProperty("dfp.refresh.token")
   def dfpNetworkCode: String
-  def dfpNativeCardOrderId: Long
-  def dfpMerchandisingOrderId: Long
+  def dfpNativeCardOrderIds: Set[Long]
+  def dfpMerchandisingOrderIds: Set[Long]
   def dfpCampaignFieldId: Long
 
   def googleServiceAccountJsonInputStream: InputStream = {
@@ -120,8 +120,8 @@ class DevConfig extends Config {
   override def ctaAtomMakerUrl = "https://cta-atom-maker.local.dev-gutools.co.uk"
 
   override val dfpNetworkCode = "158186692"
-  override val dfpNativeCardOrderId: Long = 550773372
-  override val dfpMerchandisingOrderId: Long = 550774092
+  override val dfpNativeCardOrderIds = Set(550773372L)
+  override val dfpMerchandisingOrderIds = Set(550774092L)
   override val dfpCampaignFieldId: Long = 26412
 }
 
@@ -141,8 +141,8 @@ class CodeConfig extends Config {
   override def ctaAtomMakerUrl = "https://cta-atom-maker.code.dev-gutools.co.uk"
 
   override val dfpNetworkCode = "158186692"
-  override val dfpNativeCardOrderId: Long = 550773372
-  override val dfpMerchandisingOrderId: Long = 550774092
+  override val dfpNativeCardOrderIds = Set(550773372L)
+  override val dfpMerchandisingOrderIds = Set(550774092L)
   override val dfpCampaignFieldId: Long = 26412
 }
 
@@ -162,7 +162,15 @@ class ProdConfig extends Config {
   override def ctaAtomMakerUrl = "https://cta-atom-maker.gutools.co.uk"
 
   override val dfpNetworkCode = "59666047"
-  override val dfpNativeCardOrderId: Long = 353494647
-  override val dfpMerchandisingOrderId: Long = 345535767
+  override val dfpNativeCardOrderIds = {
+    val hostedOrder: Long = 353494647
+    val paidOrder: Long = 347621127
+    Set(hostedOrder, paidOrder)
+  }
+  override val dfpMerchandisingOrderIds = {
+    val hostedOrder: Long = 345535767
+    val paidOrder: Long = 211298847
+    Set(hostedOrder, paidOrder)
+  }
   override val dfpCampaignFieldId: Long = 9927
 }

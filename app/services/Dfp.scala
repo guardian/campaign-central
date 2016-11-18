@@ -35,22 +35,21 @@ object DfpFetcher {
     .build()
   }
 
-  def fetchLineItemsByOrder(session: DfpSession, orderId: Long): Seq[LineItem] = {
+  def fetchLineItemsByOrder(session: DfpSession, orderIds: Set[Long]): Seq[LineItem] = {
 
     val start = System.currentTimeMillis
     val lineItems = fetchLineItems(
       session,
       new StatementBuilder()
-      .where("orderId = :orderId")
-      .withBindVariableValue("orderId", orderId)
+      .where(s"orderId in (${orderIds.mkString(",")})")
       .toStatement
     )
 
     lineItems match {
       case Failure(e) =>
-        Logger.error(s"Fetching line items for order $orderId failed: ${e.getMessage}")
+        Logger.error(s"Fetching line items for orders $orderIds failed: ${e.getMessage}")
       case Success(items) =>
-        Logger.info(s"Fetched ${items.size} line items for order $orderId in ${System.currentTimeMillis - start} ms")
+        Logger.info(s"Fetched ${items.size} line items for orders $orderIds in ${System.currentTimeMillis - start} ms")
     }
 
     lineItems getOrElse Nil

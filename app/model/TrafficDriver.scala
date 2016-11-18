@@ -101,14 +101,14 @@ object TrafficDriverGroup {
   def forCampaign(campaignId: String): Seq[TrafficDriverGroup] = {
     val dfpSession = DfpFetcher.mkSession()
 
-    def trafficDrivers(orderId: Long): Seq[TrafficDriver] =
-      DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
+    def trafficDrivers(orderIds: Set[Long]): Seq[TrafficDriver] =
+      DfpFetcher.fetchLineItemsByOrder(dfpSession, orderIds) filter {
         DfpFilter.hasCampaignIdCustomFieldValue(campaignId)
       } map TrafficDriver.fromDfpLineItem
 
     Seq(
-      TrafficDriverGroup.fromTrafficDrivers("Native cards", trafficDrivers(dfpNativeCardOrderId)),
-      TrafficDriverGroup.fromTrafficDrivers("Merchandising", trafficDrivers(dfpMerchandisingOrderId))
+      TrafficDriverGroup.fromTrafficDrivers("Native cards", trafficDrivers(dfpNativeCardOrderIds)),
+      TrafficDriverGroup.fromTrafficDrivers("Merchandising", trafficDrivers(dfpMerchandisingOrderIds))
     ).flatten
   }
 }
@@ -159,9 +159,9 @@ object TrafficDriverGroupStats {
 
     val dfpSession = DfpFetcher.mkSession()
 
-    def fetchStats(groupName: String, orderId: Long): TrafficDriverGroupStats = {
+    def fetchStats(groupName: String, orderIds: Set[Long]): TrafficDriverGroupStats = {
 
-      val lineItemIds = DfpFetcher.fetchLineItemsByOrder(dfpSession, orderId) filter {
+      val lineItemIds = DfpFetcher.fetchLineItemsByOrder(dfpSession, orderIds) filter {
         DfpFilter.hasCampaignIdCustomFieldValue(campaignId)
       } map (_.getId.toLong)
 
@@ -172,8 +172,8 @@ object TrafficDriverGroupStats {
     }
 
     val stats = Seq(
-      ("Native cards", dfpNativeCardOrderId),
-      ("Merchandising", dfpMerchandisingOrderId)
+      ("Native cards", dfpNativeCardOrderIds),
+      ("Merchandising", dfpMerchandisingOrderIds)
     ).par.map { case (groupName, orderId) =>
       fetchStats(groupName, orderId)
     }.toList
