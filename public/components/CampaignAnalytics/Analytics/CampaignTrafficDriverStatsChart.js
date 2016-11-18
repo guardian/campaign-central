@@ -1,4 +1,5 @@
 import React, {PropTypes} from "react";
+import ProgressSpinner from "../../utils/ProgressSpinner";
 import {
   LineChart,
   Line,
@@ -63,7 +64,7 @@ class CampaignTrafficDriverStatsChart extends React.Component {
           <a name={anchorName}/>
           <div className="campaign-box__header">{group.groupName}</div>
           <div className="campaign-box__body">
-            <span className="campaign-assets__field__value">No data yet.</span>
+            <span className="campaign-assets__field__value">No traffic driver data available.</span>
           </div>
         </div>
       );
@@ -113,36 +114,34 @@ class CampaignTrafficDriverStatsChart extends React.Component {
     );
   };
 
-  render() {
+  renderGroupCharts() {
 
     if (!this.props.campaignTrafficDriverStats) {
       return (
-        <div className="analytics-chart--full-width">
-          <div className="campaign-box__header">Traffic Driver Performance
-            <span className="campaign-driver-list__link"><a href="#driver-summary">Back to summary</a></span>
-          </div>
-          <ProgressSpinner />
-        </div>
+        <ProgressSpinner />
       );
     }
 
     if (this.props.campaignTrafficDriverStats.length > 0) {
       return (
-        <div className="analytics-chart--full-width">
-          <div className="campaign-box__header">Traffic Driver Performance
-            <span className="campaign-driver-list__link"><a href="#driver-summary">Back to summary</a></span>
-          </div>
+        <div>
           {this.props.campaignTrafficDriverStats.map(this.renderDriverGroupChart)}
         </div>
       );
     }
 
     return (
+      <span className="campaign-assets__field__value">No traffic driver data available.</span>
+    );
+  }
+
+  render() {
+    return (
       <div className="analytics-chart--full-width">
         <div className="campaign-box__header">Traffic Driver Performance
           <span className="campaign-driver-list__link"><a href="#driver-summary">Back to summary</a></span>
         </div>
-        <span className="campaign-assets__field__value">No traffic driver data to show.</span>
+        {this.renderGroupCharts()}
       </div>
     );
   }
