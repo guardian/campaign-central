@@ -20,6 +20,22 @@ class Campaigns extends Component {
     return filtered;
   }
 
+  sortBy = (field, reverse, iteratees) => {
+    let key = function(x) {return iteratees ? iteratees(x[field]) : x[field]};
+
+    reverse = !reverse ? 1 : -1;
+
+    return function (a, b) {
+      console.log(key(a), key(b));
+      return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+    }
+  }
+
+  sortCampaigns = (column, order, iterateesFunc) => {
+    console.log('inside sortCampaigns: ', this.props.campaigns);
+    return this.props.campaigns.sort(this.sortBy(column, order, iterateesFunc));
+  }
+
   componentDidMount() {
     this.props.campaignActions.getCampaigns();
     this.props.analyticsActions.getOverallAnalyticsSummary();
@@ -30,7 +46,7 @@ class Campaigns extends Component {
     return (
       <div className="campaigns">
         <h2 className="campaigns__header">Campaigns</h2>
-        <CampaignList campaigns={this.filterCampaigns(this.props.campaigns)} overallAnalyticsSummary={this.props.overallAnalyticsSummary} />
+        <CampaignList campaigns={this.sortCampaigns(this.filterCampaigns(this.props.campaigns))} sortCampaigns={this.sortCampaigns} overallAnalyticsSummary={this.props.overallAnalyticsSummary} />
       </div>
     );
   }

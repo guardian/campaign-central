@@ -4,29 +4,26 @@ import CampaignListItem from './CampaignListItem';
 class CampaignList extends React.Component {
 
   static propTypes = {
-    campaigns: PropTypes.array
+    campaigns: PropTypes.array,
+    sortCampaigns: PropTypes.func.isRequired
   };
 
   static defaultProps = {
     campaigns: []
   };
 
-  sortBy = (field, reverse, iteratees) => {
-    let key = function(x) {return iteratees ? iteratees(x[field]) : x[field]};
-
-    reverse = !reverse ? 1 : -1;
-
-    return function (a, b) {
-      return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-    }
-  }
-
   invokeSort = (column) => {
-    console.log(this.props.campaigns);
-    this.props.campaigns.sort(this.sortBy(column, false, function(value){
-        return typeof value === "string" ? value.toUpperCase() : value
-      }
-    ));
+    let iterateesFunc = (value) => {
+        if (typeof value === "string" && column === ('name' || 'type' || 'status')) {
+          return value.toUpperCase();
+        } else if (typeof value === "string" && column === ('actualValue' || 'startDate' || 'endDate')) {
+          return parseInt(value, 10);
+        } else {
+          return value;
+        }
+    }
+
+    this.props.sortCampaigns(column, false, iterateesFunc);
   }
 
   render () {
@@ -42,12 +39,12 @@ class CampaignList extends React.Component {
       <table className="campaign-list">
         <thead>
           <tr>
-            <th onClick={this.invokeSort('name')} className="campaign-list__header">Name</th>
-            <th onClick={this.invokeSort('type')} className="campaign-list__header">Type</th>
-            <th onClick={this.invokeSort('status')} className="campaign-list__header">Status</th>
-            <th onClick={this.invokeSort('actualValue')} className="campaign-list__header">Value</th>
-            <th onClick={this.invokeSort('startDate')} className="campaign-list__header">Start date</th>
-            <th onClick={this.invokeSort('endDate')} className="campaign-list__header">Finish date</th>
+            <th onClick={ () => this.invokeSort('name') } className="campaign-list__header">Name</th>
+            <th onClick={ () => this.invokeSort('type') } className="campaign-list__header">Type</th>
+            <th onClick={ () => this.invokeSort('status') } className="campaign-list__header">Status</th>
+            <th onClick={ () => this.invokeSort('actualValue') } className="campaign-list__header">Value</th>
+            <th onClick={ () => this.invokeSort('startDate') } className="campaign-list__header">Start date</th>
+            <th onClick={ () => this.invokeSort('endDate') } className="campaign-list__header">Finish date</th>
             <th className="campaign-list__header">Uniques</th>
           </tr>
         </thead>
