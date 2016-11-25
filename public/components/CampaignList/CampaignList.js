@@ -14,6 +14,7 @@ class CampaignList extends React.Component {
 
   setCampaignSort = (c) => {
     this.props.uiActions.setCampaignSort(c);
+    this.props.sortCampaigns();
   };
 
   render () {
@@ -53,7 +54,7 @@ import * as setCampaignSort from '../../actions/UIActions/setCampaignSort';
 
 function mapStateToProps(state) {
   return {
-    setCampaignSort: state.setCampaignSort
+    campaignSortColumn: state.campaignSortColumn
   };
 }
 

@@ -32,7 +32,7 @@ class Campaigns extends Component {
   }
 
   sortCampaigns = (campaigns) => {
-    let sorted = campaigns;
+    let sorted = campaigns || this.props.campaigns;
     let column = this.props.campaignSortColumn;
 
     console.log('inside sortCampaigns: ', sorted, column);
