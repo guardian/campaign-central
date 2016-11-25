@@ -2,28 +2,20 @@ package repositories
 
 import java.util.concurrent.Executors
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
-import com.google.api.client.http.{HttpRequest, HttpRequestInitializer}
 import com.google.api.services.analyticsreporting.v4.model._
-import com.google.api.services.analyticsreporting.v4.{AnalyticsReporting, AnalyticsReportingScopes}
-import model.{Campaign, CampaignDailyCountsReport, CampaignSummary}
-import org.joda.time.{DateTime, Duration}
+import model._
 import org.joda.time.format.ISODateTimeFormat
+import org.joda.time.{DateTime, Duration}
 import play.api.Logger
-import services.Config
+import services.GoogleAnalytics
 
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
 
 
-
-
-object GoogleAnalytics {
+object Analytics {
 
   implicit val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(10))
-
-  val gaClient = initialiseGaClient
 
   def getAnalyticsForCampaign(campaignId: String): Option[CampaignDailyCountsReport] = {
 
@@ -72,10 +64,21 @@ object GoogleAnalytics {
   }
 
   private def storeSummaryForCampaign(campaignId: String, report: CampaignDailyCountsReport, expiry: Option[Long]) {
-    val mostRecentStats = report.pageCountStats.last
 
-    val totalUniques = mostRecentStats.getOrElse("cumulative-unique-total", 0L)
-    val targetToDate = mostRecentStats.getOrElse("cumulative-target-uniques", 0L)
+    val totalUniques = {
+      val uniques = for {
+        campaign <- CampaignRepository.getCampaign(campaignId)
+        sectionId <- campaign.pathPrefix
+      } yield {
+        GoogleAnalytics.loadSectionUniqueVisitorCount(sectionId, campaign.startDate, campaign.endDate)
+      }
+      uniques getOrElse 0L
+    }
+
+    val targetToDate = {
+      val mostRecentStats = report.pageCountStats.last
+      mostRecentStats.getOrElse("cumulative-target-uniques", 0L)
+    }
 
     val campaignSummary = CampaignSummary(totalUniques, targetToDate)
     AnalyticsDataCache.putCampaignSummary(campaignId, campaignSummary, expiry)
@@ -94,7 +97,7 @@ object GoogleAnalytics {
       .zeroMissingPaths
       .calulateDailyTotals
       .addDailyTargets(dailyUniqueTargetValue)
-      .calulateCumalativeVales
+                  .calculateCumulativeValues
 
     CampaignDailyCountsReport(cleaned)
   }
@@ -104,7 +107,7 @@ object GoogleAnalytics {
       startDate <- campaign.startDate orElse Some(new DateTime().minusMonths(1) );//campaign.startDate;
       gaFilter <- campaign.gaFilterExpression
     ) yield {
-      loadDailyCounts(gaFilter, startDate, campaign.endDate)
+      parseDailyCountsReport(GoogleAnalytics.loadDailyCounts(gaFilter, startDate, campaign.endDate))
     }
 
     dailyCounts.flatten.map{raw => cleanAndConvertRawDailyCounts(raw, calculateDailyUniqueTarget(campaign))}
@@ -118,7 +121,7 @@ object GoogleAnalytics {
       path <- content.path
     ) yield {
       val gaFilter = s"ga:pagePath==/$path"
-      loadDailyCounts(gaFilter, startDate, campaign.endDate)
+      parseDailyCountsReport(GoogleAnalytics.loadDailyCounts(gaFilter, startDate, campaign.endDate))
     }
 
     val populatedDailyCounts = contentDailyCounts.flatten
@@ -142,36 +145,6 @@ object GoogleAnalytics {
     })
 
     if(dailyCounts.isEmpty()) None else Some(cleanAndConvertRawDailyCounts(dailyCounts, calculateDailyUniqueTarget(campaign)))
-  }
-
-
-  private def loadDailyCounts(gaFilter: String, startDate: DateTime, endDate: Option[DateTime]): Option[ParsedDailyCountsReport] = {
-    Logger.info(s"fetch ga analytics with filter ${gaFilter}")
-
-    val endOfRange = endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
-    val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
-
-    val pageViewMetric = new Metric().setExpression("ga:pageviews").setAlias("pageviews")
-    val uniqueViewMetric = new Metric().setExpression("ga:uniquePageviews").setAlias("uniques")
-
-    val dateDimension = new Dimension().setName("ga:date")
-    val pathDimension = new Dimension().setName("ga:pagePath")
-
-    val viewsReportRequest = new ReportRequest()
-      .setDateRanges(List(dateRange))
-      .setMetrics(List(pageViewMetric, uniqueViewMetric))
-      .setDimensions(List(dateDimension, pathDimension))
-      .setFiltersExpression(gaFilter)
-      .setIncludeEmptyRows(true)
-      .setSamplingLevel("LARGE")
-      .setViewId(Config().googleAnalyticsViewId)
-
-    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
-
-    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
-
-    parseDailyCountsReport(reportResponse)
-
   }
 
   private def calculateDailyUniqueTarget(campaign: Campaign): Option[Long] = {
@@ -221,7 +194,7 @@ object GoogleAnalytics {
       ParsedDailyCountsReport(seenPaths, dayStatsWithTarget)
     }
 
-    def calulateCumalativeVales = {
+    def calculateCumulativeValues = {
       val days = dayStats.keySet.toList.sortBy(_.getMillis)
 
       var cumulDayStats = Map.empty[DateTime, Map[String, Long]]
@@ -320,7 +293,7 @@ object GoogleAnalytics {
         builderId <- cta.builderId;
         trackingCode <- cta.trackingCode
       ) yield {
-        builderId -> loadCtaClicks(trackingCode, startDate, campaign.endDate)
+        builderId -> GoogleAnalytics.loadCtaClicks(trackingCode, startDate, campaign.endDate)
       }
 
       val report = reportLines.toMap
@@ -329,70 +302,16 @@ object GoogleAnalytics {
 
       report
     }
-
   }
-
-  private def loadCtaClicks(trackingCode: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
-
-    Logger.info(s"fetch CTa clicks for cta $trackingCode")
-
-    val endOfRange = endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
-    val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
-
-    val totalEvents = new Metric().setExpression("ga:totalEvents").setAlias("totalEvents")
-
-    val viewsReportRequest = new ReportRequest()
-      .setDateRanges(List(dateRange))
-      .setMetrics(List(totalEvents))
-      .setFiltersExpression(s"ga:eventCategory==Click;ga:eventAction==External;ga:eventLabel==$trackingCode")
-      .setIncludeEmptyRows(true)
-      .setSamplingLevel("LARGE")
-      .setViewId(Config().googleAnalyticsViewId)
-
-    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
-
-    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
-
-    // this report has a single value, so just dive in grabbing the first entry at each level
-    val clickCount = for(
-      report <- reportResponse.getReports.headOption;
-      row <- report.getData.getRows.headOption;
-      metrics <- row.getMetrics.headOption;
-      value <- metrics.getValues.headOption
-    ) yield { value.toLong}
-
-    clickCount.getOrElse(0L)
-  }
-
-  // general GA connection stuff
 
   def calculateValidToDateForDailyStats(campaign: Campaign): Option[Long] = {
     val campaignFinished = for (
       d <- campaign.endDate
     ) yield {d.isBeforeNow}
 
-    if(campaignFinished.getOrElse(false)) None else { Some( DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis) }
-  }
-
-  private def initialiseGaClient = {
-
-    val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
-    val credential = GoogleCredential.fromStream(Config().googleServiceAccountJsonInputStream)
-    val scoped = credential.createScoped(List(AnalyticsReportingScopes.ANALYTICS_READONLY))
-
-    new AnalyticsReporting.Builder(
-        httpTransport,
-        com.google.api.client.googleapis.util.Utils.getDefaultJsonFactory,
-        new TimeoutRequestInitializer(scoped))
-      .setApplicationName("campaign central")
-      .build()
-  }
-
-  private class TimeoutRequestInitializer(creds: HttpRequestInitializer) extends HttpRequestInitializer {
-    override def initialize(request: HttpRequest): Unit = {
-      creds.initialize(request);
-      request.setConnectTimeout(3 * 60000);  // 3 minutes connect timeout
-      request.setReadTimeout(3 * 60000);
+    if (campaignFinished.getOrElse(false)) None
+    else {
+      Some(DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis)
     }
   }
 }

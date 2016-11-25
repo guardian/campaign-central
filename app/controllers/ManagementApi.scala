@@ -7,7 +7,7 @@ import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
-import repositories.{AnalyticsDataCache, GoogleAnalytics}
+import repositories.{Analytics, AnalyticsDataCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,7 +33,7 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with Pan
 
   def refreshAnalyticsCacheForType(dataType: String) = APIAuthAction { req =>
     AnalyticsDataCache.summariseContents.filter{ e =>
-      val expired = e.expires.map(_ < System.currentTimeMillis).getOrElse(false)
+      val expired = e.expires.exists(_ < System.currentTimeMillis)
       e.dataType == dataType && expired
     }.foreach{ e =>
       refreshEntry(e.dataType, e.key)
@@ -46,11 +46,11 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with Pan
     dataType match {
       case "CampaignDailyCountsReport" => {
         Logger.info(s"manually clearing GA analytics for $key")
-        Future {GoogleAnalytics.getAnalyticsForCampaign(key)}
+        Future {Analytics.getAnalyticsForCampaign(key)}
       }
       case "CtaClicksReport" => {
         Logger.info(s"manually clearing GA CTA CTR analytics for $key")
-        Future {GoogleAnalytics.getCtaClicksForCampaign(key)}
+        Future {Analytics.getCtaClicksForCampaign(key)}
       }
       case "TrafficDriverGroupStats" => {
         Logger.info(s"manually clearing Traffic driver stats for $key")
