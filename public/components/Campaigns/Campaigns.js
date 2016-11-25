@@ -26,14 +26,28 @@ class Campaigns extends Component {
     reverse = !reverse ? 1 : -1;
 
     return function (a, b) {
-      console.log(key(a), key(b));
+      console.log('inside sortBy: ', key(a), key(b));
       return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
     }
   }
 
-  sortCampaigns = (column, order, iterateesFunc) => {
-    console.log('inside sortCampaigns: ', this.props.campaigns);
-    return this.props.campaigns.sort(this.sortBy(column, order, iterateesFunc));
+  sortCampaigns = (campaigns) => {
+    let sorted = campaigns;
+    let column = this.props.campaignSortColumn;
+
+    console.log('inside sortCampaigns: ', sorted, column);
+
+    sorted = sorted.sort(this.sortBy(column, false, function(value) {
+      if (typeof value === "string" && column === ('name' || 'type' || 'status')) {
+        return value.toUpperCase();
+      } else if (typeof value === "string" && column === ('actualValue' || 'startDate' || 'endDate')) {
+        return parseInt(value, 10);
+      } else {
+        return value;
+      }
+    }));
+
+    return sorted;
   }
 
   componentDidMount() {
@@ -63,7 +77,8 @@ function mapStateToProps(state) {
     campaigns: state.campaigns,
     overallAnalyticsSummary: state.overallAnalyticsSummary,
     campaignStateFilter: state.campaignStateFilter,
-    campaignTypeFilter: state.campaignTypeFilter
+    campaignTypeFilter: state.campaignTypeFilter,
+    campaignSortColumn: state.campaignSortColumn
   };
 }
 

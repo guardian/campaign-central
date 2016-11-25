@@ -12,19 +12,9 @@ class CampaignList extends React.Component {
     campaigns: []
   };
 
-  invokeSort = (column) => {
-    let iterateesFunc = (value) => {
-        if (typeof value === "string" && column === ('name' || 'type' || 'status')) {
-          return value.toUpperCase();
-        } else if (typeof value === "string" && column === ('actualValue' || 'startDate' || 'endDate')) {
-          return parseInt(value, 10);
-        } else {
-          return value;
-        }
-    }
-
-    this.props.sortCampaigns(column, false, iterateesFunc);
-  }
+  setCampaignSort = (c) => {
+    this.props.uiActions.setCampaignSort(c);
+  };
 
   render () {
     if (!this.props.campaigns.length) {
@@ -39,12 +29,12 @@ class CampaignList extends React.Component {
       <table className="campaign-list">
         <thead>
           <tr>
-            <th onClick={ () => this.invokeSort('name') } className="campaign-list__header">Name</th>
-            <th onClick={ () => this.invokeSort('type') } className="campaign-list__header">Type</th>
-            <th onClick={ () => this.invokeSort('status') } className="campaign-list__header">Status</th>
-            <th onClick={ () => this.invokeSort('actualValue') } className="campaign-list__header">Value</th>
-            <th onClick={ () => this.invokeSort('startDate') } className="campaign-list__header">Start date</th>
-            <th onClick={ () => this.invokeSort('endDate') } className="campaign-list__header">Finish date</th>
+            <th onClick={ () => this.setCampaignSort('name') } className="campaign-list__header">Name</th>
+            <th onClick={ () => this.setCampaignSort('type') } className="campaign-list__header">Type</th>
+            <th onClick={ () => this.setCampaignSort('status') } className="campaign-list__header">Status</th>
+            <th onClick={ () => this.setCampaignSort('actualValue') } className="campaign-list__header">Value</th>
+            <th onClick={ () => this.setCampaignSort('startDate') } className="campaign-list__header">Start date</th>
+            <th onClick={ () => this.setCampaignSort('endDate') } className="campaign-list__header">Finish date</th>
             <th className="campaign-list__header">Uniques</th>
           </tr>
         </thead>
@@ -56,4 +46,21 @@ class CampaignList extends React.Component {
   }
 }
 
-export default CampaignList;
+//REDUX CONNECTIONS
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as setCampaignSort from '../../actions/UIActions/setCampaignSort';
+
+function mapStateToProps(state) {
+  return {
+    setCampaignSort: state.setCampaignSort
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    uiActions: bindActionCreators(Object.assign({}, setCampaignSort), dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CampaignList);
