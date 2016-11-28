@@ -2,7 +2,7 @@
   border-collapse: collapse;
 }
 
-.campaign-list__header {
+%campaign-list__header {
   padding: 15px;
 
   background: $c-grey-main;
@@ -13,8 +13,58 @@
   font-size: 18px;
 }
 
+.campaign-list__header {
+  @extend %campaign-list__header;
+}
+
 .campaign-list__header:last-child {
   border-right: none;
+}
+
+%sortable-arrow-up:after {
+  cursor: pointer;
+
+  width: 0;
+  height: 0;
+
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-top: 20px solid $c-highlight-main;
+
+  position: absolute;
+  top: 20px;
+  left: 10px;
+}
+
+%sortable-arrow-down:after {
+  cursor: pointer;
+
+  width: 0;
+  height: 0;
+
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-down: 20px solid $c-highlight-main;
+
+  position: absolute;
+  top: 30px;
+  left: 10px;
+}
+
+.campaign-list__header--sortable {
+  @extend %campaign-list__header;
+  @extend %sortable-arrow-up;
+  @extend %sortable-arrow-down;
+}
+
+.campaign-list__header--sorted-asc {
+  @extend %campaign-list__header;
+  @extend %sortable-arrow-up;
+}
+
+.campaign-list__header--sorted-desc {
+  @extend %campaign-list__header;
+  @extend %sortable-arrow-down;
 }
 
 .campaign-list__row {
