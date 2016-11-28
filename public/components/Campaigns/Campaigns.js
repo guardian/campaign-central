@@ -35,8 +35,6 @@ class Campaigns extends Component {
     let column = this.props.campaignSortColumn || 'name';
     let order = this.props.campaignSortOrder;
 
-    //console.log('inside sortCampaigns: ', sorted, column, order, this.props.campaignSortColumn);
-
     sorted = sorted.sort(this.sortBy(column, order, function(value) {
       if (typeof value === "string" && column === ('name' || 'type' || 'status')) {
         return value.toUpperCase();
@@ -73,7 +71,6 @@ import * as getCampaigns from '../../actions/CampaignActions/getCampaigns';
 import * as getOverallAnalyticsSummary from '../../actions/CampaignActions/getOverallAnalyticsSummary';
 
 function mapStateToProps(state) {
-  console.log(state);
   return {
     campaigns: state.campaigns,
     overallAnalyticsSummary: state.overallAnalyticsSummary,

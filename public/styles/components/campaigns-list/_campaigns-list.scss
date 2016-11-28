@@ -21,50 +21,116 @@
   border-right: none;
 }
 
-%sortable-arrow-up:after {
+%sortable-arrow-down {
   cursor: pointer;
 
   width: 0;
   height: 0;
 
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-top: 20px solid $c-highlight-main;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid $c-highlight-main;
 
   position: absolute;
-  top: 20px;
-  left: 10px;
+  top: 26px;
+  right: 0;
 }
 
-%sortable-arrow-down:after {
+%sortable-arrow-up {
   cursor: pointer;
 
   width: 0;
   height: 0;
 
-  border-left: 20px solid transparent;
-  border-right: 20px solid transparent;
-  border-down: 20px solid $c-highlight-main;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 8px solid $c-highlight-main;
 
   position: absolute;
-  top: 30px;
-  left: 10px;
+  top: 14px;
+  right: 0;
+}
+
+%pseudo-element {
+  content: " ";
+  display: block;
 }
 
 .campaign-list__header--sortable {
   @extend %campaign-list__header;
-  @extend %sortable-arrow-up;
-  @extend %sortable-arrow-down;
+
+  cursor: pointer;
+  position: relative;
+
+  .campaign-list__header-order {
+    &::after {
+      @extend %pseudo-element;
+      @extend %sortable-arrow-up;
+    }
+
+    &::before {
+      @extend %pseudo-element;
+      @extend %sortable-arrow-down;
+    }
+  }
+
+  .campaign-list__header-order--desc {
+    &::before {
+      @extend %pseudo-element;
+      @extend %sortable-arrow-up;
+    }
+  }
+
+  .campaign-list__header-order--asc {
+    &::after {
+      @extend %pseudo-element;
+      @extend %sortable-arrow-down;
+    }
+  }
 }
 
-.campaign-list__header--sorted-asc {
-  @extend %campaign-list__header;
-  @extend %sortable-arrow-up;
-}
+.campaign-list__header--sortable {
+  .name {
+    &::after,
+    &::before {
+      right: 38%;
+    }
+  }
 
-.campaign-list__header--sorted-desc {
-  @extend %campaign-list__header;
-  @extend %sortable-arrow-down;
+  .type {
+    &::after,
+    &::before {
+      right: 22%;
+    }
+  }
+
+  .status {
+    &::after,
+    &::before {
+      right: 12%;
+    }
+  }
+
+  .actualValue {
+    &::after,
+    &::before {
+      right: 9%;
+    }
+  }
+
+  .startDate {
+    &::after,
+    &::before {
+      right: 8%;
+    }
+  }
+
+  .endDate {
+    &::after,
+    &::before {
+      right: 19%;
+    }
+  }
 }
 
 .campaign-list__row {
