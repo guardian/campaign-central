@@ -11,38 +11,33 @@ class CampaignList extends React.Component {
     campaigns: []
   };
 
-  state = {
-    sortOrder: {
-      'name': true, //false = DESC, true = ASC
-      'type': false,
-      'status': false,
-      'actualValue': false,
-      'startDate': false,
-      'endDate': false
-    },
-    headersCssClasses: {
-      'name': 'campaign-list__header-order--desc name',
-      'type': 'campaign-list__header-order type',
-      'status': 'campaign-list__header-order status',
-      'actualValue': 'campaign-list__header-order actualValue',
-      'startDate': 'campaign-list__header-order startDate',
-      'endDate': 'campaign-list__header-order endDate'
+  sortOrder = {
+    'name': true, //false = DESC, true = ASC
+    'type': false,
+    'status': false,
+    'actualValue': false,
+    'startDate': false,
+    'endDate': false
+  };
+
+  setHeaderCssClass = (currentHeader) => {
+    let sortedColumn = this.props.campaignSortColumn || 'name';
+    let order = this.sortOrder[sortedColumn] ? 'asc' : 'desc';
+    let cssClass = 'campaign-list__header-order';
+
+    if (currentHeader === sortedColumn) {
+      cssClass = 'campaign-list__header-order--' + order;
     }
+
+    return cssClass;
   };
 
   setCampaignSort = (c) => {
-    const order = this.state.sortOrder[c] ? 'asc' : 'desc';
-
     //sort campaign list
-    this.props.uiActions.setCampaignSort(c, this.state.sortOrder[c]);
-    //reset all of the headers' css classes so by default there is always up and down arrow
-    for (let value in this.state.headersCssClasses) {
-      this.state.headersCssClasses[value] = 'campaign-list__header-order ' + value;
-    }
-    //set a proper header's css class
-    this.state.headersCssClasses[c] = 'campaign-list__header-order--' + order + " " + c;
+    this.props.uiActions.setCampaignSort(c, this.sortOrder[c]);
+
     //set a new sort order
-    this.state.sortOrder[c] = !this.state.sortOrder[c];
+    this.sortOrder[c] = !this.sortOrder[c];
   };
 
   render () {
@@ -60,27 +55,27 @@ class CampaignList extends React.Component {
           <tr>
             <th onClick={ () => this.setCampaignSort('name') } className="campaign-list__header--sortable name">
               <span> Name </span>
-              <span className={ this.state.headersCssClasses['name'] }> &nbsp; </span>
+              <span className={ this.setHeaderCssClass('name') }> &nbsp; </span>
             </th>
             <th onClick={ () => this.setCampaignSort('type') } className="campaign-list__header--sortable type">
               <span> Type </span>
-              <span className={ this.state.headersCssClasses['type'] }> &nbsp; </span>
+              <span className={ this.setHeaderCssClass('type') }> &nbsp; </span>
             </th>
-            <th onClick={ () => this.setCampaignSort('status') } className="campaign-list__header--sortable">
+            <th onClick={ () => this.setCampaignSort('status') } className="campaign-list__header--sortable status">
               <span> Status </span>
-              <span className={ this.state.headersCssClasses['status'] }> &nbsp; </span>
+              <span className={ this.setHeaderCssClass('status') }> &nbsp; </span>
             </th>
-            <th onClick={ () => this.setCampaignSort('actualValue') } className="campaign-list__header--sortable">
+            <th onClick={ () => this.setCampaignSort('actualValue') } className="campaign-list__header--sortable actualValue">
               <span> Value </span>
-              <span className={ this.state.headersCssClasses['actualValue'] }> &nbsp; </span>
+              <span className={ this.setHeaderCssClass('actualValue') }> &nbsp; </span>
             </th>
-            <th onClick={ () => this.setCampaignSort('startDate') } className="campaign-list__header--sortable">
+            <th onClick={ () => this.setCampaignSort('startDate') } className="campaign-list__header--sortable startDate">
               <span> Start date </span>
-              <span className={ this.state.headersCssClasses['startDate'] }> &nbsp; </span>
+              <span className={ this.setHeaderCssClass('startDate') }> &nbsp; </span>
             </th>
             <th onClick={ () => this.setCampaignSort('endDate') } className="campaign-list__header--sortable endDate">
               <span> Finish date </span>
-              <span className={ this.state.headersCssClasses['endDate'] }> &nbsp; </span>
+              <span className={ this.setHeaderCssClass('endDate') }> &nbsp; </span>
             </th>
             <th className="campaign-list__header">Uniques</th>
           </tr>

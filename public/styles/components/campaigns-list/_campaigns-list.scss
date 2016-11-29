@@ -91,53 +91,54 @@
 
 .campaign-list__header--sortable.name {
   min-width: 270px;
-}
-
-.campaign-list__header--sortable.type {
-  min-width: 100px;
-}
-
-.campaign-list__header--sortable.endDate {
-  min-width: 164px;
-}
-
-.campaign-list__header--sortable {
-  .name {
+  [class^='campaign-list__header-order'] {
     &::after,
     &::before {
       right: 38%;
     }
   }
+}
 
-  .type {
+.campaign-list__header--sortable.type {
+  min-width: 100px;
+  [class^='campaign-list__header-order'] {
     &::after,
     &::before {
       right: 22%;
     }
   }
+}
 
-  .status {
+.campaign-list__header--sortable.status {
+  [class^='campaign-list__header-order'] {
     &::after,
     &::before {
       right: 12%;
     }
   }
+}
 
-  .actualValue {
+.campaign-list__header--sortable.actualValue {
+  [class^='campaign-list__header-order'] {
     &::after,
     &::before {
       right: 9%;
     }
   }
+}
 
-  .startDate {
+.campaign-list__header--sortable.startDate {
+  [class^='campaign-list__header-order'] {
     &::after,
     &::before {
       right: 8%;
     }
   }
+}
 
-  .endDate {
+.campaign-list__header--sortable.endDate {
+  min-width: 164px;
+  [class^='campaign-list__header-order'] {
     &::after,
     &::before {
       right: 19%;
