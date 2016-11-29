@@ -36,9 +36,9 @@ class Campaigns extends Component {
     let order = this.props.campaignSortOrder;
 
     sorted = sorted.sort(this.sortBy(column, order, function(value) {
-      if (typeof value === "string" && column === ('name' || 'type' || 'status')) {
+      if (typeof value === "string" && (column === 'name' || column === 'type' || column === 'status')) {
         return value.toUpperCase();
-      } else if (typeof value === "string" && column === ('actualValue' || 'startDate' || 'endDate')) {
+      } else if (typeof value === "number" && (column === 'actualValue' || column === 'startDate' || column === 'endDate')) {
         return parseInt(value, 10);
       } else {
         return value;
