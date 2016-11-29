@@ -30,20 +30,38 @@ class Campaigns extends Component {
     }
   }
 
+  prepareSortValues = (column, value) => {
+    switch (column) {
+      case 'name':
+      case 'type':
+      case 'status':
+        if (typeof value === 'undefined') {
+          value = "";
+        }
+        value.toUpperCase();
+        break;
+      case 'actualValue':
+      case 'startDate':
+      case 'endDate':
+        if (typeof value === 'undefined') {
+          value = 0;
+        }
+        value = parseInt(value, 10);
+      default:
+        value;
+    }
+
+    return value;
+  }
+
   sortCampaigns = (campaigns) => {
     let sorted = campaigns;
     let column = this.props.campaignSortColumn || 'name';
     let order = this.props.campaignSortOrder;
 
     sorted = sorted.sort(this.sortBy(column, order, function(value) {
-      if (typeof value === "string" && (column === 'name' || column === 'type' || column === 'status')) {
-        return value.toUpperCase();
-      } else if (typeof value === "number" && (column === 'actualValue' || column === 'startDate' || column === 'endDate')) {
-        return parseInt(value, 10);
-      } else {
-        return value;
-      }
-    }));
+      return this.prepareSortValues(column, value);
+    }.bind(this)));
 
     return sorted;
   }
