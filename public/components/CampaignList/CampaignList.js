@@ -33,8 +33,15 @@ class CampaignList extends React.Component {
   setCampaignSort = (c) => {
     const order = this.state.sortOrder[c] ? 'asc' : 'desc';
 
+    //sort campaign list
     this.props.uiActions.setCampaignSort(c, this.state.sortOrder[c]);
+    //reset all of the headers' css classes so by default there is always up and down arrow
+    for (let value in this.state.headersCssClasses) {
+      this.state.headersCssClasses[value] = 'campaign-list__header-order ' + value;
+    }
+    //set a proper header's css class
     this.state.headersCssClasses[c] = 'campaign-list__header-order--' + order + " " + c;
+    //set a new sort order
     this.state.sortOrder[c] = !this.state.sortOrder[c];
   };
 
