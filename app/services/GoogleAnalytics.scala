@@ -81,8 +81,8 @@ object GoogleAnalytics {
     clickCount.getOrElse(0L)
   }
 
-  def loadSectionUniqueVisitorCount(sectionId: String, startDate: Option[DateTime], endDate: Option[DateTime]): Long = {
-    Logger.info(s"fetch unique visitor count for section '$sectionId'")
+  def loadSectionUniquePageViewCount(sectionId: String, startDate: Option[DateTime], endDate: Option[DateTime]): Long = {
+    Logger.info(s"fetch unique page view count for section '$sectionId'")
 
     val dateRange = new DateRange().setStartDate(startOfRange(startDate)).setEndDate(endOfRange(endDate))
 
@@ -90,7 +90,7 @@ object GoogleAnalytics {
                              .setViewId(Config().googleAnalyticsViewId)
                              .setDateRanges(Seq(dateRange))
                              .setMetrics(Seq(new Metric().setExpression("ga:users").setAlias("users")))
-                             .setFiltersExpression(s"ga:dimension4==$sectionId")
+                             .setFiltersExpression(s"ga:pagepath=~/$sectionId")
                              .setSamplingLevel("LARGE")
                              .setIncludeEmptyRows(true)
 

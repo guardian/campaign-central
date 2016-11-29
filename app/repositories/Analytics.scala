@@ -70,7 +70,7 @@ object Analytics {
         campaign <- CampaignRepository.getCampaign(campaignId)
         sectionId <- campaign.pathPrefix
       } yield {
-        GoogleAnalytics.loadSectionUniqueVisitorCount(sectionId, campaign.startDate, campaign.endDate)
+        GoogleAnalytics.loadSectionUniquePageViewCount(sectionId, campaign.startDate, campaign.endDate)
       }
       uniques getOrElse 0L
     }
