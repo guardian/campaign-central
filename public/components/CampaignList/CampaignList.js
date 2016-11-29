@@ -58,11 +58,11 @@ class CampaignList extends React.Component {
       <table className="campaign-list">
         <thead>
           <tr>
-            <th onClick={ () => this.setCampaignSort('name') } className="campaign-list__header--sortable">
+            <th onClick={ () => this.setCampaignSort('name') } className="campaign-list__header--sortable name">
               <span> Name </span>
               <span className={ this.state.headersCssClasses['name'] }> &nbsp; </span>
             </th>
-            <th onClick={ () => this.setCampaignSort('type') } className="campaign-list__header--sortable">
+            <th onClick={ () => this.setCampaignSort('type') } className="campaign-list__header--sortable type">
               <span> Type </span>
               <span className={ this.state.headersCssClasses['type'] }> &nbsp; </span>
             </th>
@@ -78,7 +78,7 @@ class CampaignList extends React.Component {
               <span> Start date </span>
               <span className={ this.state.headersCssClasses['startDate'] }> &nbsp; </span>
             </th>
-            <th onClick={ () => this.setCampaignSort('endDate') } className="campaign-list__header--sortable">
+            <th onClick={ () => this.setCampaignSort('endDate') } className="campaign-list__header--sortable endDate">
               <span> Finish date </span>
               <span className={ this.state.headersCssClasses['endDate'] }> &nbsp; </span>
             </th>

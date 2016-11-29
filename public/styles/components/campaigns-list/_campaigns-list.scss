@@ -89,6 +89,18 @@
   }
 }
 
+.campaign-list__header--sortable.name {
+  min-width: 270px;
+}
+
+.campaign-list__header--sortable.type {
+  min-width: 100px;
+}
+
+.campaign-list__header--sortable.endDate {
+  min-width: 164px;
+}
+
 .campaign-list__header--sortable {
   .name {
     &::after,
