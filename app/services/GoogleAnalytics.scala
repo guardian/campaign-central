@@ -26,13 +26,13 @@ object GoogleAnalytics {
     } getOrElse "yesterday"
   }
 
+  private val pageViewMetric = new Metric().setExpression("ga:pageviews").setAlias("pageviews")
+  private val uniqueViewMetric = new Metric().setExpression("ga:uniquePageviews").setAlias("uniques")
+
   def loadDailyCounts(gaFilter: String, startDate: DateTime, endDate: Option[DateTime]): GetReportsResponse = {
     Logger.info(s"fetch ga analytics with filter $gaFilter")
 
     val dateRange = new DateRange().setStartDate(startDate.toString(datePattern)).setEndDate(endOfRange(endDate))
-
-    val pageViewMetric = new Metric().setExpression("ga:pageviews").setAlias("pageviews")
-    val uniqueViewMetric = new Metric().setExpression("ga:uniquePageviews").setAlias("uniques")
 
     val dateDimension = new Dimension().setName("ga:date")
     val pathDimension = new Dimension().setName("ga:pagePath")
@@ -89,7 +89,7 @@ object GoogleAnalytics {
     val viewsReportRequest = new ReportRequest()
                              .setViewId(Config().googleAnalyticsViewId)
                              .setDateRanges(Seq(dateRange))
-                             .setMetrics(Seq(new Metric().setExpression("ga:users").setAlias("users")))
+                             .setMetrics(Seq(uniqueViewMetric))
                              .setFiltersExpression(s"ga:pagepath=~/$sectionId")
                              .setSamplingLevel("LARGE")
                              .setIncludeEmptyRows(true)
