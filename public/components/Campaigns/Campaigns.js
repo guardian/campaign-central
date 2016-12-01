@@ -20,6 +20,52 @@ class Campaigns extends Component {
     return filtered;
   }
 
+  sortBy = (field, reverse, iteratees) => {
+    let key = function(x) {return iteratees ? iteratees(x[field]) : x[field]};
+
+    reverse = !reverse ? 1 : -1;
+
+    return function (a, b) {
+      return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+    }
+  }
+
+  prepareSortValues = (column, value) => {
+    switch (column) {
+      case 'name':
+      case 'type':
+      case 'status':
+        if (typeof value === 'undefined') {
+          value = "";
+        }
+        value.toUpperCase();
+        break;
+      case 'actualValue':
+      case 'startDate':
+      case 'endDate':
+        if (typeof value === 'undefined') {
+          value = 0;
+        }
+        value = parseInt(value, 10);
+      default:
+        value;
+    }
+
+    return value;
+  }
+
+  sortCampaigns = (campaigns) => {
+    let sorted = campaigns;
+    let column = this.props.campaignSortColumn || 'name';
+    let order = this.props.campaignSortOrder || false;
+
+    sorted = sorted.sort(this.sortBy(column, order, function(value) {
+      return this.prepareSortValues(column, value);
+    }.bind(this)));
+
+    return sorted;
+  }
+
   componentDidMount() {
     this.props.campaignActions.getCampaigns();
     this.props.analyticsActions.getOverallAnalyticsSummary();
@@ -30,7 +76,7 @@ class Campaigns extends Component {
     return (
       <div className="campaigns">
         <h2 className="campaigns__header">Campaigns</h2>
-        <CampaignList campaigns={this.filterCampaigns(this.props.campaigns)} overallAnalyticsSummary={this.props.overallAnalyticsSummary} />
+        <CampaignList campaigns={this.filterCampaigns(this.sortCampaigns(this.props.campaigns))} overallAnalyticsSummary={this.props.overallAnalyticsSummary} />
       </div>
     );
   }
@@ -47,7 +93,9 @@ function mapStateToProps(state) {
     campaigns: state.campaigns,
     overallAnalyticsSummary: state.overallAnalyticsSummary,
     campaignStateFilter: state.campaignStateFilter,
-    campaignTypeFilter: state.campaignTypeFilter
+    campaignTypeFilter: state.campaignTypeFilter,
+    campaignSortColumn: state.campaignSort.campaignSortColumn,
+    campaignSortOrder: state.campaignSort.campaignSortOrder
   };
 }
 
