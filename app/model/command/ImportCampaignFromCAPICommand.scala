@@ -31,8 +31,8 @@ trait CAPIImportCommand extends Command {
     apiContent.tags.filter(_.`type` == TagType.Type).headOption.map(_.webTitle).getOrElse(UnableToDetermineContentType)
   }
 
-  def deriveTagLogo(tag: Tag): Option[String] = {
-    tag.activeSponsorships.flatMap(_.headOption.map(_.sponsorLogo))
+  def deriveSponsorshipLogo(sponsorship: Option[Sponsorship]): Option[String] = {
+    sponsorship.flatMap(_.sponsorLogo.assets.headOption.map(_.imageUrl))
   }
 
   def buildAtomList(apiContent: ApiContent): List[Atom] = {
@@ -83,7 +83,7 @@ trait CAPIImportCommand extends Command {
         ctaAtom.cta.trackingCode
         CallToAction(Some(atomData.id), ctaAtom.cta.trackingCode)
       }.distinct,
-      campaignLogo = deriveTagLogo(hostedTag)
+      campaignLogo = deriveSponsorshipLogo(sponsorship) orElse campaign.campaignLogo
     )
 
     CampaignRepository.putCampaign(updatedCampaign)
