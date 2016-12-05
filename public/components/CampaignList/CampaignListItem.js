@@ -55,8 +55,16 @@ class CampaignListItem extends React.Component {
       const now = new Date();
       const oneDayMillis = 24 * 60 * 60 * 1000;
       const days = Math.round((this.props.campaign.endDate - now) / oneDayMillis);
+      var dayWord = ' days';
+      if(Math.abs(days) === 1) {
+        dayWord = ' day'
+      }
 
-      daysLeft = ' - ' + days + ' days left';
+      if (days < 0) {
+        daysLeft = ' - ended ' + (days * -1) + dayWord + ' ago';
+      } else {
+        daysLeft = ' - ' + days + dayWord + ' left';
+      }
     }
 
     return (

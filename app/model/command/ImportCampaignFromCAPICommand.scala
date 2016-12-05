@@ -31,8 +31,8 @@ trait CAPIImportCommand extends Command {
     apiContent.tags.filter(_.`type` == TagType.Type).headOption.map(_.webTitle).getOrElse(UnableToDetermineContentType)
   }
 
-  def deriveTagLogo(tag: Tag): Option[String] = {
-    tag.activeSponsorships.flatMap(_.headOption.map(_.sponsorLogo))
+  def deriveSponsorshipLogo(sponsorship: Option[Sponsorship]): Option[String] = {
+    sponsorship.flatMap(_.sponsorLogo.assets.headOption.map(_.imageUrl))
   }
 
   def buildAtomList(apiContent: ApiContent): List[Atom] = {
@@ -71,19 +71,27 @@ trait CAPIImportCommand extends Command {
     contentItems.foreach( CampaignContentRepository.putContent )
 
     val startDate = apiContent.flatMap(_.fields.flatMap(_.firstPublicationDate)).sortBy(_.dateTime).headOption
+    val endDate = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1)))
+
+    val status = (startDate, endDate) match {
+      case (_, Some(ed)) if ed.isBeforeNow => "dead"
+      case (Some(_), _) => "live"
+      case _ => "production"
+    }
 
     val ctaAtoms = apiContent.flatMap(_.atoms.flatMap(_.cta)).flatten
 
+
     val updatedCampaign = campaign.copy(
       startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
-      endDate = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1))),
-      status = if(startDate.isDefined) "live" else campaign.status,
+      endDate = endDate,
+      status = status,
       callToActions = ctaAtoms.map{ atomData =>
         val ctaAtom = atomData.data.asInstanceOf[AtomData.Cta]
         ctaAtom.cta.trackingCode
         CallToAction(Some(atomData.id), ctaAtom.cta.trackingCode)
       }.distinct,
-      campaignLogo = deriveTagLogo(hostedTag)
+      campaignLogo = deriveSponsorshipLogo(sponsorship) orElse campaign.campaignLogo
     )
 
     CampaignRepository.putCampaign(updatedCampaign)

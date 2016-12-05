@@ -35,8 +35,8 @@ class CapiImport extends Component {
 
     return (
       <div className="campaigns">
-        <h2 className="campaigns__header">Capi importer</h2>
-        <p>Select a hosted content campaign tag and we'll import it as a campaign.</p>
+        <h2 className="campaigns__header">Campaign importer</h2>
+        <p>Select a campaign tag (hosted or paid content) and we'll import it as a campaign.</p>
         <TagPicker type="paidContent" onTagSelected={this.tagSelected}/>
         {this.renderThobber()}
       </div>
