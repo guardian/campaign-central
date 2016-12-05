@@ -119,6 +119,7 @@
 }
 
 .campaign-list__header--sortable.actualValue {
+  min-width: 80px;
   [class^='campaign-list__header-order'] {
     &::after,
     &::before {
@@ -128,6 +129,7 @@
 }
 
 .campaign-list__header--sortable.startDate {
+  min-width: 114px;
   [class^='campaign-list__header-order'] {
     &::after,
     &::before {
