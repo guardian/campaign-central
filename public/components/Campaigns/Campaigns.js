@@ -59,7 +59,7 @@ class Campaigns extends Component {
 
   sortCampaigns = (campaigns) => {
     let sorted = campaigns;
-    let column = this.props.campaignSortColumn || 'endDate';
+    let column = this.props.campaignSortColumn;
     let order = this.props.campaignSortOrder || false;
 
     sorted = sorted.sort(this.sortBy(column, order, function(value) {
