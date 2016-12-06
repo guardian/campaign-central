@@ -27,7 +27,7 @@ class CampaignList extends React.Component {
   };
 
   setHeaderCssClass = (column) => {
-    let sortedColumn = this.props.campaignSortColumn || 'name';
+    let sortedColumn = this.props.campaignSortColumn || 'endDate';
     let order = this.getSortOrder(column) ? 'asc' : 'desc';
     let newCssClass = 'campaign-list__header-order';
 

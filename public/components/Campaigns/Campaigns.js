@@ -42,11 +42,14 @@ class Campaigns extends Component {
         break;
       case 'actualValue':
       case 'startDate':
-      case 'endDate':
         if (typeof value === 'undefined') {
           value = 0;
         }
         value = parseInt(value, 10);
+      case 'endDate':
+        if (typeof value === 'undefined') {
+          value = Infinity;
+        }
       default:
         value;
     }
@@ -56,7 +59,7 @@ class Campaigns extends Component {
 
   sortCampaigns = (campaigns) => {
     let sorted = campaigns;
-    let column = this.props.campaignSortColumn || 'name';
+    let column = this.props.campaignSortColumn;
     let order = this.props.campaignSortOrder || false;
 
     sorted = sorted.sort(this.sortBy(column, order, function(value) {
