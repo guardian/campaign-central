@@ -137,6 +137,11 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Ok(toJson(TrafficDriverGroup.forCampaign(campaignId)))
   }
 
+  def getSuggestedCampaignTrafficDrivers(campaignId: String) = APIAuthAction { req =>
+    Logger.info(s"Loading suggested traffic drivers for campaign $campaignId")
+    Ok(toJson(LineItemSummary.suggestedTrafficDriversForCampaign(campaignId)))
+  }
+
   def getCampaignTrafficDriverStats(campaignId: String) = APIAuthAction { req =>
     Logger.info(s"Loading traffic driver stats for campaign $campaignId")
     Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))

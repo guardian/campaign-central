@@ -5,9 +5,9 @@ import java.time.LocalDate
 import com.google.api.ads.dfp.axis.v201608.{DateTime, LineItem}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
-import repositories.{AnalyticsDataCache, Hit, Miss, Stale}
+import repositories._
 import services.Config.conf._
-import services.{DfpFetcher, DfpFilter}
+import services.Dfp
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -99,17 +99,22 @@ object TrafficDriverGroup {
   }
 
   def forCampaign(campaignId: String): Seq[TrafficDriverGroup] = {
-    val dfpSession = DfpFetcher.mkSession()
-
-    def trafficDrivers(orderIds: Set[Long]): Seq[TrafficDriver] =
-      DfpFetcher.fetchLineItemsByOrder(dfpSession, orderIds) filter {
-        DfpFilter.hasCampaignIdCustomFieldValue(campaignId)
-      } map TrafficDriver.fromDfpLineItem
-
-    Seq(
-      TrafficDriverGroup.fromTrafficDrivers("Native cards", trafficDrivers(dfpNativeCardOrderIds)),
-      TrafficDriverGroup.fromTrafficDrivers("Merchandising", trafficDrivers(dfpMerchandisingOrderIds))
-    ).flatten
+    val groups = for {
+      campaign <- CampaignRepository.getCampaign(campaignId)
+      nativeCardOrderId <- dfpNativeCardOrderIds.get(campaign.`type`)
+      merchandisingOrderId <- dfpMerchandisingOrderIds.get(campaign.`type`)
+    } yield {
+      val dfpSession = Dfp.mkSession()
+      def trafficDrivers(orderIds: Seq[Long]): Seq[TrafficDriver] =
+        Dfp.fetchLineItemsByOrder(dfpSession, orderIds) filter {
+          Dfp.hasCampaignIdCustomFieldValue(campaignId)
+        } map TrafficDriver.fromDfpLineItem
+      Seq(
+        TrafficDriverGroup.fromTrafficDrivers("Native cards", trafficDrivers(nativeCardOrderId)),
+        TrafficDriverGroup.fromTrafficDrivers("Merchandising", trafficDrivers(merchandisingOrderId))
+      ).flatten
+    }
+    groups getOrElse Nil
   }
 }
 
@@ -156,30 +161,61 @@ object TrafficDriverGroupStats {
   }
 
   private def fetchAndStoreStats(campaignId: String): Seq[TrafficDriverGroupStats] = {
+    val stats = for {
+      campaign <- CampaignRepository.getCampaign(campaignId)
+      nativeCardOrderIds <- dfpNativeCardOrderIds.get(campaign.`type`)
+      merchandisingOrderIds <- dfpMerchandisingOrderIds.get(campaign.`type`)
+    } yield {
+      val dfpSession = Dfp.mkSession()
+      def fetchStats(groupName: String, orderIds: Seq[Long]): TrafficDriverGroupStats = {
+        val lineItemIds = Dfp.fetchLineItemsByOrder(dfpSession, orderIds) filter {
+          Dfp.hasCampaignIdCustomFieldValue(campaignId)
+        } map (_.getId.toLong)
+        TrafficDriverGroupStats(
+          groupName,
+          Dfp.fetchStatsReport(dfpSession, lineItemIds).map(DayStats.fromDfpReport) getOrElse Nil
+        )
+      }
+      val fetched = Seq(
+        ("Native cards", nativeCardOrderIds),
+        ("Merchandising", merchandisingOrderIds)
+      ).par.map { case (groupName, orderIds) =>
+        fetchStats(groupName, orderIds)
+      }.toList
+      AnalyticsDataCache.putCampaignTrafficDriverGroupStats(campaignId, fetched)
+      fetched
+    }
+    stats getOrElse Nil
+  }
+}
 
-    val dfpSession = DfpFetcher.mkSession()
+case class LineItemSummary(id: Long, name: String)
 
-    def fetchStats(groupName: String, orderIds: Set[Long]): TrafficDriverGroupStats = {
+object LineItemSummary {
 
-      val lineItemIds = DfpFetcher.fetchLineItemsByOrder(dfpSession, orderIds) filter {
-        DfpFilter.hasCampaignIdCustomFieldValue(campaignId)
-      } map (_.getId.toLong)
+  implicit val writes = Json.writes[LineItemSummary]
 
-      TrafficDriverGroupStats(
-        groupName,
-        DfpFetcher.fetchStatsReport(dfpSession, lineItemIds).map(DayStats.fromDfpReport) getOrElse Nil
+  def fromLineItem(item: LineItem) = LineItemSummary(
+    id = item.getId,
+    name = item.getName
+  )
+
+  def suggestedTrafficDriversForCampaign(campaignId: String): Map[String, Seq[LineItemSummary]] = {
+    val lineItems = for {
+      campaign <- CampaignRepository.getCampaign(campaignId)
+      client <- ClientRepository.getClient(campaign.clientId)
+      nativeCardOrderIds <- dfpNativeCardOrderIds.get(campaign.`type`)
+      merchandisingCardOrderIds <- dfpMerchandisingOrderIds.get(campaign.`type`)
+    } yield {
+      def fetch(orderIds: Seq[Long]) =
+        Dfp.fetchSuggestedLineItems(campaign.name, client.name, Dfp.mkSession(), orderIds) map {
+          LineItemSummary.fromLineItem
+      }
+      Map(
+        "Native cards" -> fetch(nativeCardOrderIds),
+        "Merchandising" -> fetch(merchandisingCardOrderIds)
       )
     }
-
-    val stats = Seq(
-      ("Native cards", dfpNativeCardOrderIds),
-      ("Merchandising", dfpMerchandisingOrderIds)
-    ).par.map { case (groupName, orderId) =>
-      fetchStats(groupName, orderId)
-    }.toList
-
-    AnalyticsDataCache.putCampaignTrafficDriverGroupStats(campaignId, stats)
-
-    stats
+    lineItems getOrElse Map.empty
   }
 }

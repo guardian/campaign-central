@@ -16,7 +16,7 @@ import services.Config.conf._
 import scala.io.{BufferedSource, Source}
 import scala.util.{Failure, Success, Try}
 
-object DfpFetcher {
+object Dfp {
 
   System.setProperty("api.dfp.soapRequestTimeout", "300000")
 
@@ -35,33 +35,74 @@ object DfpFetcher {
     .build()
   }
 
-  def fetchLineItemsByOrder(session: DfpSession, orderIds: Set[Long]): Seq[LineItem] = {
-
-    val start = System.currentTimeMillis
+  def fetchLineItemsByOrder(session: DfpSession, orderIds: Seq[Long]): Seq[LineItem] = {
     val lineItems = fetchLineItems(
       session,
-      new StatementBuilder()
-      .where(s"orderId in (${orderIds.mkString(",")})")
-      .toStatement
-    )
-
-    lineItems match {
-      case Failure(e) =>
-        Logger.error(s"Fetching line items for orders $orderIds failed: ${e.getMessage}")
-      case Success(items) =>
-        Logger.info(s"Fetched ${items.size} line items for orders $orderIds in ${System.currentTimeMillis - start} ms")
-    }
-
+      new StatementBuilder().where(s"orderId in (${orderIds.mkString(",")})").toStatement)
     lineItems getOrElse Nil
   }
 
+  def fetchSuggestedLineItems(
+    campaignName: String,
+    clientName: String,
+    session: DfpSession,
+    orderIds: Seq[Long]
+  ): Seq[LineItem] = {
+
+    def fetch(nameCondition: String, orderId: Long): Seq[LineItem] = {
+      Logger.info(s"Fetching line items to suggest in order $orderId with condition [$nameCondition]")
+      val lineItems = fetchLineItems(
+        session,
+        new StatementBuilder()
+        .where(s"orderId = :orderId AND $nameCondition")
+        .withBindVariableValue("orderId", orderId)
+        .toStatement
+      )
+      lineItems getOrElse Nil
+    }
+
+    def nameCondition(name: String) = s"name like '%$name%'"
+
+    def pipedNameCondition(name: String) = nameCondition(s"| $name |")
+
+    def splitSignificantWords(s: String): Seq[String] = {
+      val words = s.split("\\s")
+      words.map(_.trim.stripSuffix(":").toLowerCase)
+      .filterNot(StopWords().contains)
+    }
+
+    lazy val first2SignificantWordsNameCondition =
+      splitSignificantWords(campaignName).take(2).mkString("name like '%", " ", "%'")
+
+    lazy val first3SignificantWordsNameCondition =
+      splitSignificantWords(campaignName).distinct.take(3).mkString("name like '%", "%' AND name like '%", "%'")
+
+    val fetches =
+      orderIds.toStream.map(o => fetch(pipedNameCondition(campaignName), o)) #:::
+      orderIds.toStream.map(o => fetch(pipedNameCondition(clientName), o)) #:::
+      orderIds.toStream.map(o => fetch(nameCondition(campaignName), o)) #:::
+      orderIds.toStream.map(o => fetch(nameCondition(clientName), o)) #:::
+      orderIds.toStream.map(o => fetch(first2SignificantWordsNameCondition, o)) #:::
+      orderIds.toStream.map(o => fetch(first3SignificantWordsNameCondition, o))
+
+    fetches.find(_.nonEmpty) getOrElse Nil
+  }
+
   private def fetchLineItems(session: DfpSession, statement: Statement): Try[Seq[LineItem]] = {
+    val start = System.currentTimeMillis
     val lineItemService = new DfpServices().get(session, classOf[LineItemServiceInterface])
-    Try(lineItemService.getLineItemsByStatement(statement)) map { page =>
+    val result = Try(lineItemService.getLineItemsByStatement(statement)) map { page =>
 
       // assuming only one page of results
-      page.getResults.toSeq
+      safeSeq(page.getResults)
     }
+    result match {
+      case Failure(e) =>
+        Logger.error("Fetching line items failed", e)
+      case Success(items) =>
+        Logger.info(s"Fetched ${items.size} line items in ${System.currentTimeMillis - start} ms")
+    }
+    result
   }
 
   def fetchStatsReport(session: DfpSession, lineItemIds: Seq[Long]): Option[BufferedSource] = {
@@ -122,9 +163,6 @@ object DfpFetcher {
       Source.fromURL(source)
     }
   }
-}
-
-object DfpFilter {
 
   def hasCampaignIdCustomFieldValue(campaignId: String)(lineItem: LineItem): Boolean = {
     safeSeq(lineItem.getCustomFieldValues) exists { value =>
@@ -134,4 +172,34 @@ object DfpFilter {
   }
 
   private def safeSeq[T](ts: Array[T]): Seq[T] = Option(ts).map(_.toSeq).getOrElse(Nil)
+}
+
+object StopWords {
+
+  val specificExtras = Seq("new", "test")
+
+  // Taken from http://www.ranks.nl/stopwords
+  def apply() = Seq(
+    "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as", "at",
+    "be", "because", "been", "before", "being", "below", "between", "both", "but", "by",
+    "can't", "cannot", "could", "couldn't",
+    "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during",
+    "each",
+    "few", "for", "from", "further",
+    "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her", "here",
+    "here's", "hers", "herself", "him", "himself", "his", "how", "how's",
+    "i", "i'd", "i'll", "i'm", "i've", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself",
+    "let's",
+    "me", "more", "most", "mustn't", "my", "myself",
+    "no", "nor", "not",
+    "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours", "ourselves", "out", "over", "own",
+    "same", "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't", "so", "some", "such",
+    "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's", "these",
+    "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too",
+    "under", "until", "up",
+    "very",
+    "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were", "weren't", "what", "what's", "when", "when's",
+    "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't",
+    "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves"
+  ) ++ specificExtras
 }

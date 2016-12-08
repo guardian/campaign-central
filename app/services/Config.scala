@@ -67,8 +67,8 @@ sealed trait Config {
   lazy val dfpClientSecret = getRequiredRemoteStringProperty("dfp.client.secret")
   lazy val dfpRefreshToken = getRequiredRemoteStringProperty("dfp.refresh.token")
   def dfpNetworkCode: String
-  def dfpNativeCardOrderIds: Set[Long]
-  def dfpMerchandisingOrderIds: Set[Long]
+  def dfpNativeCardOrderIds: Map[String, Seq[Long]]
+  def dfpMerchandisingOrderIds: Map[String, Seq[Long]]
   def dfpCampaignFieldId: Long
 
   def googleServiceAccountJsonInputStream: InputStream = {
@@ -104,6 +104,19 @@ sealed trait Config {
   }
 }
 
+object StagingDfpProperties {
+  val dfpNetworkCode = "158186692"
+  val dfpNativeCardOrderIds = Map(
+    "hosted" -> Seq(550773372L),
+    "paidContent" -> Seq(550773372L)
+  )
+  val dfpMerchandisingOrderIds = Map(
+    "hosted" -> Seq(550774092L),
+    "paidContent" -> Seq(550773372L)
+  )
+  val dfpCampaignFieldId: Long = 26412
+}
+
 class DevConfig extends Config {
   override def stage = "DEV"
 
@@ -119,10 +132,10 @@ class DevConfig extends Config {
   override def mediaAtomMakerUrl = "https://media-atom-maker.local.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.local.dev-gutools.co.uk"
 
-  override val dfpNetworkCode = "158186692"
-  override val dfpNativeCardOrderIds = Set(550773372L)
-  override val dfpMerchandisingOrderIds = Set(550774092L)
-  override val dfpCampaignFieldId: Long = 26412
+  override val dfpNetworkCode = StagingDfpProperties.dfpNetworkCode
+  override val dfpNativeCardOrderIds = StagingDfpProperties.dfpNativeCardOrderIds
+  override val dfpMerchandisingOrderIds = StagingDfpProperties.dfpMerchandisingOrderIds
+  override val dfpCampaignFieldId = StagingDfpProperties.dfpCampaignFieldId
 }
 
 class CodeConfig extends Config {
@@ -140,10 +153,10 @@ class CodeConfig extends Config {
   override def mediaAtomMakerUrl = "https://media-atom-maker.code.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.code.dev-gutools.co.uk"
 
-  override val dfpNetworkCode = "158186692"
-  override val dfpNativeCardOrderIds = Set(550773372L)
-  override val dfpMerchandisingOrderIds = Set(550774092L)
-  override val dfpCampaignFieldId: Long = 26412
+  override val dfpNetworkCode = StagingDfpProperties.dfpNetworkCode
+  override val dfpNativeCardOrderIds = StagingDfpProperties.dfpNativeCardOrderIds
+  override val dfpMerchandisingOrderIds = StagingDfpProperties.dfpMerchandisingOrderIds
+  override val dfpCampaignFieldId = StagingDfpProperties.dfpCampaignFieldId
 }
 
 class ProdConfig extends Config {
@@ -163,14 +176,22 @@ class ProdConfig extends Config {
 
   override val dfpNetworkCode = "59666047"
   override val dfpNativeCardOrderIds = {
-    val hostedOrder: Long = 353494647
-    val paidOrder: Long = 347621127
-    Set(hostedOrder, paidOrder)
+    val hosted = 353494647L
+    val paid = 347621127L
+    Map(
+      "hosted" -> Seq(hosted),
+      "paidContent" -> Seq(paid)
+    )
   }
-  override val dfpMerchandisingOrderIds = {
-    val hostedOrder: Long = 345535767
-    val paidOrder: Long = 211298847
-    Set(hostedOrder, paidOrder)
+  val dfpMerchandisingOrderIds = {
+    val hosted = 345535767L
+    val paid = 211298847L
+    val paidUs = 211064247L
+    val paidAu = 211090047L
+    Map(
+      "hosted" -> Seq(hosted),
+      "paidContent" -> Seq(paid, paidUs, paidAu)
+    )
   }
   override val dfpCampaignFieldId: Long = 9927
 }
