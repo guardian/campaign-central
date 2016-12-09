@@ -112,7 +112,7 @@ object StagingDfpProperties {
   )
   val dfpMerchandisingOrderIds = Map(
     "hosted" -> Seq(550774092L),
-    "paidContent" -> Seq(550773372L)
+    "paidContent" -> Seq(550774092L)
   )
   val dfpCampaignFieldId: Long = 26412
 }

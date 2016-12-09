@@ -57,7 +57,7 @@ object TrafficDriver {
     TrafficDriver(
       id = lineItem.getId,
       name = lineItem.getName,
-      url = s"https://www.google.com/dfp/$dfpNetworkCode#delivery/LineItemDetail/lineItemId=${lineItem.getId}",
+      url = LineItemUrl(lineItem.getId),
       status = lineItem.getStatus.getValue,
       startDate = mkLocalDate(lineItem.getStartDateTime),
       endDate = mkLocalDate(lineItem.getEndDateTime),
@@ -189,7 +189,7 @@ object TrafficDriverGroupStats {
   }
 }
 
-case class LineItemSummary(id: Long, name: String)
+case class LineItemSummary(id: Long, name: String, url: String)
 
 object LineItemSummary {
 
@@ -197,7 +197,8 @@ object LineItemSummary {
 
   def fromLineItem(item: LineItem) = LineItemSummary(
     id = item.getId,
-    name = item.getName
+    name = item.getName,
+    url = LineItemUrl(item.getId)
   )
 
   def suggestedTrafficDriversForCampaign(campaignId: String): Map[String, Seq[LineItemSummary]] = {
@@ -218,4 +219,9 @@ object LineItemSummary {
     }
     lineItems getOrElse Map.empty
   }
+}
+
+object LineItemUrl {
+  def apply(lineItemId: Long) =
+    s"https://www.google.com/dfp/$dfpNetworkCode#delivery/LineItemDetail/lineItemId=$lineItemId"
 }

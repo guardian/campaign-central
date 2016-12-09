@@ -53,7 +53,7 @@ class CampaignTrafficDrivers extends React.Component {
     );
   };
 
-  renderTrafficDriverGroups = () => {
+  render() {
 
     if(!this.props.campaignTrafficDrivers) {
       return (<ProgressSpinner />);
@@ -77,21 +77,9 @@ class CampaignTrafficDrivers extends React.Component {
     }
 
     return (
-      <span className="campaign-assets__field__value">No traffic drivers have been created yet.</span>
+      <span className="campaign-assets__field__value">There are currently no traffic drivers linked to this campaign.</span>
     )
   };
-
-  render() {
-    return (
-      <div className="campaign-info campaign-box">
-        <a name="driver-summary"/>
-        <div className="campaign-box__header">Traffic Drivers</div>
-        <div className="campaign-box__body">
-          {this.renderTrafficDriverGroups()}
-        </div>
-      </div>
-    );
-  }
 }
 
 //REDUX CONNECTIONS
