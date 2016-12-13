@@ -91,7 +91,14 @@ object Dfp {
       }
 
       def fetch(optName: Option[String]): Stream[Seq[LineItem]] = {
-        optName.map(name => orderIds.toStream.map(o => fetchByNameAndOrder(name, o))).getOrElse(Stream.empty)
+
+        def isAlreadyLinked(item: LineItem): Boolean = {
+          safeSeq(item.getCustomFieldValues) exists (_.getCustomFieldId == dfpCampaignFieldId)
+        }
+
+        optName.map(name => orderIds.toStream.map { orderId =>
+          fetchByNameAndOrder(name, orderId).filterNot(isAlreadyLinked)
+        }).getOrElse(Stream.empty)
       }
 
       fetch(Some(pipedNameCondition(campaignName))) #:::
