@@ -2,6 +2,7 @@ package controllers
 
 import java.util.concurrent.Executors
 
+import com.gu.pandahmac.HMACAuthActions
 import model.TrafficDriverGroupStats
 import play.api.Logger
 import play.api.libs.json._
@@ -11,27 +12,27 @@ import repositories.{AnalyticsDataCache, GoogleAnalytics}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ManagementApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
+class ManagementApi(override val wsClient: WSClient) extends Controller with HMACAuthActions with PandaAuthActions {
 
   implicit val ec = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
 
-  def getAnalyticsCacheSummary() = APIAuthAction { req =>
+  def getAnalyticsCacheSummary() = APIHMACAuthAction { req =>
     Ok(Json.toJson(AnalyticsDataCache.summariseContents))
   }
 
-  def refreshAnalyticsCacheEntry(dataType: String, key: String) = APIAuthAction { req =>
+  def refreshAnalyticsCacheEntry(dataType: String, key: String) = APIHMACAuthAction { req =>
     refreshEntry(dataType, key)
 
     NoContent
   }
 
-  def deleteAnalyticsCacheEntry(dataType: String, key: String) = APIAuthAction { req =>
+  def deleteAnalyticsCacheEntry(dataType: String, key: String) = APIHMACAuthAction { req =>
     AnalyticsDataCache.deleteCacheEntry(key, dataType)
 
     NoContent
   }
 
-  def refreshAnalyticsCacheForType(dataType: String) = APIAuthAction { req =>
+  def refreshAnalyticsCacheForType(dataType: String) = APIHMACAuthAction { req =>
     AnalyticsDataCache.summariseContents.filter{ e =>
       val expired = e.expires.map(_ < System.currentTimeMillis).getOrElse(false)
       e.dataType == dataType && expired
@@ -59,4 +60,6 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with Pan
       case s => Logger.warn(s"manual clear invoked for unexpected data type $dataType")
     }
   }
+
+  override def secret: String = "getthisfroms3"
 }
