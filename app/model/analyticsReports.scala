@@ -2,7 +2,7 @@ package model
 
 import ai.x.play.json.Jsonx
 import play.api.libs.json.Format
-import repositories.GoogleAnalytics.ParsedDailyCountsReport
+import repositories.Analytics.ParsedDailyCountsReport
 
 case class CampaignDailyCountsReport(seenPaths: Set[String], pageCountStats: List[Map[String, Long]])
 
@@ -25,4 +25,3 @@ case class CampaignSummary(totalUniques: Long, targetToDate: Long)
 object CampaignSummary{
   implicit val campaignSummaryFormat: Format[CampaignSummary] = Jsonx.formatCaseClass[CampaignSummary]
 }
-

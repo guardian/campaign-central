@@ -1,7 +1,5 @@
 package controllers
 
-import java.util.UUID
-
 import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
@@ -45,7 +43,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def getCampaignAnalytics(id: String) = APIAuthAction { req =>
-    GoogleAnalytics.getAnalyticsForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+    Analytics.getAnalyticsForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
   def getCampaignContent(id: String) =  APIAuthAction { req =>
@@ -148,6 +146,6 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def getCampaignCtaStats(campaignId: String) = APIAuthAction { req =>
-    Ok(toJson(GoogleAnalytics.getCtaClicksForCampaign(campaignId)))
+    Ok(toJson(Analytics.getCtaClicksForCampaign(campaignId)))
   }
 }
