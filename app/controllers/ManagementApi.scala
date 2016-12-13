@@ -12,7 +12,7 @@ import repositories.{AnalyticsDataCache, GoogleAnalytics}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ManagementApi(override val wsClient: WSClient) extends Controller with HMACAuthActions with PandaAuthActions {
+class ManagementApi(override val wsClient: WSClient) extends Controller with HMACPandaAuthActions {
 
   implicit val ec = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
 
@@ -61,5 +61,4 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with HMA
     }
   }
 
-  override def secret: String = "getthisfroms3"
 }

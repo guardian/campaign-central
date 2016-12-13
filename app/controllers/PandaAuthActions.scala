@@ -1,6 +1,7 @@
 package controllers
 
-import com.amazonaws.auth.{AWSCredentialsProvider}
+import com.amazonaws.auth.AWSCredentialsProvider
+import com.gu.pandahmac.HMACAuthActions
 import com.gu.pandomainauth.PanDomain
 import com.gu.pandomainauth.action.AuthActions
 import com.gu.pandomainauth.model.AuthenticatedUser
@@ -24,4 +25,9 @@ trait PandaAuthActions extends AuthActions {
     PanDomain.guardianValidation(authedUser)
   }
 
+}
+
+trait HMACPandaAuthActions extends PandaAuthActions with HMACAuthActions {
+
+  override def secret: String = Config().pandaHMACSecret
 }
