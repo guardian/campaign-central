@@ -25,19 +25,11 @@ class CampaignTrafficDriverSuggestions extends React.Component {
     alert("Does nothing yet!")
   };
 
-  renderLineItemLink = (url) => {
-    return (
-      <a key={url} href={url} target="_blank" title="DFP line item">
-        <i className="i-dfp"/>
-      </a>
-    );
-  };
-
   renderLineItem = (lineItem) => {
     return (
       <div key={lineItem.id} className="campaign-suggestion-list__row">
         <span><i className="i-dfp"/></span>
-        <span><a href={lineItem.id}>{lineItem.name} ({lineItem.id})</a></span>
+        <span><a href={lineItem.url}>{lineItem.name} ({lineItem.id})</a></span>
         <span className="campaign-suggestion-list__button"><button onClick={this.linkLineItemToCampaign}>Yes</button></span>
         <span className="campaign-suggestion-list__button"><button onClick={this.ignoreLineItemForThisCampaign}>No</button></span>
       </div>
