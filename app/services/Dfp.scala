@@ -3,6 +3,7 @@ package services
 import com.google.api.ads.common.lib.auth.OfflineCredentials
 import com.google.api.ads.common.lib.auth.OfflineCredentials.Api._
 import com.google.api.ads.dfp.axis.factory.DfpServices
+import com.google.api.ads.dfp.axis.utils.v201608.StatementBuilder.SUGGESTED_PAGE_LIMIT
 import com.google.api.ads.dfp.axis.utils.v201608.{ReportDownloader, StatementBuilder}
 import com.google.api.ads.dfp.axis.v201608.Column._
 import com.google.api.ads.dfp.axis.v201608.DateRangeType.REACH_LIFETIME
@@ -13,7 +14,9 @@ import com.google.api.ads.dfp.lib.client.DfpSession
 import play.api.Logger
 import services.Config.conf._
 
+import scala.annotation.tailrec
 import scala.io.{BufferedSource, Source}
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 object Dfp extends DfpService {
@@ -21,14 +24,14 @@ object Dfp extends DfpService {
   def fetchLineItemById(service: LineItemServiceInterface, id: Long): Option[LineItem] = {
     fetchLineItems(
       service,
-      new StatementBuilder().where("id = :id").withBindVariableValue("id", id).toStatement
+      new StatementBuilder().where("id = :id").withBindVariableValue("id", id)
     ).headOption
   }
 
   def fetchLineItemsByOrder(service: LineItemServiceInterface, orderIds: Seq[Long]): Seq[LineItem] = {
     fetchLineItems(
       service,
-      new StatementBuilder().where(s"orderId in (${orderIds.mkString(",")})").toStatement
+      new StatementBuilder().where(s"orderId in (${orderIds.mkString(",")})")
     )
   }
 
@@ -46,7 +49,6 @@ object Dfp extends DfpService {
         new StatementBuilder()
         .where(s"orderId = :orderId AND $nameCondition")
         .withBindVariableValue("orderId", orderId)
-        .toStatement
       )
     }
 
@@ -112,10 +114,11 @@ object Dfp extends DfpService {
     }
   }
 
+  def getCampaignIdCustomField(lineItem: LineItem): Option[BaseCustomFieldValue] =
+    safeSeq(lineItem.getCustomFieldValues) find (_.getCustomFieldId == dfpCampaignFieldId)
+
   def getCampaignIdCustomFieldValue(lineItem: LineItem): Option[String] = {
-    safeSeq(lineItem.getCustomFieldValues) find {
-      _.getCustomFieldId == dfpCampaignFieldId
-    } map {
+    getCampaignIdCustomField(lineItem) map {
       _.asInstanceOf[CustomFieldValue].getValue.asInstanceOf[TextValue].getValue
     }
   }
@@ -172,21 +175,35 @@ sealed trait DfpService {
   def mkReportService(session: DfpSession): ReportServiceInterface =
     new DfpServices().get(session, classOf[ReportServiceInterface])
 
-  def fetchLineItems(service: LineItemServiceInterface, statement: Statement): Seq[LineItem] = {
+  def fetchLineItems(service: LineItemServiceInterface, stmtBuilder: StatementBuilder): Seq[LineItem] = {
     val start = System.currentTimeMillis
-    val result = Try(service.getLineItemsByStatement(statement)) map { page =>
 
-      // assuming only one page of results
-      safeSeq(page.getResults)
+    def fetchPage(stmt: Statement): Option[LineItemPage] = {
+      val page = Try(service.getLineItemsByStatement(stmt))
+      page.recoverWith {
+        case NonFatal(e) =>
+          Logger.error("Fetching line items failed", e)
+          page
+      }.toOption
     }
-    result match {
-      case Failure(e) =>
-        Logger.error("Fetching line items failed", e)
-        Nil
-      case Success(items) =>
-        Logger.info(s"Fetched ${items.size} line items in ${System.currentTimeMillis - start} ms")
-        items
+
+    @tailrec
+    def fetchResults(stmtBuilder: StatementBuilder, acc: Seq[LineItem] = Nil): Seq[LineItem] = {
+      fetchPage(stmtBuilder.toStatement) match {
+        case None => acc
+        case Some(page) =>
+          val pageResults = safeSeq(page.getResults)
+          if (pageResults.size < SUGGESTED_PAGE_LIMIT) {
+            acc ++ pageResults
+          } else {
+            fetchResults(stmtBuilder.increaseOffsetBy(SUGGESTED_PAGE_LIMIT), acc ++ pageResults)
+          }
+      }
     }
+
+    val lineItems = fetchResults(stmtBuilder)
+    Logger.info(s"Fetched ${lineItems.size} line items in ${System.currentTimeMillis - start} ms")
+    lineItems
   }
 
   def fetchReport(service: ReportServiceInterface, qry: ReportQuery): Try[BufferedSource] = {
