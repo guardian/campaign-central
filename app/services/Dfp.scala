@@ -42,39 +42,65 @@ object Dfp extends DfpService {
     orderIds: Seq[Long]
   ): Seq[LineItem] = {
 
-    def fetch(nameCondition: String, orderId: Long): Seq[LineItem] = {
+    def fetchByNameAndOrder(nameCondition: String, orderId: Long): Seq[LineItem] = {
       Logger.info(s"Fetching line items to suggest in order $orderId with condition [$nameCondition]")
       fetchLineItems(
         service,
         new StatementBuilder()
-        .where(s"orderId = :orderId AND $nameCondition")
+        .where(s"orderId = :orderId AND ($nameCondition)")
         .withBindVariableValue("orderId", orderId)
       )
     }
 
-    def nameCondition(name: String) = s"name like '%$name%'"
+    val fetches = {
 
-    def pipedNameCondition(name: String) = nameCondition(s"| $name |")
+      def nameCondition(name: String) = s"name like '%${name.toLowerCase}%'"
 
-    def splitSignificantWords(s: String): Seq[String] = {
-      val words = s.split("\\s")
-      words.map(_.trim.stripSuffix(":").toLowerCase)
-      .filterNot(StopWords().contains)
+      def pipedNameCondition(name: String) = nameCondition(s"| $name |")
+
+      def splitSignificantWords(s: String): Seq[String] = {
+        val words = s.split("\\s")
+        words.map(_.trim.stripSuffix(":"))
+        .filter(_.nonEmpty)
+        .filter(_.head.isUpper)
+        .map(_.toLowerCase)
+        .filterNot(StopWords().contains)
+      }
+
+      def firstSignificantWord(s: String): Option[String] = splitSignificantWords(s).headOption
+
+      lazy val first2SignificantWordsNameCondition: Option[String] = {
+        val words = splitSignificantWords(campaignName).take(2)
+        if (words.isEmpty) None
+        else Some(words.mkString("name like '%", " ", "%'"))
+      }
+
+      lazy val first3SignificantWordsNameCondition: Option[String] = {
+        val words = splitSignificantWords(campaignName).distinct.take(3)
+        if (words.isEmpty) None
+        else Some(words.mkString("name like '%", "%' OR name like '%", "%'"))
+      }
+
+      def fetch(optName: Option[String]): Stream[Seq[LineItem]] = {
+
+        def isAlreadyLinked(item: LineItem): Boolean = {
+          safeSeq(item.getCustomFieldValues) exists (_.getCustomFieldId == dfpCampaignFieldId)
+        }
+
+        optName.map(name => orderIds.toStream.map { orderId =>
+          fetchByNameAndOrder(name, orderId).filterNot(isAlreadyLinked)
+        }).getOrElse(Stream.empty)
+      }
+
+      fetch(Some(pipedNameCondition(campaignName))) #:::
+      fetch(Some(pipedNameCondition(clientName))) #:::
+      fetch(firstSignificantWord(clientName).map(pipedNameCondition)) #:::
+      fetch(Some(nameCondition(campaignName))) #:::
+      fetch(Some(nameCondition(clientName))) #:::
+      fetch(first2SignificantWordsNameCondition) #:::
+      fetch(first3SignificantWordsNameCondition) #:::
+      fetch(firstSignificantWord(clientName).map(nameCondition))
     }
-
-    lazy val first2SignificantWordsNameCondition =
-      splitSignificantWords(campaignName).take(2).mkString("name like '%", " ", "%'")
-
-    lazy val first3SignificantWordsNameCondition =
-      splitSignificantWords(campaignName).distinct.take(3).mkString("name like '%", "%' AND name like '%", "%'")
-
-    val fetches =
-      orderIds.toStream.map(o => fetch(pipedNameCondition(campaignName), o)) #:::
-      orderIds.toStream.map(o => fetch(pipedNameCondition(clientName), o)) #:::
-      orderIds.toStream.map(o => fetch(nameCondition(campaignName), o)) #:::
-      orderIds.toStream.map(o => fetch(nameCondition(clientName), o)) #:::
-      orderIds.toStream.map(o => fetch(first2SignificantWordsNameCondition, o)) #:::
-      orderIds.toStream.map(o => fetch(first3SignificantWordsNameCondition, o))
 
     fetches.find(_.nonEmpty) getOrElse Nil
   }
@@ -242,7 +268,7 @@ sealed trait DfpService {
 
 object StopWords {
 
-  val specificExtras = Seq("new", "test")
+  val specificExtras = Seq("discover", "new", "test")
 
   // Taken from http://www.ranks.nl/stopwords
   def apply() = Seq(
