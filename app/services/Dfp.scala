@@ -54,7 +54,7 @@ object Dfp {
       val lineItems = fetchLineItems(
         session,
         new StatementBuilder()
-        .where(s"orderId = :orderId AND $nameCondition")
+        .where(s"orderId = :orderId AND ($nameCondition)")
         .withBindVariableValue("orderId", orderId)
         .toStatement
       )
@@ -69,7 +69,10 @@ object Dfp {
 
       def splitSignificantWords(s: String): Seq[String] = {
         val words = s.split("\\s")
-        words.map(_.trim.stripSuffix(":").toLowerCase)
+        words.map(_.trim.stripSuffix(":"))
+        .filter(_.nonEmpty)
+        .filter(_.head.isUpper)
+        .map(_.toLowerCase)
         .filterNot(StopWords().contains)
       }
 
@@ -84,7 +87,7 @@ object Dfp {
       lazy val first3SignificantWordsNameCondition: Option[String] = {
         val words = splitSignificantWords(campaignName).distinct.take(3)
         if (words.isEmpty) None
-        else Some(words.mkString("name like '%", "%' AND name like '%", "%'"))
+        else Some(words.mkString("name like '%", "%' OR name like '%", "%'"))
       }
 
       def fetch(optName: Option[String]): Stream[Seq[LineItem]] = {
@@ -192,7 +195,7 @@ object Dfp {
 
 object StopWords {
 
-  val specificExtras = Seq("new", "test")
+  val specificExtras = Seq("discover", "new", "test")
 
   // Taken from http://www.ranks.nl/stopwords
   def apply() = Seq(
