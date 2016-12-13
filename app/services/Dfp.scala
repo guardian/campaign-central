@@ -3,6 +3,7 @@ package services
 import com.google.api.ads.common.lib.auth.OfflineCredentials
 import com.google.api.ads.common.lib.auth.OfflineCredentials.Api._
 import com.google.api.ads.dfp.axis.factory.DfpServices
+import com.google.api.ads.dfp.axis.utils.v201608.StatementBuilder.SUGGESTED_PAGE_LIMIT
 import com.google.api.ads.dfp.axis.utils.v201608.{ReportDownloader, StatementBuilder}
 import com.google.api.ads.dfp.axis.v201608.Column._
 import com.google.api.ads.dfp.axis.v201608.DateRangeType.REACH_LIFETIME
@@ -13,7 +14,9 @@ import com.google.api.ads.dfp.lib.client.DfpSession
 import play.api.Logger
 import services.Config.conf._
 
+import scala.annotation.tailrec
 import scala.io.{BufferedSource, Source}
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
 object Dfp {
@@ -36,10 +39,10 @@ object Dfp {
   }
 
   def fetchLineItemsByOrder(session: DfpSession, orderIds: Seq[Long]): Seq[LineItem] = {
-    val lineItems = fetchLineItems(
+    fetchLineItems(
       session,
-      new StatementBuilder().where(s"orderId in (${orderIds.mkString(",")})").toStatement)
-    lineItems getOrElse Nil
+      new StatementBuilder().where(s"orderId in (${orderIds.mkString(",")})")
+    )
   }
 
   def fetchSuggestedLineItems(
@@ -51,14 +54,12 @@ object Dfp {
 
     def fetch(nameCondition: String, orderId: Long): Seq[LineItem] = {
       Logger.info(s"Fetching line items to suggest in order $orderId with condition [$nameCondition]")
-      val lineItems = fetchLineItems(
+      fetchLineItems(
         session,
         new StatementBuilder()
         .where(s"orderId = :orderId AND $nameCondition")
         .withBindVariableValue("orderId", orderId)
-        .toStatement
       )
-      lineItems getOrElse Nil
     }
 
     def nameCondition(name: String) = s"name like '%$name%'"
@@ -88,21 +89,36 @@ object Dfp {
     fetches.find(_.nonEmpty) getOrElse Nil
   }
 
-  private def fetchLineItems(session: DfpSession, statement: Statement): Try[Seq[LineItem]] = {
+  private def fetchLineItems(session: DfpSession, stmtBuilder: StatementBuilder): Seq[LineItem] = {
     val start = System.currentTimeMillis
     val lineItemService = new DfpServices().get(session, classOf[LineItemServiceInterface])
-    val result = Try(lineItemService.getLineItemsByStatement(statement)) map { page =>
 
-      // assuming only one page of results
-      safeSeq(page.getResults)
+    def fetchPage(stmt: Statement): Option[LineItemPage] = {
+      val page = Try(lineItemService.getLineItemsByStatement(stmt))
+      page.recoverWith {
+        case NonFatal(e) =>
+          Logger.error("Fetching line items failed", e)
+          page
+      }.toOption
     }
-    result match {
-      case Failure(e) =>
-        Logger.error("Fetching line items failed", e)
-      case Success(items) =>
-        Logger.info(s"Fetched ${items.size} line items in ${System.currentTimeMillis - start} ms")
+
+    @tailrec
+    def fetchResults(stmtBuilder: StatementBuilder, acc: Seq[LineItem] = Nil): Seq[LineItem] = {
+      fetchPage(stmtBuilder.toStatement) match {
+        case None => acc
+        case Some(page) =>
+          val pageResults = safeSeq(page.getResults)
+          if (pageResults.size < SUGGESTED_PAGE_LIMIT) {
+            acc ++ pageResults
+          } else {
+            fetchResults(stmtBuilder.increaseOffsetBy(SUGGESTED_PAGE_LIMIT), acc ++ pageResults)
+          }
+      }
     }
-    result
+
+    val lineItems = fetchResults(stmtBuilder)
+    Logger.info(s"Fetched ${lineItems.size} line items in ${System.currentTimeMillis - start} ms")
+    lineItems
   }
 
   def fetchStatsReport(session: DfpSession, lineItemIds: Seq[Long]): Option[BufferedSource] = {
