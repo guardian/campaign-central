@@ -142,7 +142,7 @@ object Dfp {
       }
     }
 
-    val lineItems = fetchResults(stmtBuilder)
+    val lineItems = fetchResults(stmtBuilder.limit(SUGGESTED_PAGE_LIMIT))
     Logger.info(s"Fetched ${lineItems.size} line items in ${System.currentTimeMillis - start} ms")
     lineItems
   }
