@@ -29,7 +29,7 @@ class CampaignTrafficDriverSuggestions extends React.Component {
     return (
       <div key={lineItem.id} className="campaign-suggestion-list__row">
         <span><i className="i-dfp"/></span>
-        <span><a href={lineItem.url}>{lineItem.name} ({lineItem.id})</a></span>
+        <span><a href={lineItem.url} target="_blank">{lineItem.name} ({lineItem.id})</a></span>
         <span className="campaign-suggestion-list__button"><button onClick={this.linkLineItemToCampaign}>Yes</button></span>
         <span className="campaign-suggestion-list__button"><button onClick={this.ignoreLineItemForThisCampaign}>No</button></span>
       </div>
