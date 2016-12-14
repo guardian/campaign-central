@@ -22,10 +22,12 @@ object Config extends AwsInstanceTags {
 }
 
 sealed trait Config {
+
   def stage: String
 
   def pandaDomain: String
   def pandaAuthCallback: String
+  lazy val pandaHMACSecret = getRequiredRemoteStringProperty("panda.hmac.secret")
 
   def logShippingStreamName: Option[String] = None
 
