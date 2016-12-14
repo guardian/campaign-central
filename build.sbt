@@ -14,6 +14,7 @@ lazy val dependencies = Seq(
   "com.amazonaws" % "aws-java-sdk" % "1.11.8",
   "ai.x" %% "play-json-extensions" % "0.8.0",
   "com.gu" % "pan-domain-auth-play_2-5_2.11" % "0.4.0",
+  "com.gu" %% "panda-hmac" % "1.2.0",
   "com.gu" %% "content-api-client" % "10.5",
   "com.google.apis" % "google-api-services-analyticsreporting" % "v4-rev10-1.22.0",
   "com.squareup.okhttp3" % "okhttp" % "3.4.1",
