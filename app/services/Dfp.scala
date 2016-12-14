@@ -3,6 +3,7 @@ package services
 import com.google.api.ads.common.lib.auth.OfflineCredentials
 import com.google.api.ads.common.lib.auth.OfflineCredentials.Api._
 import com.google.api.ads.dfp.axis.factory.DfpServices
+import com.google.api.ads.dfp.axis.utils.v201608.StatementBuilder.SUGGESTED_PAGE_LIMIT
 import com.google.api.ads.dfp.axis.utils.v201608.{ReportDownloader, StatementBuilder}
 import com.google.api.ads.dfp.axis.v201608.Column._
 import com.google.api.ads.dfp.axis.v201608.DateRangeType.REACH_LIFETIME
@@ -13,99 +14,98 @@ import com.google.api.ads.dfp.lib.client.DfpSession
 import play.api.Logger
 import services.Config.conf._
 
+import scala.annotation.tailrec
 import scala.io.{BufferedSource, Source}
+import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
-object Dfp {
+object Dfp extends DfpService {
 
-  System.setProperty("api.dfp.soapRequestTimeout", "300000")
-
-  def mkSession(): DfpSession = {
-    new DfpSession.Builder()
-    .withOAuth2Credential(
-      new OfflineCredentials.Builder()
-      .forApi(DFP)
-      .withClientSecrets(dfpClientId, dfpClientSecret)
-      .withRefreshToken(dfpRefreshToken)
-      .build()
-      .generateCredential()
-    )
-    .withApplicationName(dfpAppName)
-    .withNetworkCode(dfpNetworkCode)
-    .build()
+  def fetchLineItemById(service: LineItemServiceInterface, id: Long): Option[LineItem] = {
+    fetchLineItems(
+      service,
+      new StatementBuilder().where("id = :id").withBindVariableValue("id", id)
+    ).headOption
   }
 
-  def fetchLineItemsByOrder(session: DfpSession, orderIds: Seq[Long]): Seq[LineItem] = {
-    val lineItems = fetchLineItems(
-      session,
-      new StatementBuilder().where(s"orderId in (${orderIds.mkString(",")})").toStatement)
-    lineItems getOrElse Nil
+  def fetchLineItemsByOrder(service: LineItemServiceInterface, orderIds: Seq[Long]): Seq[LineItem] = {
+    fetchLineItems(
+      service,
+      new StatementBuilder().where(s"orderId in (${orderIds.mkString(",")})")
+    )
   }
 
   def fetchSuggestedLineItems(
     campaignName: String,
     clientName: String,
-    session: DfpSession,
+    service: LineItemServiceInterface,
     orderIds: Seq[Long]
   ): Seq[LineItem] = {
 
-    def fetch(nameCondition: String, orderId: Long): Seq[LineItem] = {
+    def fetchByNameAndOrder(nameCondition: String, orderId: Long): Seq[LineItem] = {
       Logger.info(s"Fetching line items to suggest in order $orderId with condition [$nameCondition]")
-      val lineItems = fetchLineItems(
-        session,
+      fetchLineItems(
+        service,
         new StatementBuilder()
-        .where(s"orderId = :orderId AND $nameCondition")
+        .where(s"orderId = :orderId AND ($nameCondition)")
         .withBindVariableValue("orderId", orderId)
-        .toStatement
       )
-      lineItems getOrElse Nil
     }
 
-    def nameCondition(name: String) = s"name like '%$name%'"
+    val fetches = {
 
-    def pipedNameCondition(name: String) = nameCondition(s"| $name |")
+      def nameCondition(name: String) = s"name like '%${name.toLowerCase}%'"
 
-    def splitSignificantWords(s: String): Seq[String] = {
-      val words = s.split("\\s")
-      words.map(_.trim.stripSuffix(":").toLowerCase)
-      .filterNot(StopWords().contains)
+      def pipedNameCondition(name: String) = nameCondition(s"| $name |")
+
+      def splitSignificantWords(s: String): Seq[String] = {
+        val words = s.split("\\s")
+        words.map(_.trim.stripSuffix(":"))
+        .filter(_.nonEmpty)
+        .filter(_.head.isUpper)
+        .map(_.toLowerCase)
+        .filterNot(StopWords().contains)
+      }
+
+      def firstSignificantWord(s: String): Option[String] = splitSignificantWords(s).headOption
+
+      lazy val first2SignificantWordsNameCondition: Option[String] = {
+        val words = splitSignificantWords(campaignName).take(2)
+        if (words.isEmpty) None
+        else Some(words.mkString("name like '%", " ", "%'"))
+      }
+
+      lazy val first3SignificantWordsNameCondition: Option[String] = {
+        val words = splitSignificantWords(campaignName).distinct.take(3)
+        if (words.isEmpty) None
+        else Some(words.mkString("name like '%", "%' OR name like '%", "%'"))
+      }
+
+      def fetch(optName: Option[String]): Stream[Seq[LineItem]] = {
+
+        def isAlreadyLinked(item: LineItem): Boolean = {
+          safeSeq(item.getCustomFieldValues) exists (_.getCustomFieldId == dfpCampaignFieldId)
+        }
+
+        optName.map(name => orderIds.toStream.map { orderId =>
+          fetchByNameAndOrder(name, orderId).filterNot(isAlreadyLinked)
+        }).getOrElse(Stream.empty)
+      }
+
+      fetch(Some(pipedNameCondition(campaignName))) #:::
+      fetch(Some(pipedNameCondition(clientName))) #:::
+      fetch(firstSignificantWord(clientName).map(pipedNameCondition)) #:::
+      fetch(Some(nameCondition(campaignName))) #:::
+      fetch(Some(nameCondition(clientName))) #:::
+      fetch(first2SignificantWordsNameCondition) #:::
+      fetch(first3SignificantWordsNameCondition) #:::
+      fetch(firstSignificantWord(clientName).map(nameCondition))
     }
-
-    lazy val first2SignificantWordsNameCondition =
-      splitSignificantWords(campaignName).take(2).mkString("name like '%", " ", "%'")
-
-    lazy val first3SignificantWordsNameCondition =
-      splitSignificantWords(campaignName).distinct.take(3).mkString("name like '%", "%' AND name like '%", "%'")
-
-    val fetches =
-      orderIds.toStream.map(o => fetch(pipedNameCondition(campaignName), o)) #:::
-      orderIds.toStream.map(o => fetch(pipedNameCondition(clientName), o)) #:::
-      orderIds.toStream.map(o => fetch(nameCondition(campaignName), o)) #:::
-      orderIds.toStream.map(o => fetch(nameCondition(clientName), o)) #:::
-      orderIds.toStream.map(o => fetch(first2SignificantWordsNameCondition, o)) #:::
-      orderIds.toStream.map(o => fetch(first3SignificantWordsNameCondition, o))
 
     fetches.find(_.nonEmpty) getOrElse Nil
   }
 
-  private def fetchLineItems(session: DfpSession, statement: Statement): Try[Seq[LineItem]] = {
-    val start = System.currentTimeMillis
-    val lineItemService = new DfpServices().get(session, classOf[LineItemServiceInterface])
-    val result = Try(lineItemService.getLineItemsByStatement(statement)) map { page =>
-
-      // assuming only one page of results
-      safeSeq(page.getResults)
-    }
-    result match {
-      case Failure(e) =>
-        Logger.error("Fetching line items failed", e)
-      case Success(items) =>
-        Logger.info(s"Fetched ${items.size} line items in ${System.currentTimeMillis - start} ms")
-    }
-    result
-  }
-
-  def fetchStatsReport(session: DfpSession, lineItemIds: Seq[Long]): Option[BufferedSource] = {
+  def fetchStatsReport(service: ReportServiceInterface, lineItemIds: Seq[Long]): Option[BufferedSource] = {
 
     if (lineItemIds.isEmpty) None
 
@@ -127,7 +127,7 @@ object Dfp {
       )
 
       val start = System.currentTimeMillis
-      val report = fetchReport(session, qry)
+      val report = fetchReport(service, qry)
       report match {
         case Failure(e) =>
           Logger.error(s"Stats report on line items ${lineItemIds.mkString(", ")} failed: ${e.getMessage}")
@@ -140,17 +140,107 @@ object Dfp {
     }
   }
 
-  private def fetchReport(session: DfpSession, qry: ReportQuery): Try[BufferedSource] = {
+  def getCampaignIdCustomField(lineItem: LineItem): Option[BaseCustomFieldValue] =
+    safeSeq(lineItem.getCustomFieldValues) find (_.getCustomFieldId == dfpCampaignFieldId)
 
-    val reportService = new DfpServices().get(session, classOf[ReportServiceInterface])
+  def getCampaignIdCustomFieldValue(lineItem: LineItem): Option[String] = {
+    getCampaignIdCustomField(lineItem) map {
+      _.asInstanceOf[CustomFieldValue].getValue.asInstanceOf[TextValue].getValue
+    }
+  }
+
+  def hasCampaignIdCustomFieldValue(campaignId: String)(lineItem: LineItem): Boolean =
+    getCampaignIdCustomFieldValue(lineItem) contains campaignId
+
+  def linkLineItemToCampaign(service: LineItemServiceInterface, lineItemId: Long, campaignId: String): Unit = {
+    fetchLineItemById(service, lineItemId) foreach { item =>
+      val currCampaignId = getCampaignIdCustomFieldValue(item)
+      if (currCampaignId.isDefined) {
+        Logger.error(s"Line item $lineItemId is already linked to campaign ${currCampaignId.get}")
+      } else {
+        appendCustomFieldToLineItem(service, item, new CustomFieldValue(dfpCampaignFieldId, new TextValue(campaignId)))
+      }
+    }
+  }
+
+  private def appendCustomFieldToLineItem(
+    service: LineItemServiceInterface,
+    item: LineItem,
+    field: CustomFieldValue
+  ): Unit = {
+    val currFields = safeSeq(item.getCustomFieldValues)
+    if (!currFields.contains(field)) {
+      item.setCustomFieldValues(currFields.toArray :+ field)
+      updateLineItem(service, item)
+    }
+  }
+}
+
+sealed trait DfpService {
+
+  System.setProperty("api.dfp.soapRequestTimeout", "300000")
+
+  def mkSession(): DfpSession = {
+    new DfpSession.Builder()
+    .withOAuth2Credential(
+      new OfflineCredentials.Builder()
+      .forApi(DFP)
+      .withClientSecrets(dfpClientId, dfpClientSecret)
+      .withRefreshToken(dfpRefreshToken)
+      .build()
+      .generateCredential()
+    )
+    .withApplicationName(dfpAppName)
+    .withNetworkCode(dfpNetworkCode)
+    .build()
+  }
+
+  def mkLineItemService(session: DfpSession): LineItemServiceInterface =
+    new DfpServices().get(session, classOf[LineItemServiceInterface])
+
+  def mkReportService(session: DfpSession): ReportServiceInterface =
+    new DfpServices().get(session, classOf[ReportServiceInterface])
+
+  def fetchLineItems(service: LineItemServiceInterface, stmtBuilder: StatementBuilder): Seq[LineItem] = {
+    val start = System.currentTimeMillis
+
+    def fetchPage(stmt: Statement): Option[LineItemPage] = {
+      val page = Try(service.getLineItemsByStatement(stmt))
+      page.recoverWith {
+        case NonFatal(e) =>
+          Logger.error("Fetching line items failed", e)
+          page
+      }.toOption
+    }
+
+    @tailrec
+    def fetchResults(stmtBuilder: StatementBuilder, acc: Seq[LineItem] = Nil): Seq[LineItem] = {
+      fetchPage(stmtBuilder.toStatement) match {
+        case None => acc
+        case Some(page) =>
+          val pageResults = safeSeq(page.getResults)
+          if (pageResults.size < SUGGESTED_PAGE_LIMIT) {
+            acc ++ pageResults
+          } else {
+            fetchResults(stmtBuilder.increaseOffsetBy(SUGGESTED_PAGE_LIMIT), acc ++ pageResults)
+          }
+      }
+    }
+
+    val lineItems = fetchResults(stmtBuilder)
+    Logger.info(s"Fetched ${lineItems.size} line items in ${System.currentTimeMillis - start} ms")
+    lineItems
+  }
+
+  def fetchReport(service: ReportServiceInterface, qry: ReportQuery): Try[BufferedSource] = {
 
     val reportJob = {
       val job = new ReportJob()
       job.setReportQuery(qry)
-      reportService.runReportJob(job)
+      service.runReportJob(job)
     }
 
-    val reportDownloader = new ReportDownloader(reportService, reportJob.getId)
+    val reportDownloader = new ReportDownloader(service, reportJob.getId)
     Try(reportDownloader.waitForReportReady()) map { completed =>
 
       val source = {
@@ -164,19 +254,21 @@ object Dfp {
     }
   }
 
-  def hasCampaignIdCustomFieldValue(campaignId: String)(lineItem: LineItem): Boolean = {
-    safeSeq(lineItem.getCustomFieldValues) exists { value =>
-      value.getCustomFieldId == dfpCampaignFieldId &&
-      value.asInstanceOf[CustomFieldValue].getValue.asInstanceOf[TextValue].getValue.toLowerCase == campaignId
+  def updateLineItem(service: LineItemServiceInterface, lineItem: LineItem): Unit = {
+    Try(service.updateLineItems(Array(lineItem))) match {
+      case Failure(e) =>
+        Logger.error(s"Failed to update line item ${lineItem.getId}", e)
+      case Success(updated) =>
+        if (updated.length != 1) Logger.error(s"Failed to update line item ${lineItem.getId}")
     }
   }
 
-  private def safeSeq[T](ts: Array[T]): Seq[T] = Option(ts).map(_.toSeq).getOrElse(Nil)
+  def safeSeq[T](ts: Array[T]): Seq[T] = Option(ts).map(_.toSeq).getOrElse(Nil)
 }
 
 object StopWords {
 
-  val specificExtras = Seq("new", "test")
+  val specificExtras = Seq("discover", "new", "test")
 
   // Taken from http://www.ranks.nl/stopwords
   def apply() = Seq(

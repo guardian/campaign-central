@@ -104,9 +104,9 @@ object TrafficDriverGroup {
       nativeCardOrderId <- dfpNativeCardOrderIds.get(campaign.`type`)
       merchandisingOrderId <- dfpMerchandisingOrderIds.get(campaign.`type`)
     } yield {
-      val dfpSession = Dfp.mkSession()
+      val lineItemService = Dfp.mkLineItemService(Dfp.mkSession())
       def trafficDrivers(orderIds: Seq[Long]): Seq[TrafficDriver] =
-        Dfp.fetchLineItemsByOrder(dfpSession, orderIds) filter {
+        Dfp.fetchLineItemsByOrder(lineItemService, orderIds) filter {
           Dfp.hasCampaignIdCustomFieldValue(campaignId)
         } map TrafficDriver.fromDfpLineItem
       Seq(
@@ -167,13 +167,15 @@ object TrafficDriverGroupStats {
       merchandisingOrderIds <- dfpMerchandisingOrderIds.get(campaign.`type`)
     } yield {
       val dfpSession = Dfp.mkSession()
+      val dfpLineItemService = Dfp.mkLineItemService(dfpSession)
+      val dfpReportService = Dfp.mkReportService(dfpSession)
       def fetchStats(groupName: String, orderIds: Seq[Long]): TrafficDriverGroupStats = {
-        val lineItemIds = Dfp.fetchLineItemsByOrder(dfpSession, orderIds) filter {
+        val lineItemIds = Dfp.fetchLineItemsByOrder(dfpLineItemService, orderIds) filter {
           Dfp.hasCampaignIdCustomFieldValue(campaignId)
         } map (_.getId.toLong)
         TrafficDriverGroupStats(
           groupName,
-          Dfp.fetchStatsReport(dfpSession, lineItemIds).map(DayStats.fromDfpReport) getOrElse Nil
+          Dfp.fetchStatsReport(dfpReportService, lineItemIds).map(DayStats.fromDfpReport) getOrElse Nil
         )
       }
       val fetched = Seq(
@@ -208,8 +210,9 @@ object LineItemSummary {
       nativeCardOrderIds <- dfpNativeCardOrderIds.get(campaign.`type`)
       merchandisingCardOrderIds <- dfpMerchandisingOrderIds.get(campaign.`type`)
     } yield {
+      val dfpLineItemService = Dfp.mkLineItemService(Dfp.mkSession())
       def fetch(orderIds: Seq[Long]) =
-        Dfp.fetchSuggestedLineItems(campaign.name, client.name, Dfp.mkSession(), orderIds) map {
+        Dfp.fetchSuggestedLineItems(campaign.name, client.name, dfpLineItemService, orderIds) map {
           LineItemSummary.fromLineItem
       }
       Map(
@@ -218,6 +221,10 @@ object LineItemSummary {
       )
     }
     lineItems getOrElse Map.empty
+  }
+
+  def acceptSuggestedTrafficDriver(campaignId: String, lineItemId: Long): Unit = {
+    Dfp.linkLineItemToCampaign(Dfp.mkLineItemService(Dfp.mkSession()), lineItemId, campaignId)
   }
 }
 
