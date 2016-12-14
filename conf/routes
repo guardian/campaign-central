@@ -44,6 +44,7 @@ GET    /management/api/analytics                        controllers.ManagementAp
 POST   /management/api/analytics/:dataType/:key         controllers.ManagementApi.refreshAnalyticsCacheEntry(dataType: String, key: String)
 DELETE /management/api/analytics/:dataType/:key         controllers.ManagementApi.deleteAnalyticsCacheEntry(dataType: String, key: String)
 POST   /management/api/analytics/:dataType              controllers.ManagementApi.refreshAnalyticsCacheForType(dataType: String)
+POST   /management/api/refreshExpiringCampaigns         controllers.ManagementApi.refreshExpiringCampaigns
 
 GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 

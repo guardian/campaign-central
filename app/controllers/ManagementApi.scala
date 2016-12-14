@@ -3,12 +3,13 @@ package controllers
 import java.util.concurrent.Executors
 
 import com.gu.pandahmac.HMACAuthActions
-import model.TrafficDriverGroupStats
+import model.{TrafficDriverGroupStats, User}
+import model.command.RefreshCampaignFromCAPICommand
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
-import repositories.{AnalyticsDataCache, GoogleAnalytics}
+import repositories.{AnalyticsDataCache, CampaignRepository, GoogleAnalytics}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,4 +62,19 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with HMA
     }
   }
 
+  def refreshExpiringCampaigns = APIHMACAuthAction { req =>
+
+    implicit val user = User("campaign", "refresher", "labs.beta@guardian.co.uk")
+
+    val expiringCampaigns = CampaignRepository.getAllCampaigns().filter{ c =>
+      c.status == "live" && c.endDate.exists(_.isBeforeNow)
+    }
+
+    expiringCampaigns foreach { c =>
+      Logger.info(s"campaign ${c.name} is due to expire, refreshing from CAPI")
+      RefreshCampaignFromCAPICommand(c.id).process()
+    }
+
+    NoContent
+  }
 }
