@@ -1,7 +1,5 @@
 package controllers
 
-import java.util.UUID
-
 import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
@@ -140,6 +138,12 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   def getSuggestedCampaignTrafficDrivers(campaignId: String) = APIAuthAction { req =>
     Logger.info(s"Loading suggested traffic drivers for campaign $campaignId")
     Ok(toJson(LineItemSummary.suggestedTrafficDriversForCampaign(campaignId)))
+  }
+
+  def acceptSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = APIAuthAction { req =>
+    Logger.info(s"Accepting traffic driver $lineItemId for campaign $campaignId")
+    LineItemSummary.acceptSuggestedTrafficDriver(campaignId, lineItemId)
+    NoContent
   }
 
   def getCampaignTrafficDriverStats(campaignId: String) = APIAuthAction { req =>
