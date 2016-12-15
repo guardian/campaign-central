@@ -1,47 +1,31 @@
 import React, {PropTypes} from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as getCampaignTrafficDriverSuggestions from "../../actions/CampaignActions/getCampaignTrafficDriverSuggestions";
 
 class CampaignTrafficDriverSuggestions extends React.Component {
 
-  componentWillMount() {
-    this.props.campaignTrafficDriverSuggestionActions.getCampaignTrafficDriverSuggestions(this.props.campaign.id);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign.id !== this.props.campaign.id) {
-      this.props.campaignTrafficDriverSuggestionActions.getCampaignTrafficDriverSuggestions(nextProps.campaign.id);
-    }
-  }
-
-  linkLineItemToCampaign = () => {
-    console.log("* Link line item x to campaign y");
+  rejectSuggestion = (trafficDriverId) => {
+    console.log('*** Rejecting traffic driver ' + trafficDriverId + ' for campaign ' + this.props.campaignId);
     alert("Does nothing yet!")
   };
 
-  ignoreLineItemForThisCampaign = () => {
-    console.log("* Ignore line item x for campaign y");
-    alert("Does nothing yet!")
-  };
-
-  renderLineItem = (lineItem) => {
+  renderSuggestion = (trafficDriver) => {
     return (
-      <div key={lineItem.id} className="campaign-suggestion-list__row">
+      <div key={trafficDriver.id} className="campaign-suggestion-list__row">
         <span><i className="i-dfp"/></span>
-        <span><a href={lineItem.url} target="_blank">{lineItem.name} ({lineItem.id})</a></span>
-        <span className="campaign-suggestion-list__button"><button onClick={this.linkLineItemToCampaign}>Yes</button></span>
-        <span className="campaign-suggestion-list__button"><button onClick={this.ignoreLineItemForThisCampaign}>No</button></span>
+        <span><a href={trafficDriver.url} target="_blank">{trafficDriver.name} ({trafficDriver.id})</a></span>
+        <span className="campaign-suggestion-list__button"><button  onClick={() => this.props.acceptSuggestion(trafficDriver.id)}>Yes</button></span>
+        <span className="campaign-suggestion-list__button"><button onClick={() => this.rejectSuggestion(trafficDriver.id)}>No</button></span>
       </div>
     );
   };
 
   renderSuggestionGroup = (group) => {
-    var lineItems = this.props.campaignTrafficDriverSuggestions[group];
+    var suggestions = this.props.campaignTrafficDriverSuggestions[group];
     return (
       <div key={group} className="campaign-suggestion-list__row">
         <div>{group}:</div>
-        {lineItems.map( this.renderLineItem ) }
+        {suggestions.map( this.renderSuggestion ) }
       </div>
     );
   };
@@ -57,7 +41,7 @@ class CampaignTrafficDriverSuggestions extends React.Component {
     if(groups.length > 0) {
       return (
         <div>
-          <div className="campaign-suggestion-list__header">Should any of these be linked to this campaign?</div>
+          <div className="campaign-suggestion-list__header">Are any of these traffic drivers for this campaign?</div>
           {groups.map(this.renderSuggestionGroup) }
         </div>
       );
@@ -67,18 +51,4 @@ class CampaignTrafficDriverSuggestions extends React.Component {
   };
 }
 
-//REDUX CONNECTIONS
-
-function mapStateToProps(state) {
-  return {
-    campaignTrafficDriverSuggestions: state.campaignTrafficDriverSuggestions
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    campaignTrafficDriverSuggestionActions: bindActionCreators(Object.assign({}, getCampaignTrafficDriverSuggestions), dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignTrafficDriverSuggestions);
+export default CampaignTrafficDriverSuggestions;

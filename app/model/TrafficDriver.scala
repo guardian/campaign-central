@@ -211,14 +211,14 @@ object LineItemSummary {
       merchandisingCardOrderIds <- dfpMerchandisingOrderIds.get(campaign.`type`)
     } yield {
       val dfpLineItemService = Dfp.mkLineItemService(Dfp.mkSession())
-      def fetch(orderIds: Seq[Long]) =
+      def fetch(orderIds: Seq[Long]): Seq[LineItemSummary] =
         Dfp.fetchSuggestedLineItems(campaign.name, client.name, dfpLineItemService, orderIds) map {
           LineItemSummary.fromLineItem
       }
       Map(
         "Native cards" -> fetch(nativeCardOrderIds),
         "Merchandising" -> fetch(merchandisingCardOrderIds)
-      )
+      ).filterNot { case (_, drivers) => drivers.isEmpty }
     }
     lineItems getOrElse Map.empty
   }

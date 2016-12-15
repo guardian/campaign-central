@@ -2,19 +2,8 @@ import React, {PropTypes} from "react";
 import ProgressSpinner from "../utils/ProgressSpinner";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as getCampaignTrafficDrivers from "../../actions/CampaignActions/getCampaignTrafficDrivers";
 
 class CampaignTrafficDrivers extends React.Component {
-
-  componentWillMount() {
-    this.props.campaignTrafficDriverActions.getCampaignTrafficDrivers(this.props.campaign.id);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign.id !== this.props.campaign.id) {
-      this.props.campaignTrafficDriverActions.getCampaignTrafficDrivers(nextProps.campaign.id);
-    }
-  }
 
   renderLineItemLink = (url) => {
     return (
@@ -82,18 +71,4 @@ class CampaignTrafficDrivers extends React.Component {
   };
 }
 
-//REDUX CONNECTIONS
-
-function mapStateToProps(state) {
-  return {
-    campaignTrafficDrivers: state.campaignTrafficDrivers
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    campaignTrafficDriverActions: bindActionCreators(Object.assign({}, getCampaignTrafficDrivers), dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignTrafficDrivers);
+export default CampaignTrafficDrivers;
