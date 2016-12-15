@@ -8,7 +8,8 @@ import CampaignTrafficDriverStatsChart from "./Analytics/CampaignTrafficDriverSt
 class CampaignAnalytics extends React.Component {
 
   isAnalysisAvailable(campaign) {
-    return (campaign.status === 'live' && campaign.startDate && campaign.pathPrefix );
+    const analysableStatus = campaign.status === 'live' || campaign.status === 'dead';
+    return (analysableStatus && campaign.startDate && campaign.pathPrefix );
   }
 
   getLatestCounts() {
