@@ -3,6 +3,7 @@ package controllers
 import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
+import model.reports.CtaClicksReport
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json._
@@ -152,6 +153,6 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def getCampaignCtaStats(campaignId: String) = APIAuthAction { req =>
-    Ok(toJson(GoogleAnalytics.getCtaClicksForCampaign(campaignId)))
+    Ok(toJson(CtaClicksReport.getCtaClicksForCampaign(campaignId)))
   }
 }
