@@ -286,9 +286,73 @@ object GoogleAnalytics {
     }
   }
 
+  // page views
+  case class DailyViewCounts(seenPaths: Set[String], countStats: Map[String, Long])
+
+  def loadPageViewsForDay(gaFilter: String, date: DateTime): Option[DailyViewCounts] = {
+    Logger.info(s"fetch ga analytics with filter ${gaFilter} for day ${date.toString("yyyy-MM-dd")}")
+
+    val dateRange = new DateRange().setStartDate(date.toString("yyyy-MM-dd")).setEndDate(date.toString("yyyy-MM-dd"))
+
+    val pageViewMetric = new Metric().setExpression("ga:pageviews").setAlias("pageViews")
+    val uniqueViewMetric = new Metric().setExpression("ga:uniquePageviews").setAlias("uniquePageViews")
+
+    val dateDimension = new Dimension().setName("ga:date")
+    val pathDimension = new Dimension().setName("ga:pagePath")
+
+    val viewsReportRequest = new ReportRequest()
+      .setDateRanges(List(dateRange))
+      .setMetrics(List(pageViewMetric, uniqueViewMetric))
+      .setDimensions(List(dateDimension, pathDimension))
+      .setFiltersExpression(gaFilter)
+      .setIncludeEmptyRows(true)
+      .setSamplingLevel("LARGE")
+      .setViewId(Config().googleAnalyticsViewId)
+
+    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
+
+    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+
+    parseDailyViewCountsReport(reportResponse)
+  }
+
+  private def parseDailyViewCountsReport(reportResponse: GetReportsResponse): Option[DailyViewCounts] = {
+    for (
+      report <- reportResponse.getReports.headOption;
+      rows <- Option(report.getData.getRows)
+    ) yield {
+      val header = report.getColumnHeader
+      val dimensions = header.getDimensions
+
+      val pathDimIndex = dimensions.indexOf("ga:pagePath")
+
+      val metricHeaders = header.getMetricHeader.getMetricHeaderEntries
+
+      val pageviewsIndex = metricHeaders.indexWhere(_.getName == "pageViews")
+      val uniquesIndex = metricHeaders.indexWhere(_.getName == "uniquePageViews")
+
+      var seenPaths: Set[String] = Set()
+      var countStats: Map[String, Long] = Map()
+
+      for (
+        row <- rows.toList;
+        dateRangeValues <- row.getMetrics.headOption
+      ) {
+        val path = row.getDimensions.apply(pathDimIndex)
+
+        val pageviews = dateRangeValues.getValues.apply(pageviewsIndex).toLong
+        val uniques = dateRangeValues.getValues.apply(uniquesIndex).toLong
+
+        seenPaths = seenPaths + path
+        countStats = countStats ++ Map(s"count$path" -> pageviews, s"unique$path" -> uniques)
+      }
+
+      DailyViewCounts(seenPaths, countStats)
+    }
+  }
+
 
   // CTA clicks functions
-
 
   def loadCtaClicks(trackingCode: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
 
