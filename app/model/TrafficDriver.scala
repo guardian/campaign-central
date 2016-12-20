@@ -57,7 +57,7 @@ object TrafficDriver {
     TrafficDriver(
       id = lineItem.getId,
       name = lineItem.getName,
-      url = s"https://www.google.com/dfp/$dfpNetworkCode#delivery/LineItemDetail/lineItemId=${lineItem.getId}",
+      url = LineItemUrl(lineItem.getId),
       status = lineItem.getStatus.getValue,
       startDate = mkLocalDate(lineItem.getStartDateTime),
       endDate = mkLocalDate(lineItem.getEndDateTime),
@@ -191,7 +191,7 @@ object TrafficDriverGroupStats {
   }
 }
 
-case class LineItemSummary(id: Long, name: String)
+case class LineItemSummary(id: Long, name: String, url: String)
 
 object LineItemSummary {
 
@@ -199,7 +199,8 @@ object LineItemSummary {
 
   def fromLineItem(item: LineItem) = LineItemSummary(
     id = item.getId,
-    name = item.getName
+    name = item.getName,
+    url = LineItemUrl(item.getId)
   )
 
   def suggestedTrafficDriversForCampaign(campaignId: String): Map[String, Seq[LineItemSummary]] = {
@@ -210,14 +211,14 @@ object LineItemSummary {
       merchandisingCardOrderIds <- dfpMerchandisingOrderIds.get(campaign.`type`)
     } yield {
       val dfpLineItemService = Dfp.mkLineItemService(Dfp.mkSession())
-      def fetch(orderIds: Seq[Long]) =
+      def fetch(orderIds: Seq[Long]): Seq[LineItemSummary] =
         Dfp.fetchSuggestedLineItems(campaign.name, client.name, dfpLineItemService, orderIds) map {
           LineItemSummary.fromLineItem
       }
       Map(
         "Native cards" -> fetch(nativeCardOrderIds),
         "Merchandising" -> fetch(merchandisingCardOrderIds)
-      )
+      ).filterNot { case (_, drivers) => drivers.isEmpty }
     }
     lineItems getOrElse Map.empty
   }
@@ -225,4 +226,9 @@ object LineItemSummary {
   def acceptSuggestedTrafficDriver(campaignId: String, lineItemId: Long): Unit = {
     Dfp.linkLineItemToCampaign(Dfp.mkLineItemService(Dfp.mkSession()), lineItemId, campaignId)
   }
+}
+
+object LineItemUrl {
+  def apply(lineItemId: Long) =
+    s"https://www.google.com/dfp/$dfpNetworkCode#delivery/LineItemDetail/lineItemId=$lineItemId"
 }
