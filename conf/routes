@@ -21,6 +21,7 @@ GET /api/campaigns/:id                    controllers.CampaignApi.getCampaign(id
 PUT /api/campaigns/:id                    controllers.CampaignApi.updateCampaign(id: String)
 DELETE /api/campaigns/:id                 controllers.CampaignApi.deleteCampaign(id: String)
 GET /api/campaigns/:id/analytics          controllers.CampaignApi.getCampaignAnalytics(id: String)
+GET /api/campaigns/:id/dailyUniques       controllers.CampaignApi.getCampaignDailyUniqueUsers(id: String)
 GET /api/campaigns/:id/content            controllers.CampaignApi.getCampaignContent(id: String)
 GET /api/campaigns/:id/notes              controllers.CampaignApi.getCampaignNotes(id: String)
 POST /api/campaigns/:id/notes             controllers.CampaignApi.addCampaignNote(id: String)

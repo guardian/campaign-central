@@ -3,7 +3,7 @@ package repositories
 import java.util.concurrent.Executors
 
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
-import model.reports.{AnalyticsDataCacheEntry, AnalyticsDataCacheEntrySummary, CampaignPageViewsReport, CtaClicksReport}
+import model.reports._
 import model.{Campaign, CampaignDailyCountsReport, CampaignSummary, TrafficDriverGroupStats}
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, Reads}
@@ -56,6 +56,11 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
+  def putDailyUniqueUsersReport(campaignId: String, data: DailyUniqueUsersReport, validToTimestamp: Option[Long]): Unit = {
+    val entry = AnalyticsDataCacheEntry(campaignId, "DailyUniqueUsersReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
   def putCampaignSummary(campaignId: String, data: CampaignSummary, validToTimestamp: Option[Long]): Unit = {
     val entry = AnalyticsDataCacheEntry(campaignId, "CampaignSummary", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
@@ -101,6 +106,10 @@ object AnalyticsDataCache {
 
   def getCampaignPageViewsReport(campaignId: String): CacheResult[CampaignPageViewsReport] = {
     getEntry[CampaignPageViewsReport](campaignId, "CampaignPageViewsReport")
+  }
+
+  def getDailyUniqueUsersReport(campaignId: String): CacheResult[DailyUniqueUsersReport] = {
+    getEntry[DailyUniqueUsersReport](campaignId, "DailyUniqueUsersReport")
   }
 
   def getCampaignSummary(campaignId: String): CacheResult[CampaignSummary] = {

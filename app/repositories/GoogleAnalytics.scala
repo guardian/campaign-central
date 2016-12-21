@@ -353,6 +353,31 @@ object GoogleAnalytics {
     }
   }
 
+  // Daily unique users
+  def loadUniqueUsersDay(gaFilter: String, date: DateTime): Long = {
+    Logger.info(s"fetch daily user analytics with filter ${gaFilter} for day ${date.toString("yyyy-MM-dd")}")
+
+    val dateRange = new DateRange().setStartDate(date.toString("yyyy-MM-dd")).setEndDate(date.toString("yyyy-MM-dd"))
+
+    val userMetric = new Metric().setExpression("ga:users").setAlias("users")
+
+    val dailyUniquesRequest = new ReportRequest()
+      .setDateRanges(List(dateRange))
+      .setMetrics(List(userMetric))
+      .setFiltersExpression(gaFilter)
+      .setIncludeEmptyRows(true)
+      .setSamplingLevel("LARGE")
+      .setViewId(getViewIdForReport("dailyUniqueUsers", Some(date)))
+
+    val getReportsRequest = new GetReportsRequest().setReportRequests(List(dailyUniquesRequest))
+
+    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+
+    reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"fetch daily user analytics with filter ${gaFilter} for day ${date.toString("yyyy-MM-dd")}")}
+
+    parseDimensionlessSingleMetricReport(reportResponse)
+  }
+
 
   // CTA clicks functions
 
@@ -379,17 +404,24 @@ object GoogleAnalytics {
 
     reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"CTA clicks for cta $trackingCode")}
     // this report has a single value, so just dive in grabbing the first entry at each level
+    parseDimensionlessSingleMetricReport(reportResponse)
+  }
+
+  // general GA stuff
+
+  private def parseDimensionlessSingleMetricReport(reportResponse: GetReportsResponse): Long = {
+    // this report has a single value, so just dive in grabbing the first entry at each level
     val clickCount = for(
       report <- reportResponse.getReports.headOption;
-      row <- report.getData.getRows.headOption;
+      data <- Option(report.getData);
+      rows <- Option(data.getRows);
+      row <- rows.headOption;
       metrics <- row.getMetrics.headOption;
       value <- metrics.getValues.headOption
     ) yield { value.toLong}
 
     clickCount.getOrElse(0L)
   }
-
-  // general GA connection stuff
 
   private def warnIfDataIsSampled(report: Report, reportTitle: String): Unit = {
     Option(report.getData.getSamplesReadCounts).foreach{ readCounts =>
@@ -404,14 +436,18 @@ object GoogleAnalytics {
   private val GLABS_VIEW_START_DATE = new DateTime("2016-12-11")
 
   private def getViewIdForReport(reportType: String, date: Option[DateTime] = None): String = {
+    def userGlabsAccountWhenAvailable = {
+      if (date.exists(_.isAfter(GLABS_VIEW_START_DATE)))
+        Config().googleAnalyticsGlabsViewId
+      else
+        Config().googleAnalyticsViewId
+    }
+
     reportType match {
       case "ctaCtr" => Config().googleAnalyticsViewId
-      case "pageViews" => {
-        if(date.exists(_.isAfter(GLABS_VIEW_START_DATE)))
-          Config().googleAnalyticsGlabsViewId
-        else
-          Config().googleAnalyticsViewId
-      }
+      case "pageViews" => userGlabsAccountWhenAvailable
+      case "dailyUniqueUsers" => userGlabsAccountWhenAvailable
+      case _ => userGlabsAccountWhenAvailable
     }
   }
 
