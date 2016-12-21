@@ -290,7 +290,7 @@ object GoogleAnalytics {
   case class DailyViewCounts(seenPaths: Set[String], countStats: Map[String, Long])
 
   def loadPageViewsForDay(gaFilter: String, date: DateTime): Option[DailyViewCounts] = {
-    Logger.info(s"fetch ga analytics with filter ${gaFilter} for day ${date.toString("yyyy-MM-dd")}")
+    Logger.info(s"fetch pageView analytics with filter ${gaFilter} for day ${date.toString("yyyy-MM-dd")}")
 
     val dateRange = new DateRange().setStartDate(date.toString("yyyy-MM-dd")).setEndDate(date.toString("yyyy-MM-dd"))
 
@@ -298,7 +298,7 @@ object GoogleAnalytics {
     val uniqueViewMetric = new Metric().setExpression("ga:uniquePageviews").setAlias("uniquePageViews")
 
     val dateDimension = new Dimension().setName("ga:date")
-    val pathDimension = new Dimension().setName("ga:pagePath")
+    val pathDimension = new Dimension().setName("ga:pageTitle")
 
     val viewsReportRequest = new ReportRequest()
       .setDateRanges(List(dateRange))
@@ -307,11 +307,13 @@ object GoogleAnalytics {
       .setFiltersExpression(gaFilter)
       .setIncludeEmptyRows(true)
       .setSamplingLevel("LARGE")
-      .setViewId(Config().googleAnalyticsViewId)
+      .setViewId(getViewIdForReport("pageViews", Some(date)))
 
     val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
 
     val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+
+    reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"pageView analytics with filter ${gaFilter} for day ${date.toString("yyyy-MM-dd")}")}
 
     parseDailyViewCountsReport(reportResponse)
   }
@@ -324,7 +326,7 @@ object GoogleAnalytics {
       val header = report.getColumnHeader
       val dimensions = header.getDimensions
 
-      val pathDimIndex = dimensions.indexOf("ga:pagePath")
+      val pathDimIndex = dimensions.indexOf("ga:pageTitle")
 
       val metricHeaders = header.getMetricHeader.getMetricHeaderEntries
 
@@ -369,12 +371,13 @@ object GoogleAnalytics {
       .setFiltersExpression(s"ga:eventCategory==Click;ga:eventAction==External;ga:eventLabel==$trackingCode")
       .setIncludeEmptyRows(true)
       .setSamplingLevel("LARGE")
-      .setViewId(Config().googleAnalyticsViewId)
+      .setViewId(getViewIdForReport("ctaCtr"))
 
     val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
 
     val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
 
+    reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"CTA clicks for cta $trackingCode")}
     // this report has a single value, so just dive in grabbing the first entry at each level
     val clickCount = for(
       report <- reportResponse.getReports.headOption;
@@ -388,6 +391,29 @@ object GoogleAnalytics {
 
   // general GA connection stuff
 
+  private def warnIfDataIsSampled(report: Report, reportTitle: String): Unit = {
+    Option(report.getData.getSamplesReadCounts).foreach{ readCounts =>
+      val readcount = readCounts.headOption.getOrElse(0L)
+      val sampleSpace = Option(report.getData.getSamplingSpaceSizes).map(_.headOption.getOrElse(0L)).getOrElse(0L)
+
+      Logger.warn(s"warning $reportTitle is sampled. $readcount / $sampleSpace")
+
+    }
+  }
+
+  private val GLABS_VIEW_START_DATE = new DateTime("2016-12-11")
+
+  private def getViewIdForReport(reportType: String, date: Option[DateTime] = None): String = {
+    reportType match {
+      case "ctaCtr" => Config().googleAnalyticsViewId
+      case "pageViews" => {
+        if(date.exists(_.isAfter(GLABS_VIEW_START_DATE)))
+          Config().googleAnalyticsGlabsViewId
+        else
+          Config().googleAnalyticsViewId
+      }
+    }
+  }
 
   private def initialiseGaClient = {
 

@@ -58,6 +58,7 @@ sealed trait Config {
   private val remoteConfiguration: Map[String, String] = loadRemoteConfiguration
 
   lazy val googleAnalyticsViewId = getRequiredRemoteStringProperty("googleAnalytivsViewId")
+  lazy val googleAnalyticsGlabsViewId = getRequiredRemoteStringProperty("googleAnalytivsGlabsViewId")
 
   lazy val capiKey = getRequiredRemoteStringProperty("capi.key")
   lazy val capiPreviewUrl = getRequiredRemoteStringProperty("capi.preview.url")

@@ -125,7 +125,10 @@ object CampaignPageViewsReport {
       campaign <- CampaignRepository.getCampaign(campaignId);
       startDate <- campaign.startDate
     ) yield {
-      val dailyReports = calculateDatesToFetch(startDate, DateTime.now).map(loadCampaignPageViewsForDay(campaign, _))
+      val dailyReports = calculateDatesToFetch(startDate, DateTime.now).map{ dt =>
+        Thread.sleep(1000) // try to avoid rate limiting
+        loadCampaignPageViewsForDay(campaign, dt)
+      }
 
       val emptyReport = CampaignPageViewsReport(campaignId, Set(), Nil)
       val report = dailyReports.foldLeft(emptyReport) { case (report: CampaignPageViewsReport, (date: DateTime, dailyViewCounts: DailyViewCounts)) =>
@@ -142,26 +145,7 @@ object CampaignPageViewsReport {
     val dailyCounts = if (campaign.`type` == "hosted") {
       campaign.gaFilterExpression.flatMap(GoogleAnalytics.loadPageViewsForDay(_, date))
     } else {
-      val contentStats = for (
-        content <- CampaignContentRepository.getContentForCampaign(campaign.id).filter(_.isLive);
-        path <- content.path
-      ) yield {
-        val gaFilter = s"ga:pagePath==/$path"
-        GoogleAnalytics.loadPageViewsForDay(gaFilter, date)
-      }
-
-      val pathStats = contentStats.flatten
-
-      if(pathStats.isEmpty) {
-        Some(DailyViewCounts(Set(), Map()))
-      } else {
-        Some(pathStats.reduce { (a: DailyViewCounts, b: DailyViewCounts) =>
-          DailyViewCounts(
-            seenPaths = a.seenPaths ++ b.seenPaths,
-            countStats = a.countStats ++ b.countStats
-          )
-        })
-      }
+      campaign.pathPrefix.flatMap{ section => GoogleAnalytics.loadPageViewsForDay(s"ga:dimension4==${section}", date)}
     }
 
     date -> calculateDailyTotals(dailyCounts)
@@ -182,8 +166,12 @@ object CampaignPageViewsReport {
     }
   }
 
+  val GA_SWITCH_ON_DATE = new DateTime("2016-07-01")
+
   def calculateDatesToFetch(startDate: DateTime, endDate: DateTime): List[DateTime] = {
-    var date = startDate.withTimeAtStartOfDay()
+
+    val sd = if(startDate.isBefore(GA_SWITCH_ON_DATE)) GA_SWITCH_ON_DATE else startDate
+    var date = sd.withTimeAtStartOfDay()
     val endDay = endDate.withTimeAtStartOfDay()
     var daysInRange: List[DateTime] = Nil
 
