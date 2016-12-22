@@ -212,9 +212,12 @@ object LineItemSummary {
     } yield {
       val dfpLineItemService = Dfp.mkLineItemService(Dfp.mkSession())
       def fetch(orderIds: Seq[Long]): Seq[LineItemSummary] =
-        Dfp.fetchSuggestedLineItems(campaign.name, client.name, dfpLineItemService, orderIds) map {
+        Dfp.fetchSuggestedLineItems(campaign.name, client.name, dfpLineItemService, orderIds) filterNot {
+          // DFP won't let you update archived line items
+          _.getIsArchived
+        } map {
           LineItemSummary.fromLineItem
-      }
+        }
       Map(
         "Native cards" -> fetch(nativeCardOrderIds),
         "Merchandising" -> fetch(merchandisingCardOrderIds)
