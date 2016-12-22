@@ -1,17 +1,16 @@
 package repositories
 
-import ai.x.play.json.Jsonx
-import com.amazonaws.services.dynamodbv2.document.Item
+import java.util.concurrent.Executors
+
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
-import model.{CampaignDailyCountsReport, CampaignSummary, TrafficDriverGroupStats}
+import model.reports._
+import model.{Campaign, CampaignDailyCountsReport, CampaignSummary, TrafficDriverGroupStats}
 import org.joda.time.DateTime
-import play.api.Logger
-import play.api.libs.json.{Format, Json, Reads}
+import play.api.libs.json.{Json, Reads}
 import services.Dynamo
-import util.Compression
 
 import scala.collection.JavaConversions._
-import scala.util.control.NonFatal
+import scala.concurrent.ExecutionContext
 
 sealed trait CacheResult[+A] extends Product {
 
@@ -38,62 +37,10 @@ case object Miss extends CacheResult[Nothing] {
   def get = throw new NoSuchElementException("Miss.get")
 }
 
-case class AnalyticsDataCacheEntrySummary(key: String, dataType: String, expires: Option[Long], written: Long)
-
-object AnalyticsDataCacheEntrySummary {
-  implicit val analyticsDataCacheEntrySummaryFormat: Format[AnalyticsDataCacheEntrySummary] = Jsonx.formatCaseClass[AnalyticsDataCacheEntrySummary]
-
-  def fromItem(item: Item) = try {
-    Json.parse(item.toJSON).as[AnalyticsDataCacheEntrySummary]
-  } catch {
-    case NonFatal(e) => {
-      Logger.error(s"failed to parse analytics data cache item summary ${item.toJSON}", e)
-      throw e
-    }
-  }
-}
-
-case class AnalyticsDataCacheEntry(key: String, dataType: String, data: String, expires: Option[Long], written: Long) {
-  //def toItem = Item.fromJSON(Json.toJson(this).toString())
-
-  def toItem = {
-    val item = new Item()
-      .withString("key", key)
-      .withString("dataType", dataType)
-      .withBinary("compressedData", Compression.compress(data))
-      .withLong("written", written)
-
-    expires.foreach(item.withLong("expires", _))
-
-    item
-  }
-
-}
-
-object AnalyticsDataCacheEntry {
-  implicit val analyticsDataCacheEntryFormat: Format[AnalyticsDataCacheEntry] = Jsonx.formatCaseClass[AnalyticsDataCacheEntry]
-
-  def fromItem(item: Item) = try {
-    if (item.isPresent("compressedData")) {
-      AnalyticsDataCacheEntry(
-        key = item.getString("key"),
-        dataType = item.getString("dataType"),
-        data = Compression.decompress(item.getBinary("compressedData")),
-        expires = if(item.isPresent("expires")) Some(item.getLong("expires")) else None,
-        written = item.getLong("written")
-      )
-    } else {
-      Json.parse(item.toJSON).as[AnalyticsDataCacheEntry]
-    }
-  } catch {
-    case NonFatal(e) => {
-      Logger.error(s"failed to parse analytics data cache item ${item.toJSON}", e)
-      throw e
-    }
-  }
-}
 
 object AnalyticsDataCache {
+
+  implicit val analyticsExectuionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(50))
 
   def deleteCacheEntry(key: String, dataType: String): Unit = {
     Dynamo.analyticsDataCacheTable.deleteItem("key", key, "dataType", dataType)
@@ -101,6 +48,16 @@ object AnalyticsDataCache {
 
   def putCampaignDailyCountsReport(campaignId: String, data: CampaignDailyCountsReport, validToTimestamp: Option[Long]): Unit = {
     val entry = AnalyticsDataCacheEntry(campaignId, "CampaignDailyCountsReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
+  def putCampaignPageViewsReport(campaignId: String, data: CampaignPageViewsReport, validToTimestamp: Option[Long]): Unit = {
+    val entry = AnalyticsDataCacheEntry(campaignId, "CampaignPageViewsReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
+  def putDailyUniqueUsersReport(campaignId: String, data: DailyUniqueUsersReport, validToTimestamp: Option[Long]): Unit = {
+    val entry = AnalyticsDataCacheEntry(campaignId, "DailyUniqueUsersReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
@@ -114,7 +71,7 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
-  def putCampaignCtaClicksReport(campaignId: String, data: Map[String, Long], validToTimestamp: Option[Long]): Unit = {
+  def putCampaignCtaClicksReport(campaignId: String, data: CtaClicksReport, validToTimestamp: Option[Long]): Unit = {
     val entry = AnalyticsDataCacheEntry(campaignId, "CtaClicksReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
@@ -147,6 +104,14 @@ object AnalyticsDataCache {
     getEntry[CampaignDailyCountsReport](campaignId, "CampaignDailyCountsReport")
   }
 
+  def getCampaignPageViewsReport(campaignId: String): CacheResult[CampaignPageViewsReport] = {
+    getEntry[CampaignPageViewsReport](campaignId, "CampaignPageViewsReport")
+  }
+
+  def getDailyUniqueUsersReport(campaignId: String): CacheResult[DailyUniqueUsersReport] = {
+    getEntry[DailyUniqueUsersReport](campaignId, "DailyUniqueUsersReport")
+  }
+
   def getCampaignSummary(campaignId: String): CacheResult[CampaignSummary] = {
     getEntry[CampaignSummary](campaignId, "CampaignSummary")
   }
@@ -156,8 +121,8 @@ object AnalyticsDataCache {
 
   }
 
-  def getCampaignCtaClicksReport(campaignId: String): CacheResult[Map[String, Long]] = {
-    getEntry[Map[String, Long]](campaignId, "CtaClicksReport")
+  def getCampaignCtaClicksReport(campaignId: String): CacheResult[CtaClicksReport] = {
+    getEntry[CtaClicksReport](campaignId, "CtaClicksReport")
   }
 
   def summariseContents = {
@@ -168,4 +133,12 @@ object AnalyticsDataCache {
 
   def getCampaignTrafficDriverGroupStats( campaignId: String): CacheResult[Seq[TrafficDriverGroupStats]] =
     getEntry[Seq[TrafficDriverGroupStats]](campaignId, "TrafficDriverGroupStats")
+
+  def calculateValidToDateForDailyStats(campaign: Campaign): Option[Long] = {
+    val campaignFinished = for (
+      d <- campaign.endDate
+    ) yield {d.isBeforeNow}
+
+    if(campaignFinished.getOrElse(false)) None else { Some( DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis) }
+  }
 }

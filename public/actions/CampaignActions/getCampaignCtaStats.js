@@ -11,7 +11,7 @@ function requestCampaignCtaStats(id) {
 function receiveCampaignCtaStats(campaignCtaStats) {
     return {
         type:        'CAMPAIGN_CTA_STATS_GET_RECEIVE',
-        campaignCtaStats:    campaignCtaStats,
+        campaignCtaStats:    campaignCtaStats.data,
         receivedAt:  Date.now()
     };
 }
