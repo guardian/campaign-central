@@ -21,7 +21,7 @@ case class DailyUniqueUsersReport(campaignId: String, dailyUniqueUsers: List[Dai
       campaign <- CampaignRepository.getCampaign(campaignId);
       lastData <- dailyUniqueUsers.lastOption
     ) {
-      val missingDays = DateBasedReport.calculateDatesToFetch(lastData.date.plusDays(1), DateTime.now)
+      val missingDays = DateBasedReport.calculateDatesToFetch(lastData.date.plusDays(1), campaign.endDate)
       val dailyReports = missingDays.map(DailyUniqueUsersReport.loadCampaignDailyUniquesForDay(campaign, _))
 
       val refreshed = dailyReports.foldLeft(this) { case (report: DailyUniqueUsersReport, (date: DateTime, dailyUniqueUsers: Long)) =>
@@ -84,7 +84,7 @@ object DailyUniqueUsersReport {
       campaign <- CampaignRepository.getCampaign(campaignId);
       startDate <- campaign.startDate
     ) yield {
-      val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, DateTime.now).map{ dt =>
+      val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate).map{ dt =>
         Thread.sleep(1000) // try to avoid rate limiting
         loadCampaignDailyUniquesForDay(campaign, dt)
       }

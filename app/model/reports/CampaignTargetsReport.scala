@@ -31,7 +31,7 @@ object CampaignTargetsReport {
     ) yield {
 
       val campaignLength = new Duration(startDate, endDate).getStandardDays
-      val reportRange = DateBasedReport.calculateDatesToFetch(startDate, DateTime.now)
+      val reportRange = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate)
 
       CampaignTargetsReport(
         campaign.targets.keys.map { targetName =>

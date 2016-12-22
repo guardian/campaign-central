@@ -53,7 +53,7 @@ POST   /management/api/refreshExpiringCampaigns         controllers.ManagementAp
 GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
 # Migration
-GET /migration/addCampaignTypes   controllers.Migration.addCampaignType()
+GET /migration/buildDailyReports   controllers.Migration.buildDailyReports
 
 
 # Management
