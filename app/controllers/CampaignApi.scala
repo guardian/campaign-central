@@ -3,7 +3,7 @@ package controllers
 import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
-import model.reports.{CampaignPageViewsReport, CtaClicksReport, DailyUniqueUsersReport}
+import model.reports.{CampaignPageViewsReport, CampaignTargetsReport, CtaClicksReport, DailyUniqueUsersReport}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json._
@@ -50,6 +50,10 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
   def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { req =>
     DailyUniqueUsersReport.getDailyUniqueUsersReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+  }
+
+  def getCampaignTargetsReport(id: String) = APIAuthAction { req =>
+    CampaignTargetsReport.getCampaignTargetsReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
   def getCampaignContent(id: String) =  APIAuthAction { req =>
