@@ -15,7 +15,9 @@ class Campaign extends React.Component {
     if (nextProps.campaign && (!this.props.campaign || nextProps.campaign.id !== this.props.campaign.id)) {
       this.props.campaignAnalyticsActions.clearCampaignAnalytics();
       if (this.isAnalysisAvailable(nextProps.campaign)) {
-        this.props.campaignAnalyticsActions.getCampaignAnalytics(nextProps.campaign.id)
+        this.props.campaignAnalyticsActions.getCampaignPageViews(nextProps.campaign.id);
+        this.props.campaignAnalyticsActions.getCampaignDailyUniques(nextProps.campaign.id);
+        this.props.campaignAnalyticsActions.getCampaignTargetsReport(nextProps.campaign.id);
       }
     }
   }
@@ -63,7 +65,9 @@ import * as updateCampaign from '../../actions/CampaignActions/updateCampaign';
 import * as saveCampaign from '../../actions/CampaignActions/saveCampaign';
 import * as deleteCampaign from '../../actions/CampaignActions/deleteCampaign';
 import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
-import * as getCampaignAnalytics from '../../actions/CampaignActions/getCampaignAnalytics';
+import * as getCampaignPageViews from '../../actions/CampaignActions/getCampaignPageViews';
+import * as getCampaignDailyUniques from '../../actions/CampaignActions/getCampaignDailyUniques';
+import * as getCampaignTargetsReport from '../../actions/CampaignActions/getCampaignTargetsReport';
 import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
 
 function mapStateToProps(state) {
@@ -75,7 +79,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignAnalytics, clearCampaignAnalytics), dispatch)
+    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignDailyUniques, getCampaignTargetsReport, clearCampaignAnalytics), dispatch)
   };
 }
 

@@ -43,9 +43,8 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     NoContent
   }
 
-  def getCampaignAnalytics(id: String) = APIAuthAction { req =>
-    //CampaignPageViewsReport.getCampaignPageViewsReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
-    GoogleAnalytics.getAnalyticsForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+  def getCampaignPageViews(id: String) = APIAuthAction { req =>
+    CampaignPageViewsReport.getCampaignPageViewsReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
   def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { req =>

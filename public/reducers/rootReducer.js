@@ -3,7 +3,9 @@ import error from './errorReducer';
 import config from './configReducer';
 import campaigns from './campaignsReducer';
 import campaign from './campaignReducer';
-import campaignAnalytics from './campaignAnalyticsReducer';
+import campaignPageViews from './campaignPageViewsReducer';
+import campaignDailyUniques from './campaignDailyUniquesReducer';
+import campaignTargetsReport from './campaignTargetsReportReducer';
 import campaignCtaStats from './campaignCtaStatsReducer';
 import clients from './clientsReducer';
 import client from './clientReducer';
@@ -23,7 +25,9 @@ export default combineReducers({
   config,
   campaigns,
   campaign,
-  campaignAnalytics,
+  campaignPageViews,
+  campaignDailyUniques,
+  campaignTargetsReport,
   campaignCtaStats,
   clients,
   client,
