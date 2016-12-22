@@ -65,6 +65,23 @@ export function fetchCampaignTrafficDrivers(id) {
   });
 }
 
+export function fetchCampaignTrafficDriverSuggestions(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/suggest-drivers',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
+export function acceptSuggestedCampaignTrafficDriver(campaignId, trafficDriverId) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + campaignId + '/driver/' + trafficDriverId,
+    contentType: 'application/json',
+    data: {null},
+    method: 'put'
+  });
+}
+
 export function fetchCampaignTrafficDriverStats(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/driverstats',
