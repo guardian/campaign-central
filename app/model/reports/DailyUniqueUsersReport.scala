@@ -21,7 +21,7 @@ case class DailyUniqueUsersReport(campaignId: String, dailyUniqueUsers: List[Dai
       campaign <- CampaignRepository.getCampaign(campaignId);
       lastData <- dailyUniqueUsers.lastOption
     ) {
-      val missingDays = CampaignPageViewsReport.calculateDatesToFetch(lastData.date.plusDays(1), DateTime.now)
+      val missingDays = DateBasedReport.calculateDatesToFetch(lastData.date.plusDays(1), DateTime.now)
       val dailyReports = missingDays.map(DailyUniqueUsersReport.loadCampaignDailyUniquesForDay(campaign, _))
 
       val refreshed = dailyReports.foldLeft(this) { case (report: DailyUniqueUsersReport, (date: DateTime, dailyUniqueUsers: Long)) =>
@@ -84,7 +84,7 @@ object DailyUniqueUsersReport {
       campaign <- CampaignRepository.getCampaign(campaignId);
       startDate <- campaign.startDate
     ) yield {
-      val dailyReports = calculateDatesToFetch(startDate, DateTime.now).map{ dt =>
+      val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, DateTime.now).map{ dt =>
         Thread.sleep(1000) // try to avoid rate limiting
         loadCampaignDailyUniquesForDay(campaign, dt)
       }
@@ -110,20 +110,4 @@ object DailyUniqueUsersReport {
     date -> dailyCount.getOrElse(0L)
   }
 
-  val GA_SWITCH_ON_DATE = new DateTime("2016-07-01")
-
-  def calculateDatesToFetch(startDate: DateTime, endDate: DateTime): List[DateTime] = {
-
-    val sd = if(startDate.isBefore(GA_SWITCH_ON_DATE)) GA_SWITCH_ON_DATE else startDate
-    var date = sd.withTimeAtStartOfDay()
-    val endDay = endDate.withTimeAtStartOfDay()
-    var daysInRange: List[DateTime] = Nil
-
-    while (date.isBefore(endDay)) {
-      daysInRange = daysInRange :+ date
-      date = date.plusDays(1)
-    }
-
-    daysInRange
-  }
 }
