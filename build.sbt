@@ -24,7 +24,6 @@ lazy val dependencies = Seq(
   "com.gu" % "kinesis-logback-appender" % "1.3.0",
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "org.slf4j" % "jcl-over-slf4j" % slf4jVersion,
-  "org.joda" % "joda-convert" % "1.8.1",
   "com.google.api-ads" % "dfp-axis" % "2.22.0",
   "com.google.guava" % "guava" % "20.0",
   "org.scalatest" %% "scalatest" % "3.0.1" % Test
