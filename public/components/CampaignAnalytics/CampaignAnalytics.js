@@ -12,9 +12,17 @@ class CampaignAnalytics extends React.Component {
     return (analysableStatus && campaign.startDate && campaign.pathPrefix );
   }
 
-  getLatestCounts() {
+  getLatestPageViews() {
     if(this.props.campaignPageViews) {
       return this.props.campaignPageViews.pageCountStats[this.props.campaignPageViews.pageCountStats.length - 1];
+    }
+
+    return undefined;
+  }
+
+  getLatestUniqueUsers() {
+    if(this.props.campaignDailyUniques) {
+      return this.props.campaignDailyUniques.dailyUniqueUsers[this.props.campaignDailyUniques.dailyUniqueUsers.length - 1];
     }
 
     return undefined;
@@ -33,11 +41,18 @@ class CampaignAnalytics extends React.Component {
       <div>
         <div className="campaign-info__body">
 
-          <CampaignPerformanceSummary campaign={this.props.campaign} paths={this.props.campaignPageViews.seenPaths}
-                                      latestCounts={this.getLatestCounts()}/>
+          <CampaignPerformanceSummary campaign={this.props.campaign}
+                                      paths={this.props.campaignPageViews.seenPaths}
+                                      latestPageViews={this.getLatestPageViews()}
+                                      latestDailyUniques={this.getLatestUniqueUsers()}
+                                      targets={this.props.campaignTargetsReport}
+          />
+
           <CampaignDailyTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}/>
+
           <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}
                                                paths={this.props.campaignPageViews.seenPaths}/>
+
           {this.props.campaignPageViews.seenPaths.map((p) =>
             <ContentTrafficChart key={p} pageCountStats={this.props.campaignPageViews.pageCountStats} path={p}/>
           )}
@@ -57,7 +72,9 @@ import { bindActionCreators } from 'redux';
 
 function mapStateToProps(state) {
   return {
-    campaignPageViews: state.campaignPageViews
+    campaignPageViews: state.campaignPageViews,
+    campaignDailyUniques: state.campaignDailyUniques,
+    campaignTargetsReport: state.campaignTargetsReport
   };
 }
 
