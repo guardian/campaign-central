@@ -10,6 +10,14 @@ class CampaignDailyTrafficChart extends React.Component {
     pageCountStats: PropTypes.arrayOf(pageCountStatPropType).isRequired
   };
 
+  combineData() {
+    if (this.props.dailyUniques) {
+      return this.props.pageCountStats.map((p, index) => Object.assign(p, this.props.dailyUniques[index]));
+    }
+
+    return this.props.pageCountStats
+  }
+
   render () {
 
     return (
@@ -17,12 +25,12 @@ class CampaignDailyTrafficChart extends React.Component {
         <div className="campaign-box__header">Daily page views</div>
         <div className="campaign-box__body">
           <ResponsiveContainer height={300} width="90%">
-            <LineChart data={this.props.pageCountStats}>
+            <LineChart data={this.combineData()}>
               <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
               <YAxis label="Views"/>
-              <Line type="linear" dataKey="count-total" stroke={getStrokeColour(0)}  name="Page Views"/>
-              <Line type="linear" dataKey="unique-total" stroke={getStrokeColour(1)} name="Uniques"/>
-              <Line type="linear" dataKey="target-uniques" stroke={getStrokeColour(2)} name="Daily target uniques" dot={false}/>
+              <Line type="linear" dataKey="count-total" stroke={getStrokeColour(0)}  name="Page views"/>
+              <Line type="linear" dataKey="unique-total" stroke={getStrokeColour(1)} name="Unique views"/>
+              <Line type="linear" dataKey="uniqueUsers" stroke={getStrokeColour(3)} name="Estimated unique users"/>
               <Tooltip labelFormatter={formatMillisecondDate} />
               <Legend />
             </LineChart>

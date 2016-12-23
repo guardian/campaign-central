@@ -9,9 +9,7 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
   combineData() {
     if (this.props.targets && this.props.targets.targets.uniques) {
       const targetRunRate = this.props.targets.targets.uniques.runRate;
-      var combined = this.props.dailyUniques.map((p, index) => Object.assign(p, targetRunRate[index]));
-      console.log(combined);
-      return combined;
+      return this.props.dailyUniques.map((p, index) => Object.assign(p, targetRunRate[index]));
     }
 
     return this.props.dailyUniques

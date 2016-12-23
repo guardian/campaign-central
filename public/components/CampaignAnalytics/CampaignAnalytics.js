@@ -55,7 +55,9 @@ class CampaignAnalytics extends React.Component {
           <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}
                                                paths={this.props.campaignPageViews.seenPaths}/>
 
-          <CampaignDailyTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}/>
+          <CampaignDailyTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}
+                                     dailyUniques={this.props.campaignDailyUniques.dailyUniqueUsers}
+          />
 
           {this.props.campaignPageViews.seenPaths.map((p) =>
             <ContentTrafficChart key={p} pageCountStats={this.props.campaignPageViews.pageCountStats} path={p}/>
