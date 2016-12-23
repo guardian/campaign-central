@@ -22,7 +22,6 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
               <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
               <YAxis label="Views"/>
               <Tooltip labelFormatter={formatMillisecondDate} />
-              <Legend />
               <Line type="linear" dataKey="cumulative-target-uniques" stroke={getStrokeColour(0)} name="Target uniques" dot={false}/>
               {this.props.paths.map((p, index) =>
                 <Area key={index}
