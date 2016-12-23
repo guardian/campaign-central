@@ -5,6 +5,7 @@ import CampaignDailyUniquesChart from "./Analytics/CampaignDailyUniquesChart";
 import CampaignDailyTrafficChart from "./Analytics/CampaignDailyTrafficChart";
 import CampaignPagesCumulativeTrafficChart from "./Analytics/CampaignPagesCumulativeTrafficChart";
 import ContentTrafficChart from "./Analytics/ContentTrafficChart";
+import CampaignQualifiedChart from "./Analytics/CampaignQualifiedChart";
 import CampaignTrafficDriverStatsChart from "./Analytics/CampaignTrafficDriverStatsChart";
 
 class CampaignAnalytics extends React.Component {
@@ -64,6 +65,8 @@ class CampaignAnalytics extends React.Component {
           <CampaignDailyTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}
                                      dailyUniques={this.props.campaignDailyUniques.dailyUniqueUsers}
           />
+
+          <CampaignQualifiedChart />
 
           {this.props.campaignPageViews.seenPaths.map((p) =>
             <ContentTrafficChart key={p} pageCountStats={this.props.campaignPageViews.pageCountStats} path={p}/>
