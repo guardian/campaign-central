@@ -3,7 +3,7 @@ import {LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsiv
 import {formatMillisecondDate, shortFormatMillisecondDate} from '../../../util/dateFormatter'
 import {formatPath, getStrokeColour, getFillColour} from '../../../util/analyticsHelper'
 
-class CampaignPagesCumulativeTrafficChart extends React.Component {
+class CampaignDailyUniquesChart extends React.Component {
 
 
   combineData() {
@@ -37,4 +37,4 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
   }
 }
 
-export default CampaignPagesCumulativeTrafficChart;
+export default CampaignDailyUniquesChart;

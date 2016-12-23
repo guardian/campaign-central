@@ -1,5 +1,6 @@
 import React, {PropTypes} from "react";
 import CampaignPerformanceSummary from "./Analytics/CampaignPerformanceSummary";
+import CampaignContentContributionPie from "./Analytics/CampaignContentContributionPie";
 import CampaignDailyUniquesChart from "./Analytics/CampaignDailyUniquesChart";
 import CampaignDailyTrafficChart from "./Analytics/CampaignDailyTrafficChart";
 import CampaignPagesCumulativeTrafficChart from "./Analytics/CampaignPagesCumulativeTrafficChart";
@@ -47,6 +48,11 @@ class CampaignAnalytics extends React.Component {
                                       latestPageViews={this.getLatestPageViews()}
                                       latestDailyUniques={this.getLatestUniqueUsers()}
                                       targets={this.props.campaignTargetsReport}
+          />
+
+          <CampaignContentContributionPie campaign={this.props.campaign}
+                                      paths={this.props.campaignPageViews.seenPaths}
+                                      latestPageViews={this.getLatestPageViews()}
           />
 
           <CampaignDailyUniquesChart dailyUniques={this.props.campaignDailyUniques.dailyUniqueUsers}
