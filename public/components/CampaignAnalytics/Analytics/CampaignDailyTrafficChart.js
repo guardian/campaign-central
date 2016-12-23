@@ -28,9 +28,9 @@ class CampaignDailyTrafficChart extends React.Component {
             <LineChart data={this.combineData()}>
               <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
               <YAxis label="Views"/>
-              <Line type="linear" dataKey="count-total" stroke={getStrokeColour(0)}  name="Page views"/>
-              <Line type="linear" dataKey="unique-total" stroke={getStrokeColour(1)} name="Unique views"/>
-              <Line type="linear" dataKey="uniqueUsers" stroke={getStrokeColour(3)} name="Estimated unique users"/>
+              <Line type="linear" dataKey="count-total" stroke={getStrokeColour(0)}  name="Page views" dot={false}/>
+              <Line type="linear" dataKey="unique-total" stroke={getStrokeColour(1)} name="Unique views" dot={false} />
+              <Line type="linear" dataKey="uniqueUsers" stroke={getStrokeColour(3)} name="Estimated unique users" dot={false} />
               <Tooltip labelFormatter={formatMillisecondDate} />
               <Legend />
             </LineChart>

@@ -65,7 +65,7 @@ class CampaignPerformanceSummary extends React.Component {
 
     var estimatedUniques = this.getEstimatedUniques();
     if (estimatedUniques) {
-      data.push( {name: "estimated Uniques", count: estimatedUniques, fill: getFillColour(index++)} );
+      data.push( {name: "estimated uniques", count: estimatedUniques, fill: getFillColour(index++)} );
     }
 
     var targetPageViews = this.getCampaignTargetPageViews();
