@@ -15,7 +15,7 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
 
     return (
       <div className="analytics-chart--half-width">
-        <div className="campaign-box__header">Cumulative uniques</div>
+        <div className="campaign-box__header">Cumulative page views</div>
         <div className="campaign-box__body">
           <ResponsiveContainer height={300} width="90%">
             <ComposedChart data={this.props.pageCountStats}>

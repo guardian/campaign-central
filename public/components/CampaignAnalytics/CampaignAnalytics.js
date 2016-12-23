@@ -1,5 +1,6 @@
 import React, {PropTypes} from "react";
 import CampaignPerformanceSummary from "./Analytics/CampaignPerformanceSummary";
+import CampaignDailyUniquesChart from "./Analytics/CampaignDailyUniquesChart";
 import CampaignDailyTrafficChart from "./Analytics/CampaignDailyTrafficChart";
 import CampaignPagesCumulativeTrafficChart from "./Analytics/CampaignPagesCumulativeTrafficChart";
 import ContentTrafficChart from "./Analytics/ContentTrafficChart";
@@ -48,10 +49,13 @@ class CampaignAnalytics extends React.Component {
                                       targets={this.props.campaignTargetsReport}
           />
 
-          <CampaignDailyTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}/>
+          <CampaignDailyUniquesChart dailyUniques={this.props.campaignDailyUniques.dailyUniqueUsers}
+                                     targets={this.props.campaignTargetsReport}/>
 
           <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}
                                                paths={this.props.campaignPageViews.seenPaths}/>
+
+          <CampaignDailyTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}/>
 
           {this.props.campaignPageViews.seenPaths.map((p) =>
             <ContentTrafficChart key={p} pageCountStats={this.props.campaignPageViews.pageCountStats} path={p}/>
