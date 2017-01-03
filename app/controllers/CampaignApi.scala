@@ -3,7 +3,7 @@ package controllers
 import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
-import model.reports.{CampaignPageViewsReport, CampaignTargetsReport, CtaClicksReport, DailyUniqueUsersReport}
+import model.reports._
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json._
@@ -19,7 +19,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   }
 
   def getAnalyticsSummary() = APIAuthAction { req =>
-    Ok(Json.toJson(AnalyticsDataCache.getOverallSummary().getOrElse(Map())))
+    Ok(Json.toJson(OverallSummaryReport.getOverallSummaryReport().getOrElse(OverallSummaryReport(Map()))))
   }
 
   def getCampaign(id: String) = APIAuthAction { req =>

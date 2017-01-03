@@ -7,7 +7,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.http.{HttpRequest, HttpRequestInitializer}
 import com.google.api.services.analyticsreporting.v4.model._
 import com.google.api.services.analyticsreporting.v4.{AnalyticsReporting, AnalyticsReportingScopes}
-import model.{Campaign, CampaignDailyCountsReport, CampaignSummary}
+import model.{Campaign, CampaignDailyCountsReport}
 import org.joda.time.{DateTime, Duration}
 import org.joda.time.format.ISODateTimeFormat
 import play.api.Logger
@@ -65,28 +65,9 @@ object GoogleAnalytics {
       val expiry = campaign.flatMap(AnalyticsDataCache.calculateValidToDateForDailyStats)
 
       AnalyticsDataCache.putCampaignDailyCountsReport(campaignId, data, expiry)
-      storeSummaryForCampaign(campaignId, data, expiry)
     }
 
     report
-  }
-
-  private def storeSummaryForCampaign(campaignId: String, report: CampaignDailyCountsReport, expiry: Option[Long]) {
-    val mostRecentStats = report.pageCountStats.last
-
-    val totalUniques = mostRecentStats.getOrElse("cumulative-unique-total", 0L)
-    val targetToDate = mostRecentStats.getOrElse("cumulative-target-uniques", 0L)
-
-    val campaignSummary = CampaignSummary(totalUniques, targetToDate)
-    AnalyticsDataCache.putCampaignSummary(campaignId, campaignSummary, expiry)
-
-    updateOverallSummary(campaignId, campaignSummary)
-  }
-
-  private def updateOverallSummary(campaignId: String, campaignSummary: CampaignSummary): Unit = {
-    val overallSummary = AnalyticsDataCache.getOverallSummary().getOrElse(Map())
-
-    AnalyticsDataCache.putOverallSummary(overallSummary + (campaignId -> campaignSummary))
   }
 
   private def cleanAndConvertRawDailyCounts(rawDailyCounts: ParsedDailyCountsReport, dailyUniqueTargetValue: Option[Long]): CampaignDailyCountsReport = {
