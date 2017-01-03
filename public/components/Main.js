@@ -33,7 +33,7 @@ class Main extends React.Component {
         <Header />
         {this.renderErrorBar()}
         <div className="main__sidebar">
-          <Sidebar />
+          <Sidebar query={this.props.location.query}/>
         </div>
         <div className="main__content">
           {this.props.children}
