@@ -83,6 +83,8 @@ class CampaignList extends React.Component {
               <span> Finish date </span>
               <span className={ this.setHeaderCssClass('endDate') } ref="sort-endDate"> &nbsp; </span>
             </th>
+            <th className="campaign-list__header">Days left</th>
+            <th className="campaign-list__header">Target</th>
             <th className="campaign-list__header">Uniques</th>
           </tr>
         </thead>
