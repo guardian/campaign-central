@@ -54,6 +54,7 @@ GET /assets/*file                 controllers.Assets.versioned(path="/public", f
 
 # Migration
 GET /migration/buildDailyReports   controllers.Migration.buildDailyReports
+GET /migration/rebuildCampaignSummaries   controllers.Migration.rebuildCampaignSummaries
 
 
 # Management
