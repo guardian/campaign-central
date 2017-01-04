@@ -69,7 +69,7 @@ class CampaignListItem extends React.Component {
 
     return (
       <tr className="campaign-list__row" onClick={this.redirectToCampaign}>
-        <td className="campaign-list__item">{this.props.campaign.name}<br/>{image}</td>
+        <td className="campaign-list__item">{this.props.campaign.name}{image}</td>
         <td className="campaign-list__item">{this.props.campaign.type}</td>
         <td className="campaign-list__item">{this.props.campaign.status}</td>
         <td className="campaign-list__item">{this.props.campaign.actualValue}</td>
