@@ -98,8 +98,6 @@ function mapStateToProps(state) {
   return {
     campaigns: state.campaigns,
     overallAnalyticsSummary: state.overallAnalyticsSummary,
-    campaignStateFilter: state.campaignStateFilter,
-    campaignTypeFilter: state.campaignTypeFilter,
     campaignSortColumn: state.campaignSort.campaignSortColumn,
     campaignSortOrder: state.campaignSort.campaignSortOrder
   };

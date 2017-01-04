@@ -1,15 +1,7 @@
 import React, { PropTypes } from 'react';
 import {Link} from 'react-router';
 
-class Sidebar extends React.Component {
-
-  setCampaignStateFilter = (f) => {
-    this.props.uiActions.setCampaignStateFilter(f);
-  };
-
-  setCampaignTypeFilter = (f) => {
-    this.props.uiActions.setCampaignTypeFilter(f);
-  };
+export default class Sidebar extends React.Component {
 
   filterLink = (changeValue, displayName) => {
     var query = Object.assign({}, this.props.query, changeValue);
@@ -63,24 +55,3 @@ class SidebarLink extends React.Component {
     </Link>;
   }
 }
-
-//REDUX CONNECTIONS
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as setCampaignStateFilter from '../../actions/UIActions/setCampaignStateFilter';
-import * as setCampaignTypeFilter from '../../actions/UIActions/setCampaignTypeFilter';
-
-function mapStateToProps(state) {
-  return {
-    campaignStateFilter: state.campaignStateFilter,
-    campaignTypeFilter: state.campaignTypeFilter
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    uiActions: bindActionCreators(Object.assign({}, setCampaignStateFilter, setCampaignTypeFilter), dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);
