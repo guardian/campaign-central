@@ -10,10 +10,10 @@ class Campaigns extends Component {
   filterCampaigns = (campaigns) => {
     var filtered = campaigns;
 
-    var stateFilter = this.props.location.query.state;
+    var stateFilter = this.props.location.query.state || 'live';
     var typeFilter = this.props.location.query.type;
 
-    if (stateFilter) {
+    if (stateFilter && stateFilter !== 'all') {
       filtered = filtered.filter((c) => c.status === stateFilter);
     }
 
@@ -98,8 +98,6 @@ function mapStateToProps(state) {
   return {
     campaigns: state.campaigns,
     overallAnalyticsSummary: state.overallAnalyticsSummary,
-    campaignStateFilter: state.campaignStateFilter,
-    campaignTypeFilter: state.campaignTypeFilter,
     campaignSortColumn: state.campaignSort.campaignSortColumn,
     campaignSortOrder: state.campaignSort.campaignSortOrder
   };

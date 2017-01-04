@@ -13,8 +13,6 @@ import campaignTrafficDriverSuggestions from './campaignTrafficDriverSuggestions
 import campaignTrafficDriversDirty from './campaignTrafficDriversDirtyReducer';
 import campaignTrafficDriverStats from './campaignTrafficDriverStatsReducer';
 import campaignNotes from './campaignNotesReducer';
-import campaignStateFilter from './campaignStateFilterReducer';
-import campaignTypeFilter from './campaignTypeFilterReducer';
 import campaignSort from './campaignSortReducer';
 import overallAnalyticsSummary from './overallAnalyticsSummaryReducer';
 
@@ -33,8 +31,6 @@ export default combineReducers({
   campaignTrafficDriversDirty,
   campaignTrafficDriverStats,
   campaignNotes,
-  campaignStateFilter,
-  campaignTypeFilter,
   campaignSort,
   overallAnalyticsSummary
 });
