@@ -9,7 +9,7 @@ export function formatMillisecondDate(msDate) {
 export function shortFormatMillisecondDate(msDate) {
   const date = new Date(msDate);
 
-  return date.toLocaleDateString();
+  return date.toLocaleDateString('en-GB');
 }
 
 export function isoFormatMillisecondDate(msDate) {
