@@ -11,27 +11,11 @@ class Sidebar extends React.Component {
     this.props.uiActions.setCampaignTypeFilter(f);
   };
 
-  stateFilterLink = (stateValue, displayName) => {
-    var className = 'sidebar__filter-group__link';
-
-    if(this.props.campaignStateFilter === stateValue) {
-      className = className + ' sidebar__filter-group__link--active'
-    }
+  filterLink = (changeValue, displayName) => {
+    var query = Object.assign({}, this.props.query, changeValue);
 
     return(
-      <Link to="/campaigns" className={className} onClick={() => this.setCampaignStateFilter(stateValue)}>{displayName}</Link>
-    )
-  };
-
-  typeFilterLink = (stateValue, displayName) => {
-    var className = 'sidebar__filter-group__link';
-
-    if(this.props.campaignTypeFilter === stateValue) {
-      className = className + ' sidebar__filter-group__link--active'
-    }
-
-    return(
-      <Link to="/campaigns" className={className} onClick={() => this.setCampaignTypeFilter(stateValue)}>{displayName}</Link>
+      <Link to={{pathname: "/campaigns", query: query}} className="sidebar__filter-group__link" activeClassName="sidebar__filter-group__link--active">{displayName}</Link>
     )
   };
 
@@ -43,17 +27,17 @@ class Sidebar extends React.Component {
           <SidebarLink to="/campaigns">All Campaigns</SidebarLink>
           <div className="sidebar__filter-group">
             <div className="sidebar__filter-group__header">State:</div>
-            {this.stateFilterLink(false, 'All')}
-            {this.stateFilterLink('prospect', 'Prospects')}
-            {this.stateFilterLink('production', 'In Production')}
-            {this.stateFilterLink('live', 'Live')}
-            {this.stateFilterLink('dead', 'Dead')}
+            {this.filterLink({state: undefined}, 'All')}
+            {this.filterLink({state: 'prospect'}, 'Prospects')}
+            {this.filterLink({state: 'production'}, 'In Production')}
+            {this.filterLink({state: 'live'}, 'Live')}
+            {this.filterLink({state: 'dead'}, 'Dead')}
           </div>
           <div className="sidebar__filter-group">
             <div className="sidebar__filter-group__header">Type:</div>
-            {this.typeFilterLink(false, 'All')}
-            {this.typeFilterLink('hosted', 'Hosted')}
-            {this.typeFilterLink('paidContent', 'Paid Content')}
+            {this.filterLink({type: undefined}, 'All')}
+            {this.filterLink({type: 'hosted'}, 'Hosted')}
+            {this.filterLink({type: 'paidContent'}, 'Paid Content')}
           </div>
         </div>
         <div className="sidebar__link-group">
