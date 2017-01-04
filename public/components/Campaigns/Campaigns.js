@@ -10,12 +10,15 @@ class Campaigns extends Component {
   filterCampaigns = (campaigns) => {
     var filtered = campaigns;
 
-    if (this.props.campaignStateFilter) {
-      filtered = filtered.filter((c) => c.status === this.props.campaignStateFilter);
+    var stateFilter = this.props.location.query.state;
+    var typeFilter = this.props.location.query.type;
+
+    if (stateFilter) {
+      filtered = filtered.filter((c) => c.status === stateFilter);
     }
 
-    if (this.props.campaignTypeFilter) {
-      filtered = filtered.filter((c) => c.type === this.props.campaignTypeFilter);
+    if (typeFilter) {
+      filtered = filtered.filter((c) => c.type === typeFilter);
     }
     return filtered;
   }
