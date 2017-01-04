@@ -27,10 +27,10 @@ class Sidebar extends React.Component {
           <SidebarLink to="/campaigns">All Campaigns</SidebarLink>
           <div className="sidebar__filter-group">
             <div className="sidebar__filter-group__header">State:</div>
-            {this.filterLink({state: undefined}, 'All')}
+            {this.filterLink({state: 'all'}, 'All')}
             {this.filterLink({state: 'prospect'}, 'Prospects')}
             {this.filterLink({state: 'production'}, 'In Production')}
-            {this.filterLink({state: 'live'}, 'Live')}
+            {this.filterLink({state: undefined}, 'Live')}
             {this.filterLink({state: 'dead'}, 'Dead')}
           </div>
           <div className="sidebar__filter-group">
