@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import com.gu.pandahmac.HMACAuthActions
 import model.{TrafficDriverGroupStats, User}
 import model.command.RefreshCampaignFromCAPICommand
-import model.reports.CtaClicksReport
+import model.reports.{CampaignPageViewsReport, CtaClicksReport, DailyUniqueUsersReport}
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
@@ -54,6 +54,14 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with HMA
       case "CtaClicksReport" => {
         Logger.info(s"manually clearing GA CTA CTR analytics for $key")
         Future {CtaClicksReport.getCtaClicksForCampaign(key)}
+      }
+      case "DailyUniqueUsersReport" => {
+        Logger.info(s"manually clearing DailyUniqueUsersReport analytics for $key")
+        Future {DailyUniqueUsersReport.getDailyUniqueUsersReport(key)}
+      }
+      case "CampaignPageViewsReport" => {
+        Logger.info(s"manually clearing CampaignPageViewsReport analytics for $key")
+        Future {CampaignPageViewsReport.getCampaignPageViewsReport(key)}
       }
       case "TrafficDriverGroupStats" => {
         Logger.info(s"manually clearing Traffic driver stats for $key")

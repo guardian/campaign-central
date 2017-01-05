@@ -29,6 +29,8 @@ case class DailyUniqueUsersReport(campaignId: String, dailyUniqueUsers: List[Dai
       }
       AnalyticsDataCache.putDailyUniqueUsersReport(campaignId, refreshed, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
 
+      CampaignSummary.storeLatestUniquesForCampaign(campaign, refreshed.dailyUniqueUsers.lastOption)
+
       refreshed
     }
 
@@ -95,6 +97,7 @@ object DailyUniqueUsersReport {
       }
 
       AnalyticsDataCache.putDailyUniqueUsersReport(campaignId, report, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
+      CampaignSummary.storeLatestUniquesForCampaign(campaign, report.dailyUniqueUsers.lastOption)
 
       report
     }

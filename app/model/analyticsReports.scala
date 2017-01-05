@@ -20,9 +20,5 @@ object CampaignDailyCountsReport{
   }
 }
 
-case class CampaignSummary(totalUniques: Long, targetToDate: Long)
 
-object CampaignSummary{
-  implicit val campaignSummaryFormat: Format[CampaignSummary] = Jsonx.formatCaseClass[CampaignSummary]
-}
 

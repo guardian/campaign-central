@@ -4,7 +4,7 @@ import java.util.concurrent.Executors
 
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
 import model.reports._
-import model.{Campaign, CampaignDailyCountsReport, CampaignSummary, TrafficDriverGroupStats}
+import model.{Campaign, CampaignDailyCountsReport, TrafficDriverGroupStats}
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, Reads}
 import services.Dynamo
@@ -66,7 +66,7 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
-  def putOverallSummary(data: Map[String, CampaignSummary]): Unit = {
+  def putOverallSummary(data: OverallSummaryReport): Unit = {
     val entry = AnalyticsDataCacheEntry("overall", "CampaignSummary", Json.toJson(data).toString(), None, System.currentTimeMillis())
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
@@ -116,9 +116,8 @@ object AnalyticsDataCache {
     getEntry[CampaignSummary](campaignId, "CampaignSummary")
   }
 
-  def getOverallSummary(): CacheResult[Map[String, CampaignSummary]] = {
-    getEntry[Map[String, CampaignSummary]]("overall", "CampaignSummary")
-
+  def getOverallSummary(): CacheResult[OverallSummaryReport] = {
+    getEntry[OverallSummaryReport]("overall", "CampaignSummary")
   }
 
   def getCampaignCtaClicksReport(campaignId: String): CacheResult[CtaClicksReport] = {

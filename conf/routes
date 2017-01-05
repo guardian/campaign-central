@@ -20,7 +20,7 @@ GET /api/campaigns/analytics              controllers.CampaignApi.getAnalyticsSu
 GET /api/campaigns/:id                    controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id                    controllers.CampaignApi.updateCampaign(id: String)
 DELETE /api/campaigns/:id                 controllers.CampaignApi.deleteCampaign(id: String)
-GET /api/campaigns/:id/analytics          controllers.CampaignApi.getCampaignAnalytics(id: String)
+GET /api/campaigns/:id/pageViews          controllers.CampaignApi.getCampaignPageViews(id: String)
 GET /api/campaigns/:id/dailyUniques       controllers.CampaignApi.getCampaignDailyUniqueUsers(id: String)
 GET /api/campaigns/:id/targetsReport      controllers.CampaignApi.getCampaignTargetsReport(id: String)
 GET /api/campaigns/:id/content            controllers.CampaignApi.getCampaignContent(id: String)
@@ -54,6 +54,7 @@ GET /assets/*file                 controllers.Assets.versioned(path="/public", f
 
 # Migration
 GET /migration/buildDailyReports   controllers.Migration.buildDailyReports
+GET /migration/rebuildCampaignSummaries   controllers.Migration.rebuildCampaignSummaries
 
 
 # Management
