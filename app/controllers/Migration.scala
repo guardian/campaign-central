@@ -1,6 +1,6 @@
 package controllers
 
-import model.reports.{CampaignPageViewsReport, DailyUniqueUsersReport}
+import model.reports.{CampaignPageViewsReport, CampaignSummary, DailyUniqueUsersReport}
 import play.api.Logger
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
@@ -49,6 +49,21 @@ class Migration(override val wsClient: WSClient) extends Controller with PandaAu
 
     Ok(s"build kicked off")
 
+  }
+
+  def rebuildCampaignSummaries() = APIAuthAction { req =>
+    Future {
+      val allCampaigns = CampaignRepository.getAllCampaigns()
+
+      allCampaigns.filter { c =>
+        c.startDate.isDefined && c.pathPrefix.isDefined
+      }.foreach { c =>
+        val uuReport = DailyUniqueUsersReport.getDailyUniqueUsersReport(c.id)
+        uuReport.foreach{ r => CampaignSummary.storeLatestUniquesForCampaign(c, r.dailyUniqueUsers.lastOption) }
+      }
+    }
+
+    Ok(s"build kicked off")
   }
 
 }

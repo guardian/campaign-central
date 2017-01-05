@@ -15,14 +15,13 @@ class CampaignPagesCumulativeTrafficChart extends React.Component {
 
     return (
       <div className="analytics-chart--half-width">
-        <div className="campaign-box__header">Cumulative uniques</div>
+        <div className="campaign-box__header">Cumulative page views</div>
         <div className="campaign-box__body">
           <ResponsiveContainer height={300} width="90%">
             <ComposedChart data={this.props.pageCountStats}>
               <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
               <YAxis label="Views"/>
               <Tooltip labelFormatter={formatMillisecondDate} />
-              <Legend />
               <Line type="linear" dataKey="cumulative-target-uniques" stroke={getStrokeColour(0)} name="Target uniques" dot={false}/>
               {this.props.paths.map((p, index) =>
                 <Area key={index}

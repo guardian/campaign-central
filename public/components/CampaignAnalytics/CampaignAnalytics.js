@@ -1,8 +1,11 @@
 import React, {PropTypes} from "react";
 import CampaignPerformanceSummary from "./Analytics/CampaignPerformanceSummary";
+import CampaignContentContributionPie from "./Analytics/CampaignContentContributionPie";
+import CampaignDailyUniquesChart from "./Analytics/CampaignDailyUniquesChart";
 import CampaignDailyTrafficChart from "./Analytics/CampaignDailyTrafficChart";
 import CampaignPagesCumulativeTrafficChart from "./Analytics/CampaignPagesCumulativeTrafficChart";
 import ContentTrafficChart from "./Analytics/ContentTrafficChart";
+import CampaignQualifiedChart from "./Analytics/CampaignQualifiedChart";
 import CampaignTrafficDriverStatsChart from "./Analytics/CampaignTrafficDriverStatsChart";
 
 class CampaignAnalytics extends React.Component {
@@ -12,9 +15,17 @@ class CampaignAnalytics extends React.Component {
     return (analysableStatus && campaign.startDate && campaign.pathPrefix );
   }
 
-  getLatestCounts() {
-    if(this.props.campaignAnalytics) {
-      return this.props.campaignAnalytics.pageCountStats[this.props.campaignAnalytics.pageCountStats.length - 1];
+  getLatestPageViews() {
+    if(this.props.campaignPageViews) {
+      return this.props.campaignPageViews.pageCountStats[this.props.campaignPageViews.pageCountStats.length - 1];
+    }
+
+    return undefined;
+  }
+
+  getLatestUniqueUsers() {
+    if(this.props.campaignDailyUniques) {
+      return this.props.campaignDailyUniques.dailyUniqueUsers[this.props.campaignDailyUniques.dailyUniqueUsers.length - 1];
     }
 
     return undefined;
@@ -25,7 +36,7 @@ class CampaignAnalytics extends React.Component {
       return null;
     }
 
-    if (!this.props.campaignAnalytics) {
+    if (!this.props.campaignPageViews) {
       return <div className="campaign-info__body">Loading... </div>;
     }
 
@@ -33,13 +44,32 @@ class CampaignAnalytics extends React.Component {
       <div>
         <div className="campaign-info__body">
 
-          <CampaignPerformanceSummary campaign={this.props.campaign} paths={this.props.campaignAnalytics.seenPaths}
-                                      latestCounts={this.getLatestCounts()}/>
-          <CampaignDailyTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats}/>
-          <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignAnalytics.pageCountStats}
-                                               paths={this.props.campaignAnalytics.seenPaths}/>
-          {this.props.campaignAnalytics.seenPaths.map((p) =>
-            <ContentTrafficChart key={p} pageCountStats={this.props.campaignAnalytics.pageCountStats} path={p}/>
+          <CampaignPerformanceSummary campaign={this.props.campaign}
+                                      paths={this.props.campaignPageViews.seenPaths}
+                                      latestPageViews={this.getLatestPageViews()}
+                                      latestDailyUniques={this.getLatestUniqueUsers()}
+                                      targets={this.props.campaignTargetsReport}
+          />
+
+          <CampaignContentContributionPie campaign={this.props.campaign}
+                                      paths={this.props.campaignPageViews.seenPaths}
+                                      latestPageViews={this.getLatestPageViews()}
+          />
+
+          <CampaignDailyUniquesChart dailyUniques={this.props.campaignDailyUniques.dailyUniqueUsers}
+                                     targets={this.props.campaignTargetsReport}/>
+
+          <CampaignPagesCumulativeTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}
+                                               paths={this.props.campaignPageViews.seenPaths}/>
+
+          <CampaignDailyTrafficChart pageCountStats={this.props.campaignPageViews.pageCountStats}
+                                     dailyUniques={this.props.campaignDailyUniques.dailyUniqueUsers}
+          />
+
+          <CampaignQualifiedChart />
+
+          {this.props.campaignPageViews.seenPaths.map((p) =>
+            <ContentTrafficChart key={p} pageCountStats={this.props.campaignPageViews.pageCountStats} path={p}/>
           )}
         </div>
         <div className="campaign-info__body">
@@ -57,7 +87,9 @@ import { bindActionCreators } from 'redux';
 
 function mapStateToProps(state) {
   return {
-    campaignAnalytics: state.campaignAnalytics
+    campaignPageViews: state.campaignPageViews,
+    campaignDailyUniques: state.campaignDailyUniques,
+    campaignTargetsReport: state.campaignTargetsReport
   };
 }
 

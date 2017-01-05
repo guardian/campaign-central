@@ -41,9 +41,25 @@ export function fetchOverallAnalyticsSummary() {
   });
 }
 
-export function fetchCampaignAnalytics(id) {
+export function fetchCampaignPageViews(id) {
   return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/analytics',
+    url: '/api/campaigns/' + id + '/pageViews',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
+export function fetchCampaignDailyUniques(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/dailyUniques',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
+export function fetchCampaignTargetsReport(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/targetsReport',
     contentType: 'application/json',
     method: 'get'
   });

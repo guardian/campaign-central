@@ -31,7 +31,7 @@ export function getOverallAnalyticsSummary() {
       return fetchOverallAnalyticsSummary()
         .catch(error => dispatch(errorRecievingOverallAnalyticsSummary(error)))
         .then(res => {
-          dispatch(receiveOverallAnalyticsSummary(res));
+          dispatch(receiveOverallAnalyticsSummary(res.summaries));
         });
     };
 }
