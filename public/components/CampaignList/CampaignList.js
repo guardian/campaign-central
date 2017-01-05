@@ -8,6 +8,7 @@ class CampaignList extends React.Component {
   };
 
   static defaultProps = {
+    campaignSortColumn: 'endDate',
     campaigns: []
   };
 
@@ -21,19 +22,13 @@ class CampaignList extends React.Component {
     }
 
     //set an opposite sort order
-    order = !order;
-
-    return order;
+    return !order;
   };
 
   setHeaderCssClass = (column) => {
-    let sortedColumn = this.props.campaignSortColumn || 'endDate';
+    let sortedColumn = this.props.campaignSortColumn;
     let order = this.getSortOrder(column) ? 'asc' : 'desc';
     let newCssClass = 'campaign-list__header-order';
-
-    if (!this.props.campaignSortColumn) { //after page load, when we don't have campaignSortColumn prop yet
-      order = 'desc'; //order is always desc
-    }
 
     if (column === sortedColumn) {
       newCssClass = 'campaign-list__header-order--' + order;

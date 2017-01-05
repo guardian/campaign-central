@@ -1,9 +1,9 @@
 .error-bar {
   position: absolute;
-  width: 100%;
   background-color: $c-orange;
 
-  margin-left: $size-sidebar-width;
+  left: $size-sidebar-width;
+  right:0;
 
   z-index: 10;
 

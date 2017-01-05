@@ -7,6 +7,10 @@ class Campaigns extends Component {
     campaigns: PropTypes.array.isRequired,
   }
 
+  static defaultProps = {
+    campaignSortColumn: 'endDate',
+  }
+
   filterCampaigns = (campaigns) => {
     var filtered = campaigns;
 
@@ -38,38 +42,22 @@ class Campaigns extends Component {
       case 'name':
       case 'type':
       case 'status':
-        if (typeof value === 'undefined') {
-          value = "";
-        }
-        value.toUpperCase();
-        break;
+        return (value || "").toUpperCase();
       case 'actualValue':
       case 'startDate':
-        if (typeof value === 'undefined') {
-          value = 0;
-        }
-        value = parseInt(value, 10);
+        return parseInt(value || 0, 10);
       case 'endDate':
-        if (typeof value === 'undefined') {
-          value = Infinity;
-        }
-      default:
-        value;
+        return value || Infinity;
     }
 
     return value;
-  }
+  };
 
   sortCampaigns = (campaigns) => {
-    let sorted = campaigns;
     let column = this.props.campaignSortColumn;
     let order = this.props.campaignSortOrder || false;
 
-    sorted = sorted.sort(this.sortBy(column, order, function(value) {
-      return this.prepareSortValues(column, value);
-    }.bind(this)));
-
-    return sorted;
+    return campaigns.sort(this.sortBy(column, order, this.prepareSortValues.bind(this, column)));
   }
 
   componentDidMount() {
