@@ -9,36 +9,29 @@ class CampaignList extends React.Component {
 
   static defaultProps = {
     campaignSortColumn: 'endDate',
+    campaignSortOrder: 1, //asc
     campaigns: []
   };
 
-  getSortOrder = (column) => {
-    let order = false; //false = DESC, true = ASC
-    let DOMNode = this.refs['sort-' + column];
-    let cssClass = DOMNode ? DOMNode.className : '';
+  sortOrderClass = (column) => {
+    let order = this.props.campaignSortOrder === 1 ? 'asc' : 'desc';
 
-    if (cssClass.substring(cssClass.length - 3) === 'asc') {
-      order = true;
-    }
-
-    //set an opposite sort order
-    return !order;
+    return column === this.props.campaignSortColumn ? 'campaign-list__header-order--' + order : '';
   };
 
-  setHeaderCssClass = (column) => {
-    let sortedColumn = this.props.campaignSortColumn;
-    let order = this.getSortOrder(column) ? 'asc' : 'desc';
-    let newCssClass = 'campaign-list__header-order';
-
-    if (column === sortedColumn) {
-      newCssClass = 'campaign-list__header-order--' + order;
-    }
-
-    return newCssClass;
+  setCampaignSort = (column) => {
+    var currentColumn = this.props.campaignSortColumn;
+    var currentOrder = this.props.campaignSortOrder;
+    this.props.uiActions.setCampaignSort(column, column !== currentColumn ? 1 : -currentOrder);
   };
 
-  setCampaignSort = (c) => {
-    this.props.uiActions.setCampaignSort(c, this.getSortOrder(c));
+  sortableColumnHead = (columnName, displayName) => {
+    return (
+      <th onClick={ () => this.setCampaignSort(columnName) } className="campaign-list__header campaign-list__header--sortable">
+        <span className="campaign-list__header-title">{displayName}</span>
+        <i className={'campaign-list__header-order ' + this.sortOrderClass(columnName) }/>
+      </th>
+    )
   };
 
   render () {
@@ -54,30 +47,12 @@ class CampaignList extends React.Component {
       <table className="campaign-list">
         <thead>
           <tr>
-            <th onClick={ () => this.setCampaignSort('name') } className="campaign-list__header--sortable name">
-              <span> Name </span>
-              <span className={ this.setHeaderCssClass('name') } ref="sort-name"> &nbsp; </span>
-            </th>
-            <th onClick={ () => this.setCampaignSort('type') } className="campaign-list__header--sortable type">
-              <span> Type </span>
-              <span className={ this.setHeaderCssClass('type') } ref="sort-type"> &nbsp; </span>
-            </th>
-            <th onClick={ () => this.setCampaignSort('status') } className="campaign-list__header--sortable status">
-              <span> Status </span>
-              <span className={ this.setHeaderCssClass('status') } ref="sort-status"> &nbsp; </span>
-            </th>
-            <th onClick={ () => this.setCampaignSort('actualValue') } className="campaign-list__header--sortable actualValue">
-              <span> Value </span>
-              <span className={ this.setHeaderCssClass('actualValue') } ref="sort-actualValue"> &nbsp; </span>
-            </th>
-            <th onClick={ () => this.setCampaignSort('startDate') } className="campaign-list__header--sortable startDate">
-              <span> Start date </span>
-              <span className={ this.setHeaderCssClass('startDate') } ref="sort-startDate"> &nbsp; </span>
-            </th>
-            <th onClick={ () => this.setCampaignSort('endDate') } className="campaign-list__header--sortable endDate">
-              <span> Finish date </span>
-              <span className={ this.setHeaderCssClass('endDate') } ref="sort-endDate"> &nbsp; </span>
-            </th>
+            {this.sortableColumnHead('name', 'Name')}
+            {this.sortableColumnHead('type', 'Type')}
+            {this.sortableColumnHead('status', 'Status')}
+            {this.sortableColumnHead('actualValue', 'Value')}
+            {this.sortableColumnHead('startDate', 'Start date')}
+            {this.sortableColumnHead('endDate', 'Finish date')}
             <th className="campaign-list__header">Days left</th>
             <th className="campaign-list__header">Target</th>
             <th className="campaign-list__header">Uniques</th>
