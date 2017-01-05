@@ -22,97 +22,40 @@
   position: relative;
 }
 
+.campaign-list__header-title {
+  user-select: none;
+}
+
 .campaign-list__header-order {
+  display: inline-block;
+  width: 10px;
+  height: 15px;
+  position: relative;
+  margin-left: 5px;
   &::before, &::after {
     content: "";
-    position: absolute;
-    right: 0;
     display: block;
-    cursor: pointer;
-
-    width: 0;
-    height: 0;
-
     border-left: 5px solid transparent;
     border-right: 5px solid transparent;
-  }
-
-  &::after {
-    border-bottom: 7px solid $c-highlight-main;
-    top: 14px;
+    box-sizing: border-box;
   }
 
   &::before {
+    border-bottom: 7px solid $c-highlight-main;
+    margin-bottom: 5px;
+  }
+
+  &::after {
     border-top: 7px solid $c-highlight-main;
-    top: 26px;
   }
+
 }
 
-.campaign-list__header-order--desc::before,
-.campaign-list__header-order--asc::after {
-  display: none;
+.campaign-list__header-order--desc::after,
+.campaign-list__header-order--asc::before {
+  visibility: hidden;
 }
 
-
-
-.campaign-list__header--sortable.name {
-  min-width: 270px;
-  [class^='campaign-list__header-order'] {
-    &::after,
-    &::before {
-      right: 38%;
-    }
-  }
-}
-
-.campaign-list__header--sortable.type {
-  min-width: 100px;
-  [class^='campaign-list__header-order'] {
-    &::after,
-    &::before {
-      right: 22%;
-    }
-  }
-}
-
-.campaign-list__header--sortable.status {
-  [class^='campaign-list__header-order'] {
-    &::after,
-    &::before {
-      right: 12%;
-    }
-  }
-}
-
-.campaign-list__header--sortable.actualValue {
-  min-width: 80px;
-  [class^='campaign-list__header-order'] {
-    &::after,
-    &::before {
-      right: 9%;
-    }
-  }
-}
-
-.campaign-list__header--sortable.startDate {
-  min-width: 114px;
-  [class^='campaign-list__header-order'] {
-    &::after,
-    &::before {
-      right: 8%;
-    }
-  }
-}
-
-.campaign-list__header--sortable.endDate {
-  min-width: 164px;
-  [class^='campaign-list__header-order'] {
-    &::after,
-    &::before {
-      right: 19%;
-    }
-  }
-}
 
 .campaign-list__row {
   background-color: $c-grey-200;

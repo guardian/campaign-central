@@ -27,9 +27,9 @@ class CampaignList extends React.Component {
 
   sortableColumnHead = (columnName, displayName) => {
     return (
-      <th onClick={ () => this.setCampaignSort(columnName) } className={"campaign-list__header campaign-list__header--sortable " + columnName}>
-        <span>{displayName}</span>
-        <span className={'campaign-list__header-order ' + this.sortOrderClass(columnName) }> &nbsp; </span>
+      <th onClick={ () => this.setCampaignSort(columnName) } className="campaign-list__header campaign-list__header--sortable">
+        <span className="campaign-list__header-title">{displayName}</span>
+        <i className={'campaign-list__header-order ' + this.sortOrderClass(columnName) }/>
       </th>
     )
   };
