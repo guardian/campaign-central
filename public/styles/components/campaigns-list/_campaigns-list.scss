@@ -180,6 +180,10 @@
   font-size: 14px;
 
   color: $c-grey-main;
+
+  .i-info-grey {
+    float: right;
+  }
 }
 
 .campaign-list__item--ahead {
@@ -198,4 +202,21 @@
   max-width: 60px;
   padding: 3px;
   float:right;
+}
+
+.campaign-list__helper {
+  display: none;
+  position: absolute;
+  background: $c-grey-100;
+  padding: 6px;
+  border: 1px solid $c-grey-300;
+  z-index: 1;
+  cursor: initial;
+  &:hover {
+    display: block;
+  }
+}
+
+.i-info-grey:hover + .campaign-list__helper {
+  display: block;
 }
