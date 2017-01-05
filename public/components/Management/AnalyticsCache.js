@@ -98,7 +98,8 @@ class AnalyticsCache extends Component {
         {this.renderCacheItems()}
         <h3 className="campaigns__header">Refresh all stale items of type:</h3>
         <ul>
-          <li onClick={() => refreshDataType('CampaignDailyCountsReport')}><i className="i-refresh-black" />CampaignDailyCountsReport</li>
+          <li onClick={() => refreshDataType('CampaignPageViewsReport')}><i className="i-refresh-black" />CampaignPageViewsReport</li>
+          <li onClick={() => refreshDataType('DailyUniqueUsersReport')}><i className="i-refresh-black" />DailyUniqueUsersReport</li>
           <li onClick={() => refreshDataType('CtaClicksReport')}><i className="i-refresh-black" />CtaClicksReport</li>
           <li onClick={() => refreshDataType('TrafficDriverGroupStats')}><i className="i-refresh-black" />TrafficDriverGroupStats</li>
         </ul>
