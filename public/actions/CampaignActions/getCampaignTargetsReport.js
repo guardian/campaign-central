@@ -16,7 +16,7 @@ function receiveCampaignTargetsReport(campaignTargetsReport) {
     };
 }
 
-function errorRecievingCampaignTargetsReport(error) {
+function errorReceivingCampaignTargetsReport(error) {
     return {
         type:       'SHOW_ERROR',
         message:    'Could not get campaign targets',
@@ -29,7 +29,7 @@ export function getCampaignTargetsReport(id) {
     return dispatch => {
       dispatch(requestCampaignTargetsReport(id));
       return fetchCampaignTargetsReport(id)
-        .catch(error => dispatch(errorRecievingCampaignTargetsReport(error)))
+        .catch(error => dispatch(errorReceivingCampaignTargetsReport(error)))
         .then(res => {
           dispatch(receiveCampaignTargetsReport(res));
         });
