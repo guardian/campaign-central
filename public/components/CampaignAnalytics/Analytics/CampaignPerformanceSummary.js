@@ -55,17 +55,17 @@ class CampaignPerformanceSummary extends React.Component {
 
     var targetUniques = this.getCampaignTargetUniques();
     if (targetUniques) {
-      data.push( {name: "target uniques", count: targetUniques, fill: getFillColour(index++)} );
+      data.push( {name: "target unique users", count: targetUniques, fill: getFillColour(index++)} );
     }
 
     var targetUniquesToDate = this.getUniquesTargetToDate();
     if (targetUniquesToDate) {
-      data.push( {name: "target uniques to date", count: targetUniquesToDate, fill: getFillColour(index++)} );
+      data.push( {name: "target unique users to date", count: targetUniquesToDate, fill: getFillColour(index++)} );
     }
 
     var estimatedUniques = this.getEstimatedUniques();
     if (estimatedUniques) {
-      data.push( {name: "estimated uniques", count: estimatedUniques, fill: getFillColour(index++)} );
+      data.push( {name: "estimated unique users", count: estimatedUniques, fill: getFillColour(index++)} );
     }
 
     var targetPageViews = this.getCampaignTargetPageViews();

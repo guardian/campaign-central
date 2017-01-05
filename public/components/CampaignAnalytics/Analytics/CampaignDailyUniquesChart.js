@@ -19,14 +19,14 @@ class CampaignDailyUniquesChart extends React.Component {
 
     return (
       <div className="analytics-chart--half-width">
-        <div className="campaign-box__header">Estimated uniques</div>
+        <div className="campaign-box__header">Estimated unique users</div>
         <div className="campaign-box__body">
           <ResponsiveContainer height={300} width="90%">
             <LineChart data={this.combineData()}>
               <XAxis dataKey="date" tickFormatter={shortFormatMillisecondDate} label="Date" />
               <YAxis label="Views"/>
-              <Line type="linear" dataKey="cumulativeUniqueUsers" stroke={getStrokeColour(1)} name="Estimated uniques" dot={false}/>
-              <Line type="linear" dataKey="expected" stroke={getStrokeColour(2)} name="Target uniques" dot={false}/>
+              <Line type="linear" dataKey="cumulativeUniqueUsers" stroke={getStrokeColour(1)} name="Estimated unique users" dot={false}/>
+              <Line type="linear" dataKey="expected" stroke={getStrokeColour(2)} name="Target unique users" dot={false}/>
               <Tooltip labelFormatter={formatMillisecondDate} />
               <Legend />
             </LineChart>
