@@ -2,7 +2,7 @@
   border-collapse: collapse;
 }
 
-%campaign-list__header {
+.campaign-list__header {
   padding: 15px;
 
   background: $c-grey-main;
@@ -13,81 +13,47 @@
   font-size: 18px;
 }
 
-.campaign-list__header {
-  @extend %campaign-list__header;
-}
-
 .campaign-list__header:last-child {
   border-right: none;
 }
 
-%sortable-arrow-down {
-  cursor: pointer;
-
-  width: 0;
-  height: 0;
-
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-top: 7px solid $c-highlight-main;
-
-  position: absolute;
-  top: 26px;
-  right: 0;
-}
-
-%sortable-arrow-up {
-  cursor: pointer;
-
-  width: 0;
-  height: 0;
-
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 7px solid $c-highlight-main;
-
-  position: absolute;
-  top: 14px;
-  right: 0;
-}
-
-%pseudo-element {
-  content: " ";
-  display: block;
-}
-
 .campaign-list__header--sortable {
-  @extend %campaign-list__header;
-
   cursor: pointer;
   position: relative;
+}
 
-  .campaign-list__header-order {
-    &::after {
-      @extend %pseudo-element;
-      @extend %sortable-arrow-up;
-    }
+.campaign-list__header-order {
+  &::before, &::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    display: block;
+    cursor: pointer;
 
-    &::before {
-      @extend %pseudo-element;
-      @extend %sortable-arrow-down;
-    }
+    width: 0;
+    height: 0;
+
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
   }
 
-  .campaign-list__header-order--desc {
-    &::before {
-      @extend %pseudo-element;
-      @extend %sortable-arrow-up;
-    }
+  &::after {
+    border-bottom: 7px solid $c-highlight-main;
+    top: 14px;
   }
 
-  .campaign-list__header-order--asc {
-    &::after {
-      @extend %pseudo-element;
-      @extend %sortable-arrow-down;
-    }
+  &::before {
+    border-top: 7px solid $c-highlight-main;
+    top: 26px;
   }
 }
+
+.campaign-list__header-order--desc::before,
+.campaign-list__header-order--asc::after {
+  display: none;
+}
+
+
 
 .campaign-list__header--sortable.name {
   min-width: 270px;

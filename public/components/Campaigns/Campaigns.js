@@ -9,6 +9,7 @@ class Campaigns extends Component {
 
   static defaultProps = {
     campaignSortColumn: 'endDate',
+    campaignSortOrder: 1, //asc
   }
 
   filterCampaigns = (campaigns) => {
@@ -27,13 +28,11 @@ class Campaigns extends Component {
     return filtered;
   }
 
-  sortBy = (field, reverse, iteratees) => {
+  sortBy = (field, order, iteratees) => {
     let key = function(x) {return iteratees ? iteratees(x[field]) : x[field]};
 
-    reverse = !reverse ? 1 : -1;
-
     return function (a, b) {
-      return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+      return a = key(a), b = key(b), order * ((a > b) - (b > a));
     }
   }
 
@@ -55,7 +54,7 @@ class Campaigns extends Component {
 
   sortCampaigns = (campaigns) => {
     let column = this.props.campaignSortColumn;
-    let order = this.props.campaignSortOrder || false;
+    let order = this.props.campaignSortOrder;
 
     return campaigns.sort(this.sortBy(column, order, this.prepareSortValues.bind(this, column)));
   }
