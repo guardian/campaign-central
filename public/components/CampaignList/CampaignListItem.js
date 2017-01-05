@@ -15,17 +15,45 @@ class CampaignListItem extends React.Component {
     window.document.location = "/campaign/" + this.props.campaign.id;
   };
 
-  renderProgressSummary = () => {
-    if (this.props.analyticsSummary) {
-      const progressClass = (this.props.analyticsSummary.totalUniques < this.props.analyticsSummary.targetToDate) ? 'campaign-list__item--behind' : 'campaign-list__item--ahead';
+  daysBetween = (date1, date2) => {
+    const oneDayMillis = 24 * 60 * 60 * 1000;
+    return Math.ceil((date2 - date1) / oneDayMillis);
+  };
 
-      return(<td className={'campaign-list__item '+ progressClass}>
-        progress: {this.props.analyticsSummary.totalUniques} uniques<br/>
-        against: {this.props.analyticsSummary.targetToDate} expected
-      </td>);
+  renderProgressSummary = () => {
+    if (!this.props.analyticsSummary) {
+      return <td className="campaign-list__item">-</td>;
+    }
+    const totalUniques = this.props.analyticsSummary.totalUniques;
+    const targetToDate = this.props.analyticsSummary.targetToDate;
+    const now = new Date();
+    const endDate = this.props.campaign.endDate;
+    const startDate = this.props.campaign.startDate;
+    const target = this.props.campaign.targets && this.props.campaign.targets.uniques;
+    const ahead = 'campaign-list__item--ahead';
+    const behind = 'campaign-list__item--behind';
+
+    if (!endDate || endDate < now) {
+      var progressClass = !endDate ? '' : (totalUniques >= target) ? ahead : behind;
+      return <td className={'campaign-list__item ' + progressClass}>{totalUniques}</td>;
     }
 
-    return(<td className="campaign-list__item">-</td>);
+    const daysGone = this.daysBetween(startDate, now);
+    const days = this.daysBetween(startDate, endDate);
+
+    return(<td className={'campaign-list__item ' + ((totalUniques >= targetToDate) ? ahead : behind)}>
+      {totalUniques}
+
+      <i className="i-info-grey" />
+
+      <div className="campaign-list__helper" onClick={e => e.stopPropagation()}>
+        {daysGone} days into campaign ({Math.round(100*daysGone/days)}%)<br/>
+        {!!targetToDate && targetToDate + " uniques expected so far "}
+        {!!targetToDate && !!target && "(" + Math.round(100*targetToDate/target) +"% of target)"}
+      </div>
+    </td>);
+
+
   };
 
   render () {
@@ -36,13 +64,11 @@ class CampaignListItem extends React.Component {
 
     var daysLeft = '';
     if (this.props.campaign.startDate && this.props.campaign.endDate) {
-      const now = new Date();
-      const oneDayMillis = 24 * 60 * 60 * 1000;
-      const days = Math.ceil((this.props.campaign.endDate - now) / oneDayMillis);
+      const days = this.daysBetween(new Date(), this.props.campaign.endDate);
 
       var dayWord = Math.abs(days) === 1 ? ' day' : ' days';
 
-      daysLeft = days < 0 ? 'Ended ' + (-days) + dayWord + ' ago' : days;
+      daysLeft = days < 0 ? 'Ended ' + (-days) + dayWord + ' ago' : days + dayWord + ' left';
     }
 
     return (
