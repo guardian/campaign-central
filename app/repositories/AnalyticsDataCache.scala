@@ -4,7 +4,7 @@ import java.util.concurrent.Executors
 
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
 import model.reports._
-import model.{Campaign, CampaignDailyCountsReport, TrafficDriverGroupStats}
+import model.{Campaign, TrafficDriverGroupStats}
 import org.joda.time.DateTime
 import play.api.libs.json.{Json, Reads}
 import services.Dynamo
@@ -44,11 +44,6 @@ object AnalyticsDataCache {
 
   def deleteCacheEntry(key: String, dataType: String): Unit = {
     Dynamo.analyticsDataCacheTable.deleteItem("key", key, "dataType", dataType)
-  }
-
-  def putCampaignDailyCountsReport(campaignId: String, data: CampaignDailyCountsReport, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId, "CampaignDailyCountsReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
   def putCampaignPageViewsReport(campaignId: String, data: CampaignPageViewsReport, validToTimestamp: Option[Long]): Unit = {
@@ -98,10 +93,6 @@ object AnalyticsDataCache {
         case _ => Hit(report)
       }
     }.getOrElse(Miss)
-  }
-
-  def getCampaignDailyCountsReport(campaignId: String): CacheResult[CampaignDailyCountsReport] = {
-    getEntry[CampaignDailyCountsReport](campaignId, "CampaignDailyCountsReport")
   }
 
   def getCampaignPageViewsReport(campaignId: String): CacheResult[CampaignPageViewsReport] = {
