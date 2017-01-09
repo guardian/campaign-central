@@ -1,0 +1,103 @@
+package model.reports
+
+import ai.x.play.json.Jsonx
+import model.Campaign
+import org.joda.time.DateTime
+import play.api.Logger
+import play.api.libs.json.Format
+import repositories._
+
+import scala.concurrent.Future
+
+case class QualifiedMetricReport(total: Long, qualifiedCount: Long, percentage: Double)
+
+object QualifiedMetricReport {
+  implicit val qualifiedMetricReportFormat: Format[QualifiedMetricReport] = Jsonx.formatCaseClass[QualifiedMetricReport]
+}
+
+case class QualifiedPercentagesReport(campaignId: String, metrics: Map[String, QualifiedMetricReport]) {
+
+  def refresh = QualifiedPercentagesReport.generateReport(campaignId)
+
+}
+
+object QualifiedPercentagesReport {
+
+  implicit val ec = AnalyticsDataCache.analyticsExectuionContext
+
+  implicit val qualifiedPercentagesReportFormat: Format[QualifiedPercentagesReport] = Jsonx.formatCaseClass[QualifiedPercentagesReport]
+
+  def getQualifiedPercentagesReportForCampaign(campaignId: String): Option[QualifiedPercentagesReport] = {
+
+    AnalyticsDataCache.getCampaignQualifiedPercentagesReport(campaignId) match {
+      case Hit(report) => {
+        Logger.debug(s"getting qualified percentages for campaign $campaignId - cache hit")
+        Some(report)
+      }
+      case Stale(report) => {
+        Logger.debug(s"getting qualified percentages for campaign $campaignId - cache stale spawning async refresh")
+
+        Future{
+          Logger.debug(s"async refresh of qualified percentages for campaign $campaignId")
+          report.refresh
+        } // serve stale but spawn refresh future
+        Some(report)
+      }
+      case Miss => {
+        Logger.debug(s"getting qualified percentages for campaign $campaignId - cache miss fetching sync")
+
+        generateReport(campaignId)
+      }
+    }
+  }
+
+  val qualifiedMetrics = Map(
+    "articleDwellTime" -> ContentTypeDwellTimeMetric("article", 15),
+    "galleryDwellTime" -> ContentTypeDwellTimeMetric("gallery", 15),
+    "interactiveDwellTime" -> ContentTypeDwellTimeMetric("interactive", 15)
+  )
+
+  def generateReport(campaignId: String): Option[QualifiedPercentagesReport] = {
+    CampaignRepository.getCampaign(campaignId) flatMap { campaign =>
+      for (
+        startDate <- campaign.startDate
+      ) yield {
+        val reportLines = qualifiedMetrics flatMap { case(metricName, fetcher) =>
+          val reportOption = fetcher.fetch(campaign, startDate, campaign.endDate)
+          reportOption.map{ r => metricName -> r}
+        }
+        val report = QualifiedPercentagesReport(campaignId, reportLines)
+
+        AnalyticsDataCache.putQualifiedPercentagesReport(campaignId, report, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
+
+        report
+      }
+    }
+  }
+}
+
+sealed trait QualifiedMetricReportFetcher {
+  def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Option[QualifiedMetricReport]
+}
+
+case class ContentTypeDwellTimeMetric(contentType: String, qualifiedDwellTime: Int) extends QualifiedMetricReportFetcher {
+
+  override def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Option[QualifiedMetricReport] = {
+
+    val campaignFilter = if (campaign.`type` == "hosted") {
+      campaign.gaFilterExpression
+    } else {
+      campaign.pathPrefix.map{ section =>s"ga:dimension4==${section}"}
+    }
+
+    campaignFilter.flatMap{ filter =>
+      val totalHits = GoogleAnalytics.loadTotalCampaignContentTypeViews(filter, contentType, startDate, endDate);
+      if (totalHits > 0) {
+        val qualifiedHits = GoogleAnalytics.loadCampaignContentTypeViewsWithDwellTime(filter, contentType, qualifiedDwellTime, startDate, endDate)
+        Some(QualifiedMetricReport(totalHits, qualifiedHits, (qualifiedHits.toDouble / totalHits) * 100))
+      } else {
+        None
+      }
+    }
+  }
+}

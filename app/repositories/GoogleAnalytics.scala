@@ -140,6 +140,41 @@ object GoogleAnalytics {
     parseDimensionlessSingleMetricReport(reportResponse)
   }
 
+  // qualified reporting functions
+
+  def loadTotalCampaignContentTypeViews(campaignFilter: String, contentType: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
+    loadTotalViewsWithFilter(s"$campaignFilter;ga:dimension5==$contentType", startDate, endDate)
+  }
+
+  def loadCampaignContentTypeViewsWithDwellTime(campaignFilter: String, contentType: String, qualifiedDwellTime: Int, startDate: DateTime, endDate: Option[DateTime]): Long = {
+    loadTotalViewsWithFilter(s"$campaignFilter;ga:dimension5==$contentType;ga:timeOnPage>=$qualifiedDwellTime", startDate, endDate)
+  }
+
+  private def loadTotalViewsWithFilter(filter: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
+    Logger.info(s"fetch pageViews by filter $filter")
+
+    val endOfRange = endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
+    val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
+
+    val pageViews = new Metric().setExpression("ga:pageViews").setAlias("pageViews")
+
+    val viewsReportRequest = new ReportRequest()
+      .setDateRanges(List(dateRange))
+      .setMetrics(List(pageViews))
+      .setFiltersExpression(filter)
+      .setIncludeEmptyRows(true)
+      .setSamplingLevel("LARGE")
+      .setViewId(getViewIdForReport("totalPageViewsByFilter"))
+
+    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
+
+    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+
+    reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"pageViews by filter $filter")}
+    // this report has a single value, so just dive in grabbing the first entry at each level
+    parseDimensionlessSingleMetricReport(reportResponse)
+  }
+
   // general GA stuff
 
   private def parseDimensionlessSingleMetricReport(reportResponse: GetReportsResponse): Long = {
@@ -169,7 +204,7 @@ object GoogleAnalytics {
   private val GLABS_VIEW_START_DATE = new DateTime("2016-12-11")
 
   private def getViewIdForReport(reportType: String, date: Option[DateTime] = None): String = {
-    def userGlabsAccountWhenAvailable = {
+    def useGlabsAccountWhenAvailable = {
       if (date.exists(_.isAfter(GLABS_VIEW_START_DATE)))
         Config().googleAnalyticsGlabsViewId
       else
@@ -178,9 +213,10 @@ object GoogleAnalytics {
 
     reportType match {
       case "ctaCtr" => Config().googleAnalyticsViewId
-      case "pageViews" => userGlabsAccountWhenAvailable
-      case "dailyUniqueUsers" => userGlabsAccountWhenAvailable
-      case _ => userGlabsAccountWhenAvailable
+      case "pageViews" => useGlabsAccountWhenAvailable
+      case "dailyUniqueUsers" => useGlabsAccountWhenAvailable
+      case "totalPageViewsByFilter" => Config().googleAnalyticsGlabsViewId
+      case _ => useGlabsAccountWhenAvailable
     }
   }
 
