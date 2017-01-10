@@ -51,10 +51,10 @@ object QualifiedPercentagesReport {
     }
   }
 
-  val qualifiedMetrics = Map(
-    "articleDwellTime" -> ContentTypeDwellTimeMetric("article", 15),
-    "galleryDwellTime" -> ContentTypeDwellTimeMetric("gallery", 15),
-    "interactiveDwellTime" -> ContentTypeDwellTimeMetric("interactive", 15)
+  val qualifiedMetricFetchers = List(
+    ContentTypeDwellTimeMetric("article", 15),
+    ContentTypeDwellTimeMetric("gallery", 15),
+    ContentTypeDwellTimeMetric("interactive", 15)
   )
 
   def generateReport(campaignId: String): Option[QualifiedPercentagesReport] = {
@@ -62,10 +62,11 @@ object QualifiedPercentagesReport {
       for (
         startDate <- campaign.startDate
       ) yield {
-        val reportLines = qualifiedMetrics flatMap { case(metricName, fetcher) =>
-          val reportOption = fetcher.fetch(campaign, startDate, campaign.endDate)
-          reportOption.map{ r => metricName -> r}
+
+        val reportLines = qualifiedMetricFetchers.foldLeft(Map[String, QualifiedMetricReport]()){(m, fetcher) =>
+          m ++ fetcher.fetch(campaign, startDate, campaign.endDate)
         }
+
         val report = QualifiedPercentagesReport(campaignId, reportLines)
 
         AnalyticsDataCache.putQualifiedPercentagesReport(campaignId, report, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
@@ -77,12 +78,12 @@ object QualifiedPercentagesReport {
 }
 
 sealed trait QualifiedMetricReportFetcher {
-  def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Option[QualifiedMetricReport]
+  def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Map[String, QualifiedMetricReport]
 }
 
 case class ContentTypeDwellTimeMetric(contentType: String, qualifiedDwellTime: Int) extends QualifiedMetricReportFetcher {
 
-  override def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Option[QualifiedMetricReport] = {
+  override def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Map[String, QualifiedMetricReport] = {
 
     val campaignFilter = if (campaign.`type` == "hosted") {
       campaign.gaFilterExpression
@@ -90,14 +91,16 @@ case class ContentTypeDwellTimeMetric(contentType: String, qualifiedDwellTime: I
       campaign.pathPrefix.map{ section =>s"ga:dimension4==${section}"}
     }
 
-    campaignFilter.flatMap{ filter =>
+    val report = campaignFilter.map{ filter =>
       val totalHits = GoogleAnalytics.loadTotalCampaignContentTypeViews(filter, contentType, startDate, endDate);
       if (totalHits > 0) {
         val qualifiedHits = GoogleAnalytics.loadCampaignContentTypeViewsWithDwellTime(filter, contentType, qualifiedDwellTime, startDate, endDate)
-        Some(QualifiedMetricReport(totalHits, qualifiedHits, (qualifiedHits.toDouble / totalHits) * 100))
+        Map(s"${contentType}DwellTime" -> (QualifiedMetricReport(totalHits, qualifiedHits, (qualifiedHits.toDouble / totalHits) * 100)))
       } else {
-        None
+        Map[String, QualifiedMetricReport]()
       }
     }
+
+    report.getOrElse(Map())
   }
 }
