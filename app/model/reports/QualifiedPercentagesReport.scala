@@ -54,7 +54,8 @@ object QualifiedPercentagesReport {
   val qualifiedMetricFetchers = List(
     ContentTypeDwellTimeMetric("article", 15),
     ContentTypeDwellTimeMetric("gallery", 15),
-    ContentTypeDwellTimeMetric("interactive", 15)
+    ContentTypeDwellTimeMetric("interactive", 15),
+    VideoCompletionMetricFetcher()
   )
 
   def generateReport(campaignId: String): Option[QualifiedPercentagesReport] = {
@@ -101,6 +102,30 @@ case class ContentTypeDwellTimeMetric(contentType: String, qualifiedDwellTime: I
       }
     }
 
+    report.getOrElse(Map())
+  }
+}
+
+case class VideoCompletionMetricFetcher() extends QualifiedMetricReportFetcher{
+  override def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Map[String, QualifiedMetricReport] = {
+    val campaignFilter = if (campaign.`type` == "hosted") {
+      campaign.gaFilterExpression
+    } else {
+      campaign.pathPrefix.map{ section =>s"ga:dimension4==${section}"}
+    }
+
+    val report = campaignFilter.map { filter =>
+      val totalHits = GoogleAnalytics.loadTotalCampaignContentTypeViews(filter, "video", startDate, endDate);
+      val completionCounts = GoogleAnalytics.loadVideoCompletionCounts(filter, startDate, endDate);
+
+      Map(
+        "videoPlays" -> QualifiedMetricReport(totalHits, completionCounts.playMedia, (completionCounts.playMedia.toDouble / totalHits) * 100),
+        "video25Percent" -> QualifiedMetricReport(totalHits, completionCounts.media25Complete, (completionCounts.media25Complete.toDouble / totalHits) * 100),
+        "video50Percent" -> QualifiedMetricReport(totalHits, completionCounts.media50Complete, (completionCounts.media50Complete.toDouble / totalHits) * 100),
+        "video75Percent" -> QualifiedMetricReport(totalHits, completionCounts.media75Complete, (completionCounts.media75Complete.toDouble / totalHits) * 100),
+        "videoComplete" -> QualifiedMetricReport(totalHits, completionCounts.media100Complete, (completionCounts.media100Complete.toDouble / totalHits) * 100)
+      )
+    }
     report.getOrElse(Map())
   }
 }
