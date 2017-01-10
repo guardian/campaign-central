@@ -65,6 +65,14 @@ export function fetchCampaignTargetsReport(id) {
   });
 }
 
+export function fetchCampaignQualifiedReport(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/qualifiedReport',
+    contentType: 'application/json',
+    method: 'get'
+  });
+}
+
 export function fetchCampaignContent(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/content',

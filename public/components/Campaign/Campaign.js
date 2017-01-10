@@ -18,6 +18,7 @@ class Campaign extends React.Component {
         this.props.campaignAnalyticsActions.getCampaignPageViews(nextProps.campaign.id);
         this.props.campaignAnalyticsActions.getCampaignDailyUniques(nextProps.campaign.id);
         this.props.campaignAnalyticsActions.getCampaignTargetsReport(nextProps.campaign.id);
+        this.props.campaignAnalyticsActions.getCampaignQualifiedReport(nextProps.campaign.id);
       }
     }
   }
@@ -68,6 +69,7 @@ import * as getCampaignContent from '../../actions/CampaignActions/getCampaignCo
 import * as getCampaignPageViews from '../../actions/CampaignActions/getCampaignPageViews';
 import * as getCampaignDailyUniques from '../../actions/CampaignActions/getCampaignDailyUniques';
 import * as getCampaignTargetsReport from '../../actions/CampaignActions/getCampaignTargetsReport';
+import * as getCampaignQualifiedReport from '../../actions/CampaignActions/getCampaignQualifiedReport';
 import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
 
 function mapStateToProps(state) {
@@ -79,7 +81,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignDailyUniques, getCampaignTargetsReport, clearCampaignAnalytics), dispatch)
+    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignDailyUniques, getCampaignTargetsReport, getCampaignQualifiedReport, clearCampaignAnalytics), dispatch)
   };
 }
 
