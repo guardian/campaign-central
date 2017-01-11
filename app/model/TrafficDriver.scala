@@ -212,7 +212,13 @@ object LineItemSummary {
     } yield {
       val dfpLineItemService = Dfp.mkLineItemService(Dfp.mkSession())
       def fetch(orderIds: Seq[Long]): Seq[LineItemSummary] =
-        Dfp.fetchSuggestedLineItems(campaign.name, client.name, dfpLineItemService, orderIds) filterNot {
+        Dfp.fetchSuggestedLineItems(
+          campaignName = campaign.name,
+          clientName = client.name,
+          service = dfpLineItemService,
+          orderIds,
+          lineItemIdsToIgnore = TrafficDriverRejectRepository.getRejectedDriverIds(campaignId)
+        ) filterNot {
           // DFP won't let you update archived line items
           _.getIsArchived
         } map {
@@ -228,6 +234,10 @@ object LineItemSummary {
 
   def acceptSuggestedTrafficDriver(campaignId: String, lineItemId: Long): Unit = {
     Dfp.linkLineItemToCampaign(Dfp.mkLineItemService(Dfp.mkSession()), lineItemId, campaignId)
+  }
+
+  def rejectSuggestedTrafficDriver(campaignId: String, lineItemId: Long): Unit = {
+    TrafficDriverRejectRepository.putRejectedDriverId(campaignId, lineItemId)
   }
 }
 

@@ -6,6 +6,7 @@ import {bindActionCreators} from "redux";
 import * as getCampaignTrafficDrivers from "../../actions/CampaignActions/getCampaignTrafficDrivers";
 import * as getCampaignTrafficDriverSuggestions from "../../actions/CampaignActions/getCampaignTrafficDriverSuggestions";
 import * as acceptSuggestedCampaignTrafficDriver from "../../actions/CampaignActions/AcceptSuggestedCampaignTrafficDriver";
+import * as rejectSuggestedCampaignTrafficDriver from "../../actions/CampaignActions/RejectSuggestedCampaignTrafficDriver";
 
 class CampaignTrafficDriversAndSuggestions extends React.Component {
 
@@ -15,14 +16,25 @@ class CampaignTrafficDriversAndSuggestions extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if ((nextProps.campaign.id !== this.props.campaign.id) || (nextProps.campaignTrafficDriversDirty && !this.props.campaignTrafficDriversDirty)) {
+    const campaignChanged = nextProps.campaign.id !== this.props.campaign.id;
+    const driversNeedRefresh = nextProps.campaignTrafficDriversDirty && !this.props.campaignTrafficDriversDirty;
+    const suggestionsNeedRefresh = nextProps.campaignTrafficDriverSuggestionsDirty && !this.props.campaignTrafficDriverSuggestionsDirty;
+
+    if (campaignChanged || driversNeedRefresh) {
       this.props.campaignTrafficDriverActions.getCampaignTrafficDrivers(nextProps.campaign.id);
+    }
+
+    if (campaignChanged || driversNeedRefresh || suggestionsNeedRefresh) {
       this.props.campaignTrafficDriverSuggestionActions.getCampaignTrafficDriverSuggestions(nextProps.campaign.id);
     }
   }
 
   acceptSuggestion = (trafficDriverId) => {
     this.props.campaignTrafficDriverSuggestionActions.acceptSuggestedCampaignTrafficDriver(this.props.campaign.id, trafficDriverId);
+  };
+
+  rejectSuggestion = (trafficDriverId) => {
+    this.props.campaignTrafficDriverSuggestionActions.rejectSuggestedCampaignTrafficDriver(this.props.campaign.id, trafficDriverId);
   };
 
   render() {
@@ -34,7 +46,8 @@ class CampaignTrafficDriversAndSuggestions extends React.Component {
           <CampaignTrafficDrivers campaignTrafficDrivers={this.props.campaignTrafficDrivers}/>
           <CampaignTrafficDriverSuggestions campaignId={this.props.campaign.id}
                                             campaignTrafficDriverSuggestions={this.props.campaignTrafficDriverSuggestions}
-                                            acceptSuggestion={(trafficDriverId) => this.acceptSuggestion(trafficDriverId)}/>
+                                            acceptSuggestion={(trafficDriverId) => this.acceptSuggestion(trafficDriverId)}
+                                            rejectSuggestion={(trafficDriverId) => this.rejectSuggestion(trafficDriverId)}/>
         </div>
       </div>
     );
@@ -43,16 +56,21 @@ class CampaignTrafficDriversAndSuggestions extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    campaignTrafficDrivers:           state.campaignTrafficDrivers,
+    campaignTrafficDrivers: state.campaignTrafficDrivers,
     campaignTrafficDriverSuggestions: state.campaignTrafficDriverSuggestions,
-    campaignTrafficDriversDirty:      state.campaignTrafficDriversDirty
+    campaignTrafficDriversDirty: state.campaignTrafficDriversDirty,
+    campaignTrafficDriverSuggestionsDirty: state.campaignTrafficDriverSuggestionsDirty
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     campaignTrafficDriverActions:           bindActionCreators(Object.assign({}, getCampaignTrafficDrivers), dispatch),
-    campaignTrafficDriverSuggestionActions: bindActionCreators(Object.assign({}, getCampaignTrafficDriverSuggestions, acceptSuggestedCampaignTrafficDriver), dispatch)
+    campaignTrafficDriverSuggestionActions: bindActionCreators(Object.assign({},
+      getCampaignTrafficDriverSuggestions,
+      acceptSuggestedCampaignTrafficDriver,
+      rejectSuggestedCampaignTrafficDriver
+    ), dispatch)
   };
 }
 

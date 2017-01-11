@@ -98,6 +98,15 @@ export function acceptSuggestedCampaignTrafficDriver(campaignId, trafficDriverId
   });
 }
 
+export function rejectSuggestedCampaignTrafficDriver(campaignId, trafficDriverId) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + campaignId + '/not-driver/' + trafficDriverId,
+    contentType: 'application/json',
+    data: {null},
+    method: 'put'
+  });
+}
+
 export function fetchCampaignTrafficDriverStats(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/driverstats',
