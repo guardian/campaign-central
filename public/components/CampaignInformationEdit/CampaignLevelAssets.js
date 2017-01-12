@@ -39,7 +39,7 @@ class CampaignLevelAssets extends React.Component {
     var ctaBlock;
     if(this.props.campaign.type === 'hosted') {
       ctaBlock = (
-        <CampaignCtas campaign={this.props.campaign} campaignCtaStats={this.props.campaignCtaStats} campaignAnalytics={this.props.campaignAnalytics} />
+        <CampaignCtas campaign={this.props.campaign} campaignCtaStats={this.props.campaignCtaStats} campaignAnalytics={this.props.campaignPageViews} />
       );
     }
 
@@ -64,7 +64,7 @@ import * as getCampaignCtaStats from '../../actions/CampaignActions/getCampaignC
 
 function mapStateToProps(state) {
   return {
-    campaignAnalytics: state.campaignAnalytics,
+    campaignPageViews: state.campaignPageViews,
     campaignCtaStats: state.campaignCtaStats
   };
 }
