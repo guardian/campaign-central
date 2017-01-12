@@ -4,6 +4,16 @@ import {tagEditUrl} from '../../util/urlBuilder';
 
 class CampaignLevelAssets extends React.Component {
 
+  componentWillMount() {
+    this.props.campaignCtaStatsActions.getCampaignCtaStats(this.props.campaign.id);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.campaign.id !== this.props.campaign.id) {
+      this.props.campaignCtaStatsActions.getCampaignCtaStats(nextProps.campaign.id);
+    }
+  }
+
   renderTagInformation = () => {
 
     if(this.props.campaign.tagId) {
@@ -22,14 +32,14 @@ class CampaignLevelAssets extends React.Component {
         No tag has been configured yet
       </span>
     )
-  }
+  };
 
   render () {
 
     var ctaBlock;
     if(this.props.campaign.type === 'hosted') {
       ctaBlock = (
-        <CampaignCtas campaign={this.props.campaign} />
+        <CampaignCtas campaign={this.props.campaign} campaignCtaStats={this.props.campaignCtaStats} campaignAnalytics={this.props.campaignAnalytics} />
       );
     }
 
@@ -46,4 +56,23 @@ class CampaignLevelAssets extends React.Component {
   }
 }
 
-export default CampaignLevelAssets;
+
+//REDUX CONNECTIONS
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as getCampaignCtaStats from '../../actions/CampaignActions/getCampaignCtaStats';
+
+function mapStateToProps(state) {
+  return {
+    campaignAnalytics: state.campaignAnalytics,
+    campaignCtaStats: state.campaignCtaStats
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    campaignCtaStatsActions: bindActionCreators(Object.assign({}, getCampaignCtaStats), dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CampaignLevelAssets);

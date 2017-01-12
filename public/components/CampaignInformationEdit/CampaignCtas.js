@@ -3,15 +3,7 @@ import {ctaEditUrl} from '../../util/urlBuilder'
 
 class CampaignCtas extends React.Component {
 
-  componentWillMount() {
-    this.props.campaignCtaStatsActions.getCampaignCtaStats(this.props.campaign.id);
-  }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign.id !== this.props.campaign.id) {
-      this.props.campaignCtaStatsActions.getCampaignCtaStats(nextProps.campaign.id);
-    }
-  }
 
   getClickCount = (ctaId) => {
     if(this.props.campaignCtaStats) {
@@ -132,22 +124,4 @@ class CampaignCtas extends React.Component {
   }
 }
 
-//REDUX CONNECTIONS
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
-import * as getCampaignCtaStats from '../../actions/CampaignActions/getCampaignCtaStats';
-
-function mapStateToProps(state) {
-  return {
-    campaignAnalytics: state.campaignAnalytics,
-    campaignCtaStats: state.campaignCtaStats
-  };
-}
-
-function mapDispatchToProps(dispatch) {
-  return {
-    campaignCtaStatsActions: bindActionCreators(Object.assign({}, getCampaignCtaStats), dispatch)
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignCtas);
+export default CampaignCtas
