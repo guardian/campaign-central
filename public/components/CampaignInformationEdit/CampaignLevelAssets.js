@@ -14,16 +14,42 @@ class CampaignLevelAssets extends React.Component {
     }
   }
 
+  getCtr = () => {
+    if(this.props.campaignCtaStats && this.props.campaignPageViews) {
+      var count = this.props.campaignCtaStats['logo'];
+      if(!count) {count = 0}
+
+      var latestStats = this.props.campaignPageViews.pageCountStats[this.props.campaignPageViews.pageCountStats.length - 1];
+      var uniqueCount = latestStats["cumulative-unique-total"];
+
+      var ctr = '';
+      if (uniqueCount && uniqueCount !== 0) {
+        ctr =  '(ctr: ' + ((count / uniqueCount) * 100 ).toFixed(2) + '%)';
+      }
+
+      return (<p>Logo clicks: {this.props.campaignCtaStats['logo']} {ctr}</p>);
+    }
+
+    return undefined;
+  };
+
+
   renderTagInformation = () => {
 
     if(this.props.campaign.tagId) {
       return (
+        <div>
         <span className="campaign-assets__field__value">
           <a href={tagEditUrl(this.props.campaign.tagId)} target="_blank">
             <img src={this.props.campaign.campaignLogo} className="campaign-assets__field__logo"/>
             {this.props.campaign.pathPrefix}
           </a>
+
         </span>
+        <span className="campaign-assets__field__value">
+          {this.getCtr()}
+        </span>
+        </div>
       )
     }
 
