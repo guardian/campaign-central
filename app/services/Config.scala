@@ -39,6 +39,8 @@ sealed trait Config {
 
   def analyticsDataCacheTableName = s"campaign-central-$stage-analytics"
 
+  def trafficDriverRejectTableName = s"campaign-central-$stage-drivers-rejected"
+
   def tagManagerApiUrl: String
   def composerUrl: String
   def liveUrl: String
@@ -186,7 +188,7 @@ class ProdConfig extends Config {
       "paidContent" -> Seq(paid)
     )
   }
-  val dfpMerchandisingOrderIds = {
+  override val dfpMerchandisingOrderIds = {
     val hosted = 345535767L
     val paid = 211298847L
     val paidUs = 211064247L

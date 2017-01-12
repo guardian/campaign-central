@@ -4,18 +4,13 @@ import {bindActionCreators} from "redux";
 
 class CampaignTrafficDriverSuggestions extends React.Component {
 
-  rejectSuggestion = (trafficDriverId) => {
-    console.log('*** Rejecting traffic driver ' + trafficDriverId + ' for campaign ' + this.props.campaignId);
-    alert("Does nothing yet!")
-  };
-
   renderSuggestion = (trafficDriver) => {
     return (
       <div key={trafficDriver.id} className="campaign-suggestion-list__row">
         <span><i className="i-dfp"/></span>
         <span><a href={trafficDriver.url} target="_blank">{trafficDriver.name} ({trafficDriver.id})</a></span>
         <span className="campaign-suggestion-list__button"><button  onClick={() => this.props.acceptSuggestion(trafficDriver.id)}>Yes</button></span>
-        <span className="campaign-suggestion-list__button"><button onClick={() => this.rejectSuggestion(trafficDriver.id)}>No</button></span>
+        <span className="campaign-suggestion-list__button"><button onClick={() => this.props.rejectSuggestion(trafficDriver.id)}>No</button></span>
       </div>
     );
   };

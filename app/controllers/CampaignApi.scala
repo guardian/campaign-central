@@ -161,6 +161,12 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     NoContent
   }
 
+  def rejectSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = APIAuthAction { req =>
+    Logger.info(s"Rejecting traffic driver $lineItemId for campaign $campaignId")
+    LineItemSummary.rejectSuggestedTrafficDriver(campaignId, lineItemId)
+    NoContent
+  }
+
   def getCampaignTrafficDriverStats(campaignId: String) = APIAuthAction { req =>
     Logger.info(s"Loading traffic driver stats for campaign $campaignId")
     Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))

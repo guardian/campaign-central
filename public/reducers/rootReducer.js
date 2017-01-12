@@ -12,8 +12,9 @@ import clients from './clientsReducer';
 import client from './clientReducer';
 import campaignContent from './campaignContentReducer';
 import campaignTrafficDrivers from './campaignTrafficDriverReducer';
-import campaignTrafficDriverSuggestions from './campaignTrafficDriverSuggestionsReducer';
 import campaignTrafficDriversDirty from './campaignTrafficDriversDirtyReducer';
+import campaignTrafficDriverSuggestions from './campaignTrafficDriverSuggestionsReducer';
+import campaignTrafficDriverSuggestionsDirty from './campaignTrafficDriverSuggestionsDirtyReducer';
 import campaignTrafficDriverStats from './campaignTrafficDriverStatsReducer';
 import campaignNotes from './campaignNotesReducer';
 import campaignSort from './campaignSortReducer';
@@ -33,8 +34,9 @@ export default combineReducers({
   client,
   campaignContent,
   campaignTrafficDrivers,
-  campaignTrafficDriverSuggestions,
   campaignTrafficDriversDirty,
+  campaignTrafficDriverSuggestions,
+  campaignTrafficDriverSuggestionsDirty,
   campaignTrafficDriverStats,
   campaignNotes,
   campaignSort,

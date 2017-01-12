@@ -39,7 +39,8 @@ object Dfp extends DfpService {
     campaignName: String,
     clientName: String,
     service: LineItemServiceInterface,
-    orderIds: Seq[Long]
+    orderIds: Seq[Long],
+    lineItemIdsToIgnore: Seq[Long]
   ): Seq[LineItem] = {
 
     val fetches: Stream[Seq[LineItem]] = {
@@ -89,10 +90,14 @@ object Dfp extends DfpService {
 
         def fetchByNameAndOrder(nameCondition: String, orderId: Long): Seq[LineItem] = {
           Logger.info(s"Fetching line items to suggest in order $orderId with condition [$nameCondition]")
+          val lineItemCondition = {
+            if (lineItemIdsToIgnore.isEmpty) ""
+            else s"AND NOT id IN (${lineItemIdsToIgnore.mkString(",")})"
+          }
           fetchLineItems(
             service,
             new StatementBuilder()
-            .where(s"orderId = :orderId AND ($nameCondition)")
+            .where(s"orderId = :orderId $lineItemCondition AND ($nameCondition)")
             .withBindVariableValue("orderId", orderId)
           )
         }
