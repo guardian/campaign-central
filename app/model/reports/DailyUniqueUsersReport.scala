@@ -53,7 +53,7 @@ case class DailyUniqueUsersReport(campaignId: String, dailyUniqueUsers: List[Dai
 
 object DailyUniqueUsersReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExectuionContext
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
   implicit val dailyUniqueUsersReportFormat: Format[DailyUniqueUsersReport] = Jsonx.formatCaseClass[DailyUniqueUsersReport]
 

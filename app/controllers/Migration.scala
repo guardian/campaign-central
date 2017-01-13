@@ -21,7 +21,7 @@ class Migration(override val wsClient: WSClient) extends Controller with PandaAu
     Ok(s"migration no longer used")
   }
 
-  implicit val ec = AnalyticsDataCache.analyticsExectuionContext
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
   def buildDailyReports() = APIAuthAction { req =>
     Future {

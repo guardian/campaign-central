@@ -40,7 +40,7 @@ case object Miss extends CacheResult[Nothing] {
 
 object AnalyticsDataCache {
 
-  implicit val analyticsExectuionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(50))
+  implicit val analyticsExecutionContext = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(50))
 
   def deleteCacheEntry(key: String, dataType: String): Unit = {
     Dynamo.analyticsDataCacheTable.deleteItem("key", key, "dataType", dataType)

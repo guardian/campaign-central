@@ -126,7 +126,7 @@ object GoogleAnalytics {
     val viewsReportRequest = new ReportRequest()
       .setDateRanges(List(dateRange))
       .setMetrics(List(totalEvents))
-      .setFiltersExpression(s"ga:eventCategory==Click;ga:eventAction==External;ga:eventLabel==$trackingCode")
+      .setFiltersExpression(s"ga:eventCategory==click;ga:eventAction==external;ga:eventLabel==$trackingCode")
       .setIncludeEmptyRows(true)
       .setSamplingLevel("LARGE")
       .setViewId(getViewIdForReport("ctaCtr"))
@@ -139,6 +139,34 @@ object GoogleAnalytics {
     // this report has a single value, so just dive in grabbing the first entry at each level
     parseDimensionlessSingleMetricReport(reportResponse)
   }
+
+  def loadSponsorLogoClicks(sectionId: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
+
+    Logger.info(s"fetch sponsor logo clicks for $sectionId")
+
+    val endOfRange = endDate.flatMap { ed => if (ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None }.getOrElse("yesterday")
+    val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
+
+    val totalEvents = new Metric().setExpression("ga:totalEvents").setAlias("totalEvents")
+
+    val viewsReportRequest = new ReportRequest()
+      .setDateRanges(List(dateRange))
+      .setMetrics(List(totalEvents))
+      .setFiltersExpression(s"ga:eventAction==sponsor logo;ga:dimension4==$sectionId")
+      .setIncludeEmptyRows(true)
+      .setSamplingLevel("LARGE")
+      .setViewId(getViewIdForReport("sponsorLogoCtr"))
+
+    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
+
+    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+
+    reportResponse.getReports.foreach { report => warnIfDataIsSampled(report, s"fetch sponsor logo clicks for $sectionId") }
+
+    // this report has a single value, so just dive in grabbing the first entry at each level
+    parseDimensionlessSingleMetricReport(reportResponse)
+  }
+
 
   // qualified reporting functions
 
@@ -169,10 +197,9 @@ object GoogleAnalytics {
     val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
 
     val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
-
     reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"pageViews by filter $filter")}
-    // this report has a single value, so just dive in grabbing the first entry at each level
-    parseDimensionlessSingleMetricReport(reportResponse)
+  // this report has a single value, so just dive in grabbing the first entry at each level
+  parseDimensionlessSingleMetricReport(reportResponse)
   }
 
   //                               metric1          metric3                metric4                metric5                metric6
@@ -277,6 +304,7 @@ object GoogleAnalytics {
       case "ctaCtr" => Config().googleAnalyticsViewId
       case "pageViews" => useGlabsAccountWhenAvailable
       case "dailyUniqueUsers" => useGlabsAccountWhenAvailable
+      case "sponsorLogoCtr" => Config().googleAnalyticsGlabsViewId
       case "totalPageViewsByFilter" => Config().googleAnalyticsGlabsViewId
       case "videoCompletionCounts" => Config().googleAnalyticsGlabsViewId
       case _ => useGlabsAccountWhenAvailable

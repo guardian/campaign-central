@@ -15,7 +15,7 @@ case class CtaClicksReport(campaignId: String, data: Map[String, Long]) {
 
 object CtaClicksReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExectuionContext
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
   implicit val actaClicksReportyFormat: Format[CtaClicksReport] = Jsonx.formatCaseClass[CtaClicksReport]
 
@@ -45,7 +45,7 @@ object CtaClicksReport {
 
   def generateReport(campaignId: String): Option[CtaClicksReport] = {
     CampaignRepository.getCampaign(campaignId) map { campaign =>
-      val reportLines = for (
+      val ctaReportLines = for (
         cta <- campaign.callToActions;
         startDate <- campaign.startDate;
         builderId <- cta.builderId;
@@ -54,7 +54,15 @@ object CtaClicksReport {
         builderId -> GoogleAnalytics.loadCtaClicks(trackingCode, startDate, campaign.endDate)
       }
 
-      val report = CtaClicksReport(campaignId, reportLines.toMap)
+      val logoReportLines = for (
+        startDate <- campaign.startDate;
+        sectionId <- campaign.pathPrefix
+      ) yield {
+        campaign.pathPrefix
+        "logo" -> GoogleAnalytics.loadSponsorLogoClicks(sectionId, startDate, campaign.endDate)
+      }
+
+      val report = CtaClicksReport(campaignId, (logoReportLines.toList ::: ctaReportLines).toMap)
 
       AnalyticsDataCache.putCampaignCtaClicksReport(campaignId, report, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
 

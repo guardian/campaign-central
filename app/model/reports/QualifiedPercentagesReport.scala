@@ -23,7 +23,7 @@ case class QualifiedPercentagesReport(campaignId: String, metrics: Map[String, Q
 
 object QualifiedPercentagesReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExectuionContext
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
   implicit val qualifiedPercentagesReportFormat: Format[QualifiedPercentagesReport] = Jsonx.formatCaseClass[QualifiedPercentagesReport]
 
