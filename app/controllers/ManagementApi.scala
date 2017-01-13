@@ -5,7 +5,7 @@ import java.util.concurrent.Executors
 import com.gu.pandahmac.HMACAuthActions
 import model.{TrafficDriverGroupStats, User}
 import model.command.RefreshCampaignFromCAPICommand
-import model.reports.{CampaignPageViewsReport, CtaClicksReport, DailyUniqueUsersReport}
+import model.reports._
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
@@ -62,6 +62,10 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with HMA
       case "TrafficDriverGroupStats" => {
         Logger.info(s"manually clearing Traffic driver stats for $key")
         Future {TrafficDriverGroupStats.forCampaign(key)}
+      }
+      case "QualifiedPercentagesReport" => {
+        Logger.info(s"manually clearing Qualified stats for $key")
+        Future {QualifiedPercentagesReport.getQualifiedPercentagesReportForCampaign(key)}
       }
       case s => Logger.warn(s"manual clear invoked for unexpected data type $dataType")
     }

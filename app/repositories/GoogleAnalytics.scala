@@ -144,7 +144,7 @@ object GoogleAnalytics {
 
     Logger.info(s"fetch sponsor logo clicks for $sectionId")
 
-    val endOfRange = endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
+    val endOfRange = endDate.flatMap { ed => if (ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None }.getOrElse("yesterday")
     val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
 
     val totalEvents = new Metric().setExpression("ga:totalEvents").setAlias("totalEvents")
@@ -161,9 +161,107 @@ object GoogleAnalytics {
 
     val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
 
-    reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"fetch sponsor logo clicks for $sectionId")}
+    reportResponse.getReports.foreach { report => warnIfDataIsSampled(report, s"fetch sponsor logo clicks for $sectionId") }
+
     // this report has a single value, so just dive in grabbing the first entry at each level
     parseDimensionlessSingleMetricReport(reportResponse)
+  }
+
+
+  // qualified reporting functions
+
+  def loadTotalCampaignContentTypeViews(campaignFilter: String, contentType: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
+    loadTotalViewsWithFilter(s"$campaignFilter;ga:dimension5==$contentType", startDate, endDate)
+  }
+
+  def loadCampaignContentTypeViewsWithDwellTime(campaignFilter: String, contentType: String, qualifiedDwellTime: Int, startDate: DateTime, endDate: Option[DateTime]): Long = {
+    loadTotalViewsWithFilter(s"$campaignFilter;ga:dimension5==$contentType;ga:timeOnPage>=$qualifiedDwellTime", startDate, endDate)
+  }
+
+  private def loadTotalViewsWithFilter(filter: String, startDate: DateTime, endDate: Option[DateTime]): Long = {
+    Logger.info(s"fetch pageViews by filter $filter")
+
+    val endOfRange = endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
+    val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
+
+    val pageViews = new Metric().setExpression("ga:pageViews").setAlias("pageViews")
+
+    val viewsReportRequest = new ReportRequest()
+      .setDateRanges(List(dateRange))
+      .setMetrics(List(pageViews))
+      .setFiltersExpression(filter)
+      .setIncludeEmptyRows(true)
+      .setSamplingLevel("LARGE")
+      .setViewId(getViewIdForReport("totalPageViewsByFilter"))
+
+    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
+
+    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+    reportResponse.getReports.foreach{ report => warnIfDataIsSampled(report, s"pageViews by filter $filter")}
+  // this report has a single value, so just dive in grabbing the first entry at each level
+  parseDimensionlessSingleMetricReport(reportResponse)
+  }
+
+  //                               metric1          metric3                metric4                metric5                metric6
+  case class VideoCompletionCounts(playMedia: Long, media25Complete: Long, media50Complete: Long, media75Complete: Long, media100Complete: Long)
+
+  def loadVideoCompletionCounts(campaignFilter: String, startDate: DateTime, endDate: Option[DateTime]): VideoCompletionCounts = {
+    Logger.info(s"fetch VideoCompletionCounts by filter $campaignFilter")
+
+    val endOfRange = endDate.flatMap{ed => if(ed.isBeforeNow) Some(ed.toString("yyyy-MM-dd")) else None}.getOrElse("yesterday")
+    val dateRange = new DateRange().setStartDate(startDate.toString("yyyy-MM-dd")).setEndDate(endOfRange)
+
+    val playsMetric = new Metric().setExpression("ga:metric1").setAlias("plays")
+    val complete25Metric = new Metric().setExpression("ga:metric3").setAlias("25complete")
+    val complete50Metric = new Metric().setExpression("ga:metric4").setAlias("50complete")
+    val complete75Metric = new Metric().setExpression("ga:metric5").setAlias("75complete")
+    val completeMetric = new Metric().setExpression("ga:metric6").setAlias("complete")
+
+    val viewsReportRequest = new ReportRequest()
+      .setDateRanges(List(dateRange))
+      .setMetrics(List(playsMetric, complete25Metric, complete50Metric, complete75Metric, completeMetric))
+      .setFiltersExpression(campaignFilter)
+      .setIncludeEmptyRows(true)
+      .setSamplingLevel("LARGE")
+      .setViewId(getViewIdForReport("videoCompletionCounts"))
+
+    val getReportsRequest = new GetReportsRequest().setReportRequests(List(viewsReportRequest))
+
+    val reportResponse = gaClient.reports().batchGet(getReportsRequest).execute()
+
+    parseVideoCompletionCounts(reportResponse)
+  }
+
+  private def parseVideoCompletionCounts(reportResponse: GetReportsResponse): VideoCompletionCounts = {
+    val counts = for (
+      report <- reportResponse.getReports.headOption;
+      rows <- Option(report.getData.getRows)
+    ) yield {
+      val header = report.getColumnHeader
+
+      val metricHeaders = header.getMetricHeader.getMetricHeaderEntries
+
+      val playsMetricIndex = metricHeaders.indexWhere(_.getName == "plays")
+      val complete25MetricIndex = metricHeaders.indexWhere(_.getName == "25complete")
+      val complete50MetricIndex = metricHeaders.indexWhere(_.getName == "50complete")
+      val complete75MetricIndex = metricHeaders.indexWhere(_.getName == "75complete")
+      val completeMetricIndex = metricHeaders.indexWhere(_.getName == "complete")
+
+      for (
+        row <- rows.headOption;
+        metrics <- row.getMetrics.headOption
+      ) yield {
+
+        val plays = metrics.getValues.apply(playsMetricIndex).toLong
+        val complete25 = metrics.getValues.apply(complete25MetricIndex).toLong
+        val complete50 = metrics.getValues.apply(complete50MetricIndex).toLong
+        val complete75 = metrics.getValues.apply(complete75MetricIndex).toLong
+        val complete = metrics.getValues.apply(completeMetricIndex).toLong
+
+        VideoCompletionCounts(plays, complete25, complete50, complete75, complete)
+      }
+    }
+    counts.flatten.getOrElse(VideoCompletionCounts(0,0,0,0,0))
   }
 
   // general GA stuff
@@ -195,7 +293,7 @@ object GoogleAnalytics {
   private val GLABS_VIEW_START_DATE = new DateTime("2016-12-11")
 
   private def getViewIdForReport(reportType: String, date: Option[DateTime] = None): String = {
-    def userGlabsAccountWhenAvailable = {
+    def useGlabsAccountWhenAvailable = {
       if (date.exists(_.isAfter(GLABS_VIEW_START_DATE)))
         Config().googleAnalyticsGlabsViewId
       else
@@ -204,10 +302,12 @@ object GoogleAnalytics {
 
     reportType match {
       case "ctaCtr" => Config().googleAnalyticsViewId
-      case "pageViews" => userGlabsAccountWhenAvailable
-      case "dailyUniqueUsers" => userGlabsAccountWhenAvailable
+      case "pageViews" => useGlabsAccountWhenAvailable
+      case "dailyUniqueUsers" => useGlabsAccountWhenAvailable
       case "sponsorLogoCtr" => Config().googleAnalyticsGlabsViewId
-      case _ => userGlabsAccountWhenAvailable
+      case "totalPageViewsByFilter" => Config().googleAnalyticsGlabsViewId
+      case "videoCompletionCounts" => Config().googleAnalyticsGlabsViewId
+      case _ => useGlabsAccountWhenAvailable
     }
   }
 

@@ -71,6 +71,11 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
   }
 
+  def putQualifiedPercentagesReport(campaignId: String, data: QualifiedPercentagesReport, validToTimestamp: Option[Long]): Unit = {
+    val entry = AnalyticsDataCacheEntry(campaignId, "QualifiedPercentagesReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
+    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
+  }
+
   def putCampaignTrafficDriverGroupStats( campaignId: String, data: Seq[TrafficDriverGroupStats]): Unit = {
     val entry = AnalyticsDataCacheEntry(
       key = campaignId,
@@ -113,6 +118,10 @@ object AnalyticsDataCache {
 
   def getCampaignCtaClicksReport(campaignId: String): CacheResult[CtaClicksReport] = {
     getEntry[CtaClicksReport](campaignId, "CtaClicksReport")
+  }
+
+  def getCampaignQualifiedPercentagesReport(campaignId: String): CacheResult[QualifiedPercentagesReport] = {
+    getEntry[QualifiedPercentagesReport](campaignId, "QualifiedPercentagesReport")
   }
 
   def summariseContents = {
