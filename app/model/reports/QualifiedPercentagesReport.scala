@@ -116,15 +116,19 @@ case class VideoCompletionMetricFetcher() extends QualifiedMetricReportFetcher{
 
     val report = campaignFilter.map { filter =>
       val totalHits = GoogleAnalytics.loadTotalCampaignContentTypeViews(filter, "video", startDate, endDate);
-      val completionCounts = GoogleAnalytics.loadVideoCompletionCounts(filter, startDate, endDate);
+      if (totalHits > 0) {
+        val completionCounts = GoogleAnalytics.loadVideoCompletionCounts(filter, startDate, endDate);
 
-      Map(
-        "videoPlays" -> QualifiedMetricReport(totalHits, completionCounts.playMedia, (completionCounts.playMedia.toDouble / totalHits) * 100),
-        "video25Percent" -> QualifiedMetricReport(totalHits, completionCounts.media25Complete, (completionCounts.media25Complete.toDouble / totalHits) * 100),
-        "video50Percent" -> QualifiedMetricReport(totalHits, completionCounts.media50Complete, (completionCounts.media50Complete.toDouble / totalHits) * 100),
-        "video75Percent" -> QualifiedMetricReport(totalHits, completionCounts.media75Complete, (completionCounts.media75Complete.toDouble / totalHits) * 100),
-        "videoComplete" -> QualifiedMetricReport(totalHits, completionCounts.media100Complete, (completionCounts.media100Complete.toDouble / totalHits) * 100)
-      )
+        Map(
+          "videoPlays" -> QualifiedMetricReport(totalHits, completionCounts.playMedia, (completionCounts.playMedia.toDouble / totalHits) * 100),
+          "video25Percent" -> QualifiedMetricReport(totalHits, completionCounts.media25Complete, (completionCounts.media25Complete.toDouble / totalHits) * 100),
+          "video50Percent" -> QualifiedMetricReport(totalHits, completionCounts.media50Complete, (completionCounts.media50Complete.toDouble / totalHits) * 100),
+          "video75Percent" -> QualifiedMetricReport(totalHits, completionCounts.media75Complete, (completionCounts.media75Complete.toDouble / totalHits) * 100),
+          "videoComplete" -> QualifiedMetricReport(totalHits, completionCounts.media100Complete, (completionCounts.media100Complete.toDouble / totalHits) * 100)
+        )
+      } else {
+        Map[String, QualifiedMetricReport]()
+      }
     }
     report.getOrElse(Map())
   }
