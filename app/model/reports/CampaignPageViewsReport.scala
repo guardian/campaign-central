@@ -92,7 +92,7 @@ case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], p
 
 object CampaignPageViewsReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExectuionContext
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
   implicit val campaignPageViewsReportFormat: Format[CampaignPageViewsReport] = Jsonx.formatCaseClass[CampaignPageViewsReport]
 

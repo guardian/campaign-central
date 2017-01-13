@@ -15,7 +15,7 @@ case class CtaClicksReport(campaignId: String, data: Map[String, Long]) {
 
 object CtaClicksReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExectuionContext
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
   implicit val actaClicksReportyFormat: Format[CtaClicksReport] = Jsonx.formatCaseClass[CtaClicksReport]
 
