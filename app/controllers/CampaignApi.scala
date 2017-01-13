@@ -51,6 +51,10 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     DailyUniqueUsersReport.getDailyUniqueUsersReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
+  def getCampaignQualifiedPercentagesReport(id: String) = APIAuthAction { req =>
+    QualifiedPercentagesReport.getQualifiedPercentagesReportForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+  }
+
   def getCampaignTargetsReport(id: String) = APIAuthAction { req =>
     Ok(Json.toJson(
       CampaignTargetsReport.getCampaignTargetsReport(id).getOrElse(CampaignTargetsReport(Map()))

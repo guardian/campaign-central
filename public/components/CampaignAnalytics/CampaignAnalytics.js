@@ -66,7 +66,7 @@ class CampaignAnalytics extends React.Component {
                                      dailyUniques={this.props.campaignDailyUniques.dailyUniqueUsers}
           />
 
-          <CampaignQualifiedChart />
+          <CampaignQualifiedChart qualifiedReport={this.props.campaignQualifiedReport} />
 
           {this.props.campaignPageViews.seenPaths.map((p) =>
             <ContentTrafficChart key={p} pageCountStats={this.props.campaignPageViews.pageCountStats} path={p}/>
@@ -89,7 +89,8 @@ function mapStateToProps(state) {
   return {
     campaignPageViews: state.campaignPageViews,
     campaignDailyUniques: state.campaignDailyUniques,
-    campaignTargetsReport: state.campaignTargetsReport
+    campaignTargetsReport: state.campaignTargetsReport,
+    campaignQualifiedReport: state.campaignQualifiedReport
   };
 }
 
