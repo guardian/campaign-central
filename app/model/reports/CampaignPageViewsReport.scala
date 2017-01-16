@@ -126,7 +126,7 @@ object CampaignPageViewsReport {
       startDate <- campaign.startDate
     ) yield {
       val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate).map{ dt =>
-        Thread.sleep(1000) // try to avoid rate limiting
+        Thread.sleep(3000) // try to avoid rate limiting
         loadCampaignPageViewsForDay(campaign, dt)
       }
 
