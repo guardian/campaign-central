@@ -107,8 +107,8 @@ case class ImportCampaignFromCAPICommand(
 
 
 
-  def findOrCreateClient(tag: Tag): Client = {
-    val sponsorName = tag.activeSponsorships.flatMap(_.headOption.map(_.sponsorName)) getOrElse (SponsorNameNotFound)
+  def findOrCreateClient(sponsorship: Option[Sponsorship]): Client = {
+    val sponsorName = sponsorship.map(_.sponsorName) getOrElse (SponsorNameNotFound)
     ClientRepository.getClientByName(sponsorName) getOrElse {
       val client = Client(
         id = UUID.randomUUID().toString,
@@ -129,6 +129,8 @@ case class ImportCampaignFromCAPICommand(
     val apiContent = ContentApi.loadAllContentInSection(section.pathPrefix)
     val hostedTag = deriveHostedTagFromContent(apiContent) getOrElse (CampaignTagNotFound)
 
+    val sponsorship = TagManagerApi.getSponsorshipForTag(id)
+
     val campaignType = hostedTag.paidContentType match {
       case Some("HostedContent") => "hosted"
       case Some(_) => "paidContent"
@@ -143,7 +145,7 @@ case class ImportCampaignFromCAPICommand(
         status = "pending",
         tagId = Some(id),
         pathPrefix = Some(section.pathPrefix),
-        clientId = findOrCreateClient(hostedTag).id,
+        clientId = findOrCreateClient(sponsorship).id,
         created = now,
         createdBy = userOrDefault,
         lastModified = now,
@@ -153,8 +155,6 @@ case class ImportCampaignFromCAPICommand(
         targets = Map("uniques" -> 10000L)
       )
     }
-
-    val sponsorship = campaign.tagId.flatMap( TagManagerApi.getSponsorshipForTag )
 
     updateCampaignAndContent(apiContent, hostedTag, campaign, sponsorship)
   }
