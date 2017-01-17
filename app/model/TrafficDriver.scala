@@ -41,7 +41,7 @@ case class TrafficDriver(
   url: String,
   status: String,
   startDate: LocalDate,
-  endDate: LocalDate,
+  endDate: Option[LocalDate],
   summaryStats: PerformanceStats
 )
 
@@ -49,9 +49,11 @@ object TrafficDriver {
 
   def fromDfpLineItem(lineItem: LineItem): TrafficDriver = {
 
-    def mkLocalDate(dfpDateTime: DateTime): LocalDate = {
-      val date = dfpDateTime.getDate
-      LocalDate.of(date.getYear, date.getMonth, date.getDay)
+    def mkLocalDate(dfpDateTime: DateTime): Option[LocalDate] = {
+      Option(dfpDateTime) map { dateTime =>
+        val date = dateTime.getDate
+        LocalDate.of(date.getYear, date.getMonth, date.getDay)
+      }
     }
 
     TrafficDriver(
@@ -59,7 +61,7 @@ object TrafficDriver {
       name = lineItem.getName,
       url = LineItemUrl(lineItem.getId),
       status = lineItem.getStatus.getValue,
-      startDate = mkLocalDate(lineItem.getStartDateTime),
+      startDate = mkLocalDate(lineItem.getStartDateTime).getOrElse(LocalDate.now),
       endDate = mkLocalDate(lineItem.getEndDateTime),
       summaryStats = PerformanceStats(
         impressions = Option(lineItem.getStats) map (_.getImpressionsDelivered.toInt) getOrElse 0,
@@ -91,7 +93,7 @@ object TrafficDriverGroup {
       TrafficDriverGroup(
         groupName,
         startDate = trafficDrivers.map(_.startDate).min,
-        endDate = trafficDrivers.map(_.endDate).max,
+        endDate = trafficDrivers.map(_.endDate.getOrElse(LocalDate.MIN)).max,
         summaryStats = PerformanceStats.sum(trafficDrivers.map(_.summaryStats)),
         trafficDriverUrls = trafficDrivers.map(_.url)
       )

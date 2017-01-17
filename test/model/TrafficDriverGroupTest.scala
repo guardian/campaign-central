@@ -19,7 +19,7 @@ class TrafficDriverGroupTest extends FlatSpec with Matchers {
         url = "url",
         status = "status",
         startDate = LocalDate.of(2015, 1, 2),
-        endDate = LocalDate.of(2015, 4, 6),
+        endDate = Some(LocalDate.of(2015, 4, 6)),
         summaryStats = PerformanceStats(12, 3)
       )
     )
@@ -43,7 +43,7 @@ class TrafficDriverGroupTest extends FlatSpec with Matchers {
         url = "url1",
         status = "status",
         startDate = LocalDate.of(2015, 1, 2),
-        endDate = LocalDate.of(2017, 4, 6),
+        endDate = Some(LocalDate.of(2017, 4, 6)),
         summaryStats = PerformanceStats(12, 3)
       ),
       TrafficDriver(
@@ -52,7 +52,7 @@ class TrafficDriverGroupTest extends FlatSpec with Matchers {
         url = "url2",
         status = "status",
         startDate = LocalDate.of(2014, 3, 22),
-        endDate = LocalDate.of(2016, 12, 6),
+        endDate = Some(LocalDate.of(2016, 12, 6)),
         summaryStats = PerformanceStats(2, 1)
       ),
       TrafficDriver(
@@ -61,7 +61,7 @@ class TrafficDriverGroupTest extends FlatSpec with Matchers {
         url = "url3",
         status = "status",
         startDate = LocalDate.of(2015, 5, 7),
-        endDate = LocalDate.of(2015, 5, 16),
+        endDate = Some(LocalDate.of(2015, 5, 16)),
         summaryStats = PerformanceStats(127, 43)
       ),
       TrafficDriver(
@@ -70,7 +70,7 @@ class TrafficDriverGroupTest extends FlatSpec with Matchers {
         url = "url4",
         status = "status",
         startDate = LocalDate.of(2015, 6, 7),
-        endDate = LocalDate.of(2015, 8, 16),
+        endDate = Some(LocalDate.of(2015, 8, 16)),
         summaryStats = PerformanceStats(0, 0)
       )
     )
