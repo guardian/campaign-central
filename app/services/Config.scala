@@ -134,7 +134,7 @@ class DevConfig extends Config {
   override def composerUrl = "https://composer.local.dev-gutools.co.uk"
   override def liveUrl = "https://www.theguardian.com"
   override def previewUrl = "https://viewer.gutools.co.uk/preview"
-  override def mediaAtomMakerUrl = "https://media-atom-maker.local.dev-gutools.co.uk"
+  override def mediaAtomMakerUrl = "https://video.local.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.local.dev-gutools.co.uk"
 
   override val dfpNetworkCode = StagingDfpProperties.dfpNetworkCode
@@ -155,7 +155,7 @@ class CodeConfig extends Config {
   override def composerUrl = "https://composer.code.dev-gutools.co.uk"
   override def liveUrl = "http://m.code.dev-theguardian.com"
   override def previewUrl = "https://viewer.code.dev-gutools.co.uk/preview"
-  override def mediaAtomMakerUrl = "https://media-atom-maker.code.dev-gutools.co.uk"
+  override def mediaAtomMakerUrl = "https://video.code.dev-gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.code.dev-gutools.co.uk"
 
   override val dfpNetworkCode = StagingDfpProperties.dfpNetworkCode
@@ -176,7 +176,7 @@ class ProdConfig extends Config {
   override def composerUrl = "https://composer.gutools.co.uk"
   override def liveUrl = "https://www.theguardian.com"
   override def previewUrl = "https://viewer.gutools.co.uk/preview"
-  override def mediaAtomMakerUrl = "https://media-atom-maker.gutools.co.uk"
+  override def mediaAtomMakerUrl = "https://video.gutools.co.uk"
   override def ctaAtomMakerUrl = "https://cta-atom-maker.gutools.co.uk"
 
   override val dfpNetworkCode = "59666047"
