@@ -46,10 +46,6 @@
       "Description": "The kinesis stream to send logs to",
       "Type": "String",
       "Default": "elk-PROD-KinesisStream-1PYU4KS1UEQA"
-    },
-    "CertificateArn": {
-      "Description": "ARN of the SSL certificate for this service",
-      "Type": "String"
     }
   },
   "Mappings": {
@@ -305,7 +301,7 @@
           "LoadBalancerPort": "443",
           "InstancePort": "9000",
           "Protocol": "HTTPS",
-          "SSLCertificateId": {"Ref": "CertificateArn"}
+          "SSLCertificateId": {"Fn::ImportValue" : {"Fn::Sub" : "certificate:gutools:campaign-central:${Stage}"}}
         }],
         "HealthCheck" : {
           "Target" : "HTTP:9000/management/healthcheck",
