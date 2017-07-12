@@ -3,13 +3,13 @@ package services
 import com.google.api.ads.common.lib.auth.OfflineCredentials
 import com.google.api.ads.common.lib.auth.OfflineCredentials.Api._
 import com.google.api.ads.dfp.axis.factory.DfpServices
-import com.google.api.ads.dfp.axis.utils.v201608.StatementBuilder.SUGGESTED_PAGE_LIMIT
-import com.google.api.ads.dfp.axis.utils.v201608.{ReportDownloader, StatementBuilder}
-import com.google.api.ads.dfp.axis.v201608.Column._
-import com.google.api.ads.dfp.axis.v201608.DateRangeType.REACH_LIFETIME
-import com.google.api.ads.dfp.axis.v201608.Dimension._
-import com.google.api.ads.dfp.axis.v201608.ExportFormat._
-import com.google.api.ads.dfp.axis.v201608.{ReportDownloadOptions, ReportJob, ReportQuery, ReportServiceInterface, _}
+import com.google.api.ads.dfp.axis.utils.v201705.StatementBuilder.SUGGESTED_PAGE_LIMIT
+import com.google.api.ads.dfp.axis.utils.v201705.{ReportDownloader, StatementBuilder}
+import com.google.api.ads.dfp.axis.v201705.Column._
+import com.google.api.ads.dfp.axis.v201705.DateRangeType.REACH_LIFETIME
+import com.google.api.ads.dfp.axis.v201705.Dimension._
+import com.google.api.ads.dfp.axis.v201705.ExportFormat._
+import com.google.api.ads.dfp.axis.v201705.{ReportDownloadOptions, ReportJob, ReportQuery, ReportServiceInterface, _}
 import com.google.api.ads.dfp.lib.client.DfpSession
 import play.api.Logger
 import services.Config.conf._
