@@ -2,7 +2,7 @@ package model
 
 import java.time.LocalDate
 
-import com.google.api.ads.dfp.axis.v201608.{DateTime, LineItem}
+import com.google.api.ads.dfp.axis.v201705.{DateTime, LineItem}
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
 import repositories._
