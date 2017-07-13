@@ -8,7 +8,7 @@ version := "1.0"
 
 resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-tools"
 
-val slf4jVersion = "1.7.21"
+val slf4jVersion = "1.7.25"
 
 lazy val dependencies = Seq(
   "com.amazonaws" % "aws-java-sdk" % "1.11.8",
