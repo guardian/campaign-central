@@ -101,7 +101,7 @@ export function acceptSuggestedCampaignTrafficDriver(campaignId, trafficDriverId
   return AuthedReqwest({
     url: '/api/campaigns/' + campaignId + '/driver/' + trafficDriverId,
     contentType: 'application/json',
-    data: {null},
+    data: {},
     method: 'put'
   });
 }
@@ -110,7 +110,7 @@ export function rejectSuggestedCampaignTrafficDriver(campaignId, trafficDriverId
   return AuthedReqwest({
     url: '/api/campaigns/' + campaignId + '/not-driver/' + trafficDriverId,
     contentType: 'application/json',
-    data: {null},
+    data: {},
     method: 'put'
   });
 }
