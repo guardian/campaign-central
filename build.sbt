@@ -13,7 +13,7 @@ val slf4jVersion = "1.7.21"
 lazy val dependencies = Seq(
   "com.amazonaws" % "aws-java-sdk" % "1.11.8",
   "ai.x" %% "play-json-extensions" % "0.8.0",
-  "com.gu" % "pan-domain-auth-play_2-5_2.11" % "0.4.0",
+  "com.gu" % "pan-domain-auth-play_2-5_2.11" % "0.4.1",
   "com.gu" %% "panda-hmac" % "1.2.0",
   "com.gu" %% "content-api-client" % "10.5",
   "com.google.apis" % "google-api-services-analyticsreporting" % "v4-rev115-1.22.0",
