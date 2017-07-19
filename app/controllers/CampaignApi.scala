@@ -29,10 +29,9 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   def updateCampaign(id: String) = APIAuthAction { req =>
     req.body.asJson.flatMap(_.asOpt[Campaign]) match {
       case None => BadRequest("Could not convert json to campaign")
-      case Some(campaign) => {
+      case Some(campaign) =>
         CampaignRepository.putCampaign(campaign)
         Ok(Json.toJson(campaign))
-      }
     }
   }
 
@@ -73,7 +72,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
     val content = (req.body.asJson.get \ "content").as[String]
 
-    if (content.isEmpty())
+    if (content.isEmpty)
       BadRequest("Cannot add a note with no content")
     else {
       val created = DateTime.now()
@@ -103,7 +102,7 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
       CampaignNotesRepository.getNote(id, dateCreated) match {
         case None => NotFound
-        case Some(note) => {
+        case Some(note) =>
 
           val lastModified = DateTime.now()
           val modifiedBy = User(req.user)
@@ -117,30 +116,31 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
           CampaignNotesRepository.putNote(updatedNote)
           Ok(Json.toJson(updatedNote))
-        }
       }
     }
   }
 
   def importFromTag() = APIAuthAction { req =>
     implicit val user = Option(User(req.user))
-    req.body.asJson.map { json =>
-      try {
-        json.as[ImportCampaignFromCAPICommand].process.map{ t => Ok(Json.toJson(t)) } getOrElse NotFound
-      } catch {
-        commandErrorAsResult
+    req.body.asJson map { json =>
+      json.as[ImportCampaignFromCAPICommand].process() match {
+        case Left(e) =>
+          commandErrorAsResult(e)
+        case Right(campaign) =>
+          campaign map (t => Ok(Json.toJson(t))) getOrElse NotFound
       }
-    }.getOrElse {
+    } getOrElse {
       BadRequest("Expecting Json data")
     }
   }
 
   def refreshCampaignFromCAPI(campaignId: String) = APIAuthAction { req =>
     implicit val user = Option(User(req.user))
-    try {
-      RefreshCampaignFromCAPICommand(campaignId).process.map{ t => Ok(Json.toJson(t)) } getOrElse NotFound
-    } catch {
-      commandErrorAsResult
+    RefreshCampaignFromCAPICommand(campaignId).process() match {
+      case Left(e) =>
+        commandErrorAsResult(e)
+      case Right(campaign) =>
+        campaign map (t => Ok(Json.toJson(t))) getOrElse NotFound
     }
   }
 
