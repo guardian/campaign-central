@@ -7,7 +7,7 @@ case class CommandError(message: String, responseCode: Int) extends RuntimeExcep
 
 object CommandError extends Results {
 
-  def CampaignTagNotFound = throw new CommandError("campaign tag not found", 400)
+  def CampaignTagNotFound = new CommandError("campaign tag not found", 400)
   def InvalidCampaignTagType = throw new CommandError("campaign tag was not expected type", 400)
   def CampaignNotFound = throw new CommandError("campaign not found", 404)
   def CampaignMissingData(field: String) = throw new CommandError(s"campaign missing required field $field", 400)
