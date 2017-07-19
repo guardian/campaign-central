@@ -3,14 +3,18 @@ package controllers
 import model.reports.{CampaignPageViewsReport, CampaignSummary, DailyUniqueUsersReport}
 import play.api.Logger
 import play.api.libs.ws.WSClient
-import play.api.mvc.Controller
+import play.api.mvc.{AbstractController, ControllerComponents, ControllerHelpers, PlayBodyParsers}
 import repositories.{AnalyticsDataCache, CampaignRepository}
 
 import scala.concurrent.Future
+import scala.util.control.NonFatal
 
-class Migration(override val wsClient: WSClient) extends Controller with PandaAuthActions {
+class Migration(override val wsClient: WSClient, components: ControllerComponents)
+  extends CentralController(components) with PandaAuthActions {
 
-  def addCampaignType() = APIAuthAction { req =>
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
+
+  def addCampaignType() = APIAuthAction {
 //    val campaigns = CampaignRepository.getAllCampaigns
 //
 //    campaigns foreach { c =>
@@ -18,12 +22,10 @@ class Migration(override val wsClient: WSClient) extends Controller with PandaAu
 //      CampaignRepository.putCampaign(cWithType)
 //    }
 
-    Ok(s"migration no longer used")
+    Ok("migration no longer used")
   }
 
-  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
-
-  def buildDailyReports() = APIAuthAction { req =>
+  def buildDailyReports() = APIAuthAction {
     Future {
       val allCampaigns = CampaignRepository.getAllCampaigns()
       val analyticsReports = AnalyticsDataCache.summariseContents
@@ -36,22 +38,26 @@ class Migration(override val wsClient: WSClient) extends Controller with PandaAu
         c.startDate.isDefined && c.pathPrefix.isDefined
       }.foreach { c =>
         if (!reportExists(c.id, "CampaignPageViewsReport")) {
-          try {CampaignPageViewsReport.getCampaignPageViewsReport(c.id) } catch {case e => Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)}
+          try { CampaignPageViewsReport.getCampaignPageViewsReport(c.id) } catch { case NonFatal(e) =>
+            Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)
+          }
         }
 
         if(!reportExists(c.id, "DailyUniqueUsersReport")) {
-          try {DailyUniqueUsersReport.getDailyUniqueUsersReport(c.id) } catch {case e => Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)}
+          try { DailyUniqueUsersReport.getDailyUniqueUsersReport(c.id) } catch { case NonFatal(e) =>
+            Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)
+          }
         }
 
       }
 
     }
 
-    Ok(s"build kicked off")
+    Ok("build kicked off")
 
   }
 
-  def rebuildCampaignSummaries() = APIAuthAction { req =>
+  def rebuildCampaignSummaries() = APIAuthAction {
     Future {
       val allCampaigns = CampaignRepository.getAllCampaigns()
 
@@ -63,7 +69,7 @@ class Migration(override val wsClient: WSClient) extends Controller with PandaAu
       }
     }
 
-    Ok(s"build kicked off")
+    Ok("build kicked off")
   }
 
 }

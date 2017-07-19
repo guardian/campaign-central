@@ -1,15 +1,14 @@
 package controllers
 
-import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import services.Config
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class App(override val wsClient: WSClient) extends Controller with PandaAuthActions {
+class App(override val wsClient: WSClient, components: ControllerComponents)
+  extends CentralController(components) with PandaAuthActions {
 
   def index(id: String = "") = AuthAction { implicit request =>
 
@@ -41,6 +40,6 @@ class App(override val wsClient: WSClient) extends Controller with PandaAuthActi
   }
 
   def logout = Action.async { implicit request =>
-    Future(processLogout)
+    Future(processLogout)(components.executionContext)
   }
 }
