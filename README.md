@@ -17,6 +17,18 @@ The campaign-central is a standard play app, so to run it's `sbt run`.  You will
 The Nginx setup uses the [dev-nginx](https://github.com/guardian/dev-nginx) tool.  After running this, campaign central
 will be available on https://campaign-central.local.dev-gutools.co.uk.
 
+### nginx Troubleshooting
+If you get the following error when attempting to start nginx after adding campaign central config:
+
+```
+could not build the server_names_hash, you should increase server_names_hash_bucket_size: 64
+```
+
+Add the following to your `/usr/local/etc/nginx/nginx.conf` in the `http { }` block:
+
+`server_names_hash_bucket_size 256;`
+
+---
 By default if you change any frontend code, you will need to recompile the assets using `scripts/setup.sh` but there
 are alternatives:
 
