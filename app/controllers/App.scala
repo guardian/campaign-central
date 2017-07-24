@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc._
@@ -11,7 +11,9 @@ import scala.concurrent.Future
 
 class App(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
-  def index(id: String = "") = AuthAction {
+  def index(id: String = "") = AuthAction { implicit request =>
+
+    Logger.info(s"${request.user.email} logged in")
 
     val jsFileName = "build/app.js"
 
