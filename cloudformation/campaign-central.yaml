@@ -1,0 +1,352 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: campaign-central
+Parameters:
+  KeyName:
+    Description: The EC2 Key Pair to allow SSH access to the instance
+    Type: String
+    Default: composer-team
+
+  Stage:
+    Description: Environment name
+    Type: String
+    AllowedValues:
+    - PROD
+    - CODE
+    Default: PROD
+
+  VpcId:
+    Description: ID of the VPC onto which to launch the application eg. vpc-1234abcd
+    Type: AWS::EC2::VPC::Id
+    Default: vpc-381fa95d
+
+  PublicVpcSubnets:
+    Description: Subnets to use in VPC for public internet-facing ELB eg. subnet-abcd1234
+    Type: List<AWS::EC2::Subnet::Id>
+    Default: subnet-c3620fa6,subnet-2b37bd5c,subnet-3667c86f
+
+  PrivateVpcSubnets:
+    Description: Subnets to use in VPC for private EC2 instances eg. subnet-abcd1234
+    Type: List<AWS::EC2::Subnet::Id>
+    Default: subnet-c2620fa7,subnet-2a37bd5d,subnet-2967c870
+
+  MachineImagesAMI:
+    Description: AMI id from the machine-images repo
+    Type: AWS::EC2::Image::Id
+
+  GuardianIP:
+    Description: Ip range for the office
+    Type: String
+    Default: 77.91.248.0/21
+
+  GithubTeamName:
+    Description: Github team name, used for giving ssh access to members of the team.
+    Type: String
+    Default: Editorial-Tools-SSHAccess
+
+  LogsKinesisStreamName:
+    Description: The kinesis stream to send logs to
+    Type: String
+    Default: elk-PROD-KinesisStream-1PYU4KS1UEQA
+
+Mappings:
+  Config:
+    CODE:
+      MinSize: 1
+      MaxSize: 2
+      DesiredCapacity: 1
+      InstanceType: t2.micro
+    PROD:
+      MinSize: 3
+      MaxSize: 6
+      DesiredCapacity: 3
+      InstanceType: t2.micro
+
+Resources:
+  CampaignCentralRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+
+  CampaignCentralDescribeEC2Policy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralDescribeEC2Policy
+      PolicyDocument:
+        Statement:
+        - Action:
+          - EC2:Describe*
+          Effect: Allow
+          Resource: "*"
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralGetDistributablesPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralGetDistributablesPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:GetObject
+          Resource:
+          - arn:aws:s3:::composer-dist/*
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralGetConfigPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralGetConfigPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:GetObject
+          Resource:
+          - arn:aws:s3:::guconf-flexible/campaign-central/*
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralPanDomainPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralPanDomainPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:GetObject
+          Resource:
+          - arn:aws:s3:::pan-domain-auth-settings/*
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralGetTeamKeysPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralGetTeamKeysPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:GetObject
+          Resource:
+          - arn:aws:s3:::github-team-keys/*
+        - Effect: Allow
+          Action:
+          - s3:ListBucket
+          Resource: arn:aws:s3:::github-team-keys
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralCloudwatchPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralCloudwatchPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - cloudwatch:*
+          Resource: "*"
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralDynamoPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralDynamoPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:*
+          Resource: "*"
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralKinesisPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CampaignCentralKinesisPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - kinesis:*
+          Resource:
+            Fn::Join:
+            - ''
+            - - arn:aws:kinesis:eu-west-1:743583969668:stream/
+              - Ref: LogsKinesisStreamName
+      Roles:
+      - Ref: CampaignCentralRole
+
+  CampaignCentralInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+      - Ref: CampaignCentralRole
+
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH access from the office
+      VpcId:
+        Ref: VpcId
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '22'
+        ToPort: '22'
+        CidrIp: 0.0.0.0/0
+
+  AppServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: campaign central Application servers
+      VpcId:
+        Ref: VpcId
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 9000
+        ToPort: 9000
+        CidrIp:
+          Ref: GuardianIP
+      - IpProtocol: tcp
+        FromPort: 9000
+        ToPort: 9000
+        SourceSecurityGroupId:
+          Ref: LoadBalancerSecurityGroup
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: campaign central application load balancer
+      VpcId:
+        Ref: VpcId
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: '80'
+        ToPort: '80'
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: '443'
+        ToPort: '443'
+        CidrIp: 0.0.0.0/0
+
+  CampaignCentralLoadBalancer:
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Properties:
+      SecurityGroups:
+      - Fn::GetAtt:
+        - LoadBalancerSecurityGroup
+        - GroupId
+      CrossZone: true
+      Subnets:
+        Ref: PublicVpcSubnets
+      Listeners:
+      - LoadBalancerPort: '80'
+        InstancePort: '9000'
+        Protocol: HTTP
+      - LoadBalancerPort: '443'
+        InstancePort: '9000'
+        Protocol: HTTPS
+        SSLCertificateId:
+          Fn::ImportValue:
+            Fn::Sub: certificate:gutools:campaign-central:${Stage}
+      HealthCheck:
+        Target: HTTP:9000/management/healthcheck
+        HealthyThreshold: '2'
+        UnhealthyThreshold: '2'
+        Interval: '10'
+        Timeout: '5'
+      Tags:
+      - Key: Stage
+        Value:
+          Ref: Stage
+      - Key: Stack
+        Value: flexible
+      - Key: App
+        Value: campaign-central
+
+  AutoscalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        Fn::GetAZs: ''
+      VPCZoneIdentifier:
+        Ref: PrivateVpcSubnets
+      LaunchConfigurationName:
+        Ref: CampaignCentralLaunchConfig
+      MinSize:
+        Fn::FindInMap:
+        - Config
+        - Ref: Stage
+        - MinSize
+      MaxSize:
+        Fn::FindInMap:
+        - Config
+        - Ref: Stage
+        - MaxSize
+      DesiredCapacity:
+        Fn::FindInMap:
+        - Config
+        - Ref: Stage
+        - DesiredCapacity
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 300
+      LoadBalancerNames:
+      - Ref: CampaignCentralLoadBalancer
+      Tags:
+      - Key: Stage
+        Value:
+          Ref: Stage
+        PropagateAtLaunch: 'true'
+      - Key: Stack
+        Value: flexible
+        PropagateAtLaunch: 'true'
+      - Key: App
+        Value: campaign-central
+        PropagateAtLaunch: 'true'
+        
+  CampaignCentralLaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      KeyName:
+        Ref: KeyName
+      ImageId:
+        Ref: MachineImagesAMI
+      SecurityGroups:
+      - Ref: AppServerSecurityGroup
+      - Ref: SSHSecurityGroup
+      InstanceType:
+        Fn::FindInMap:
+        - Config
+        - Ref: Stage
+        - InstanceType
+      IamInstanceProfile:
+        Ref: CampaignCentralInstanceProfile
+      UserData:
+        Fn::Base64:
+          Fn::Join:
+          - ''
+          - - "#!/bin/bash -ev\n"
+            - "/opt/features/gnm-ca/install.sh\n"
+            - Fn::Join:
+              - ''
+              - - "/opt/features/ssh-keys/initialise-keys-and-cron-job.sh -b github-team-keys
+                  -t "
+                - Ref: GithubTeamName
+                - " -l || true\n"
+            - "/opt/features/native-packager/install.sh -b composer-dist -t tgz -s\n"
