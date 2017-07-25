@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 import {Link} from 'react-router';
 import CampaignEdit from '../CampaignInformationEdit/CampaignEdit';
 import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
-import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
 import CampaignTrafficDriversAndSuggestions from '../CampaignInformationEdit/CampaignTrafficDriversAndSuggestions';
 
 class Campaign extends React.Component {
@@ -51,7 +50,6 @@ class Campaign extends React.Component {
                           getCampaign={this.props.campaignActions.getCampaign}
                           getCampaignContent={this.props.campaignActions.getCampaignContent} />
           <CampaignTrafficDriversAndSuggestions campaign={campaign} />
-          <CampaignAnalytics campaign={campaign} />
         </div>
       </div>
     );
