@@ -13,8 +13,6 @@ class App(override val wsClient: WSClient) extends Controller with PandaAuthActi
 
   def index(id: String = "") = AuthAction { implicit request =>
 
-    Logger.info(s"${request.user.email} logged in")
-
     val jsFileName = "build/app.js"
 
     val jsLocation = sys.env.get("JS_ASSET_HOST") match {
