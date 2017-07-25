@@ -237,6 +237,46 @@
         }
       },
       "DeletionPolicy": "Retain"
+    },
+    "CampaignPerformanceDataDBTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "campaignId",
+            "AttributeType": "S"
+          }, {
+            "AttributeName": "reportExecutionTimestamp",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "campaignId",
+            "KeyType": "HASH"
+          },{
+            "AttributeName": "reportExecutionTimestamp",
+            "KeyType": "RANGE"
+          }
+        ],
+        "ProvisionedThroughput": {
+          "ReadCapacityUnits": "10",
+          "WriteCapacityUnits": "10"
+        },
+        "TableName": {
+          "Fn::Join": [
+            "-",
+            [
+              "campaign-central",
+              {
+                "Ref": "Stage"
+              },
+              "campaign-performance-data"
+            ]
+          ]
+        }
+      },
+      "DeletionPolicy": "Retain"
     }
   }
 }
