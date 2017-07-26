@@ -148,7 +148,7 @@ Resources:
           - drivers-rejected
     DeletionPolicy: Retain
 
-  CampaignPerformanceDataDBTable:
+  CampaignUniquesDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
@@ -169,5 +169,29 @@ Resources:
         - "-"
         - - campaign-central
           - Ref: Stage
-          - campaign-performance-data
+          - campaign-uniques
+    DeletionPolicy: Retain
+
+  CampaignPageViewsDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      - AttributeName: reportExecutionTimestamp
+        AttributeType: S
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      - AttributeName: reportExecutionTimestamp
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - campaign-page-views
     DeletionPolicy: Retain

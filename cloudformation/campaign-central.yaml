@@ -49,6 +49,10 @@ Parameters:
     Type: String
     Default: elk-PROD-KinesisStream-1PYU4KS1UEQA
 
+  OphanAccountNumber:
+    Description: 'Account number for the Ophan team to permit them to write to our dynamodb tables.'
+    Type: String
+
 Mappings:
   Config:
     CODE:
@@ -75,6 +79,17 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: "/"
+
+  OphanExcavatorCrossAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            AWS: !Sub arn:aws:iam::${OphanAccountNumber}:root  
 
   CampaignCentralDescribeEC2Policy:
     Type: AWS::IAM::Policy
@@ -174,6 +189,23 @@ Resources:
           Resource: "*"
       Roles:
       - Ref: CampaignCentralRole
+
+  OphanExcavatorDynamoPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: OphanExcavatorDynamoPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action:
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:BatchWriteItem
+          Resource:
+          - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-page-views
+          - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-uniques
+      Roles:
+      - Ref: OphanExcavatorCrossAccountRole
 
   CampaignCentralKinesisPolicy:
     Type: AWS::IAM::Policy
