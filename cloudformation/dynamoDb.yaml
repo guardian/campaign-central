@@ -1,0 +1,197 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: campaign-central dynamo DB tables
+
+Parameters:
+  Stage:
+    Description: Environment name
+    Type: String
+    AllowedValues:
+    - PROD
+    - CODE
+    - DEV
+
+Resources:
+  CampaignDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - campaigns
+    DeletionPolicy: Retain
+
+  CampaignNotesDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      - AttributeName: created
+        AttributeType: N
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      - AttributeName: created
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - campaign-notes
+    DeletionPolicy: Retain
+
+  CampaignContentDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      - AttributeName: id
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - campaign-content
+    DeletionPolicy: Retain
+
+  ClientDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - clients
+    DeletionPolicy: Retain
+
+  CampaignAnalyticsDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: key
+        AttributeType: S
+      - AttributeName: dataType
+        AttributeType: S
+      KeySchema:
+      - AttributeName: key
+        KeyType: HASH
+      - AttributeName: dataType
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - analytics
+    DeletionPolicy: Retain
+
+  TrafficDriverRejectDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      - AttributeName: lineItemId
+        AttributeType: N
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      - AttributeName: lineItemId
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - drivers-rejected
+    DeletionPolicy: Retain
+
+  CampaignUniquesDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      - AttributeName: reportExecutionTimestamp
+        AttributeType: S
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      - AttributeName: reportExecutionTimestamp
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - campaign-uniques
+    DeletionPolicy: Retain
+
+  CampaignPageViewsDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      - AttributeName: reportExecutionTimestamp
+        AttributeType: S
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      - AttributeName: reportExecutionTimestamp
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - campaign-page-views
+    DeletionPolicy: Retain
