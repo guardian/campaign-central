@@ -201,9 +201,11 @@ Resources:
           - dynamodb:PutItem
           - dynamodb:UpdateItem
           - dynamodb:BatchWriteItem
+          - dynamodb:Scan
           Resource:
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-page-views
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-uniques
+          - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaigns
       Roles:
       - Ref: OphanExcavatorCrossAccountRole
 
