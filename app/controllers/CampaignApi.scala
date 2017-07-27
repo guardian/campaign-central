@@ -9,21 +9,20 @@ import play.api.Logger
 import play.api.libs.json.Json._
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import play.api.mvc._
+import play.api.mvc.Controller
 import repositories._
 
-class CampaignApi(override val wsClient: WSClient, components: ControllerComponents)
-  extends CentralController(components) with PandaAuthActions {
+class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
-  def getAllCampaigns() = APIAuthAction {
+  def getAllCampaigns() = APIAuthAction { req =>
     Ok(Json.toJson(CampaignRepository.getAllCampaigns()))
   }
 
-  def getAnalyticsSummary() = APIAuthAction {
+  def getAnalyticsSummary() = APIAuthAction { req =>
     Ok(Json.toJson(OverallSummaryReport.getOverallSummaryReport().getOrElse(OverallSummaryReport(Map()))))
   }
 
-  def getCampaign(id: String) = APIAuthAction {
+  def getCampaign(id: String) = APIAuthAction { req =>
     CampaignRepository.getCampaign(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
   }
 

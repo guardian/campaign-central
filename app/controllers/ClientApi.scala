@@ -1,13 +1,16 @@
 package controllers
 
+import java.util.UUID
+
+import com.gu.pandomainauth.model.{User => PandaUser}
 import model._
+import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import play.api.mvc.{AbstractController, ControllerComponents}
-import repositories.ClientRepository
+import play.api.mvc.Controller
+import repositories.{ClientRepository}
 
-class ClientApi(override val wsClient: WSClient, components: ControllerComponents)
-  extends CentralController(components) with PandaAuthActions {
+class ClientApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
   def getAllClients() = APIAuthAction { req =>
     Ok(Json.toJson(ClientRepository.getAllClients()))
@@ -20,9 +23,10 @@ class ClientApi(override val wsClient: WSClient, components: ControllerComponent
   def updateClient(id: String) = APIAuthAction { req =>
     req.body.asJson.flatMap(_.asOpt[Client]) match {
       case None => BadRequest("Could not convert json to client")
-      case Some(client) =>
+      case Some(client) => {
         ClientRepository.putClient(client)
         Ok(Json.toJson(client))
+      }
     }
   }
 

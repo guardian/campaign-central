@@ -2,19 +2,19 @@ package controllers
 
 import java.util.concurrent.Executors
 
+import com.gu.pandahmac.HMACAuthActions
+import model.{TrafficDriverGroupStats, User}
 import model.command.RefreshCampaignFromCAPICommand
 import model.reports._
-import model.{TrafficDriverGroupStats, User}
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
-import play.api.mvc.{AbstractController, ControllerComponents}
-import repositories.{AnalyticsDataCache, CampaignRepository}
+import play.api.mvc.Controller
+import repositories.{AnalyticsDataCache, CampaignRepository, GoogleAnalytics}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ManagementApi(override val wsClient: WSClient, components: ControllerComponents)
-    extends CentralController(components) with HMACPandaAuthActions {
+class ManagementApi(override val wsClient: WSClient) extends Controller with HMACPandaAuthActions {
 
   implicit val ec = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
 
@@ -36,7 +36,7 @@ class ManagementApi(override val wsClient: WSClient, components: ControllerCompo
 
   def refreshAnalyticsCacheForType(dataType: String) = APIHMACAuthAction { req =>
     AnalyticsDataCache.summariseContents.filter{ e =>
-      val expired = e.expires.exists(_ < System.currentTimeMillis)
+      val expired = e.expires.map(_ < System.currentTimeMillis).getOrElse(false)
       e.dataType == dataType && expired
     }.foreach{ e =>
       refreshEntry(e.dataType, e.key)
@@ -71,7 +71,7 @@ class ManagementApi(override val wsClient: WSClient, components: ControllerCompo
     }
   }
 
-  def refreshExpiringCampaigns = APIHMACAuthAction {
+  def refreshExpiringCampaigns = APIHMACAuthAction { req =>
 
     implicit val user = User("campaign", "refresher", "labs.beta@guardian.co.uk")
 

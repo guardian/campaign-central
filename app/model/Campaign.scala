@@ -1,12 +1,10 @@
 package model
 
+import org.joda.time.DateTime
+import play.api.libs.json._
 import ai.x.play.json.Jsonx
 import com.amazonaws.services.dynamodbv2.document.Item
-import org.joda.time.DateTime
 import play.api.Logger
-import play.api.libs.json.JodaReads._
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json._
 
 import scala.util.control.NonFatal
 
