@@ -5,6 +5,8 @@ import model.Campaign
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Format
+import play.api.libs.json.JodaReads._
+import play.api.libs.json.JodaWrites._
 import repositories._
 
 import scala.concurrent.Future
