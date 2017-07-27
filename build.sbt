@@ -43,7 +43,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
     riffRaffPackageName := s"commercial-tools:${name.value}",
     riffRaffManifestProjectName := riffRaffPackageName.value,
     riffRaffArtifactResources := Seq(
-      riffRaffPackageType.value -> s"packages/${name.value}/${riffRaffPackageType.value.getName}",
+      riffRaffPackageType.value -> s"${name.value}/${riffRaffPackageType.value.getName}",
       baseDirectory.value / "riff-raff.yaml" -> "riff-raff.yaml"
     ),
     scalaVersion := "2.11.8",
