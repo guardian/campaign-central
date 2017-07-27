@@ -34,23 +34,21 @@ lazy val dependencies = Seq(
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaffArtifact)
+lazy val root = (project in file(".")).enablePlugins(PlayScala, RiffRaffArtifact, UniversalPlugin)
   .settings(Defaults.coreDefaultSettings: _*)
   .settings(
     playDefaultPort := 2267,
     packageName in Universal := normalizedName.value,
     name in Universal := normalizedName.value,
     topLevelDirectory in Universal := Some(normalizedName.value),
-    riffRaffPackageType := (packageZipTarball in config("universal")).value,
+
+    riffRaffPackageType := (packageZipTarball in Universal).value,
     riffRaffBuildIdentifier := Option(System.getenv("CIRCLE_BUILD_NUM")).getOrElse("DEV"),
     riffRaffUploadArtifactBucket := Option("riffraff-artifact"),
     riffRaffUploadManifestBucket := Option("riffraff-builds"),
     riffRaffPackageName := s"commercial-tools:${name.value}",
     riffRaffManifestProjectName := riffRaffPackageName.value,
-    riffRaffArtifactResources := Seq(
-      riffRaffPackageType.value -> s"packages/${name.value}/${riffRaffPackageType.value.getName}",
-      baseDirectory.value / "riff-raff.yaml" -> "riff-raff.yaml"
-    ),
+
     scalaVersion := "2.11.8",
     scalaVersion in ThisBuild := "2.11.8",
     libraryDependencies ++= dependencies,
