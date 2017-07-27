@@ -9,17 +9,13 @@ version := "1.0"
 resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-tools"
 
 val slf4jVersion = "1.7.25"
-val playJsonVersion = "2.6.2"
-val dfpClientVersion = "3.5.0"
 
 lazy val dependencies = Seq(
-  "com.typesafe.play" %% "play-json" % playJsonVersion,
-  "com.typesafe.play" %% "play-json-joda" % playJsonVersion,
-  "ai.x" %% "play-json-extensions" % "0.10.0",
   "com.amazonaws" % "aws-java-sdk" % "1.11.8",
-  "com.gu" %% "pan-domain-auth-play_2-6" % "0.5.0",
+  "ai.x" %% "play-json-extensions" % "0.8.0",
+  "com.gu" % "pan-domain-auth-play_2-5_2.11" % "0.4.1",
   "com.gu" %% "panda-hmac" % "1.2.0",
-  "com.gu" %% "content-api-client" % "11.19",
+  "com.gu" %% "content-api-client" % "10.5",
   "com.google.apis" % "google-api-services-analyticsreporting" % "v4-rev115-1.22.0",
   "com.squareup.okhttp3" % "okhttp" % "3.4.1",
   ws,
@@ -28,8 +24,7 @@ lazy val dependencies = Seq(
   "com.gu" % "kinesis-logback-appender" % "1.3.0",
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "org.slf4j" % "jcl-over-slf4j" % slf4jVersion,
-  "com.google.api-ads" % "ads-lib" % dfpClientVersion,
-  "com.google.api-ads" % "dfp-axis" % dfpClientVersion,
+  "com.google.api-ads" % "dfp-axis" % "3.5.0",
   "com.google.guava" % "guava" % "20.0",
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
@@ -53,7 +48,5 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
     ),
     scalaVersion := "2.11.8",
     scalaVersion in ThisBuild := "2.11.8",
-    libraryDependencies ++= dependencies,
-    // this can be removed when it's no longer a transitive dependency
-    excludeDependencies += "com.gu" %% "pan-domain-auth-play_2-5"
+    libraryDependencies ++= dependencies
   )
