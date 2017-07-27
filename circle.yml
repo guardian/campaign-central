@@ -5,6 +5,7 @@ machine:
   node:
     version: 5.2.0
   environment:
+    SBT_VERSION: 0.13.15
     NODE_ENV: production
 
 # Collect build artifacts
@@ -27,6 +28,12 @@ dependencies:
     - npm run build
     - npm run build-icons
     - sbt test:compile
+  pre:
+    - wget --output-document=$HOME/bin/sbt-launch.jar https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/"$SBT_VERSION"/sbt-launch.jar
+    - echo "java $SBT_OPTS -jar \`dirname \$0\`/sbt-launch.jar \"\$@\"" > $HOME/bin/sbt
+    - chmod u+x $HOME/bin/sbt
+    - which sbt
+    - sbt sbt-version
 
 test:
   override:

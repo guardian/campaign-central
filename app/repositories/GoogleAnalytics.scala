@@ -282,8 +282,9 @@ object GoogleAnalytics {
 
   private def warnIfDataIsSampled(report: Report, reportTitle: String): Unit = {
     Option(report.getData.getSamplesReadCounts).foreach{ readCounts =>
-      val readcount = readCounts.headOption.getOrElse(0L)
-      val sampleSpace = Option(report.getData.getSamplingSpaceSizes).map(_.headOption.getOrElse(0L)).getOrElse(0L)
+      val readcount: Long = readCounts.headOption.map(_.toLong).getOrElse(0L)
+      val sampleSpace: Long =
+        Option(report.getData.getSamplingSpaceSizes).map(_.headOption.map(_.toLong).getOrElse(0L)).getOrElse(0L)
 
       Logger.warn(s"warning $reportTitle is sampled. $readcount / $sampleSpace")
 
