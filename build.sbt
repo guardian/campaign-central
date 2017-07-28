@@ -16,7 +16,7 @@ lazy val dependencies = Seq(
   "com.typesafe.play" %% "play-json" % playJsonVersion,
   "com.typesafe.play" %% "play-json-joda" % playJsonVersion,
   "ai.x" %% "play-json-extensions" % "0.10.0",
-  "com.amazonaws" % "aws-java-sdk" % "1.11.169",
+  "com.amazonaws" % "aws-java-sdk" % "1.11.170",
   "com.gu" %% "pan-domain-auth-play_2-6" % "0.5.0",
   "com.gu" %% "panda-hmac" % "1.2.0",
   "com.gu" %% "content-api-client" % "11.19",
@@ -55,5 +55,8 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
     scalaVersion in ThisBuild := "2.11.8",
     libraryDependencies ++= dependencies,
     // this can be removed when it's no longer a transitive dependency
-    excludeDependencies += "com.gu" %% "pan-domain-auth-play_2-5"
+    excludeDependencies ++= Seq(
+      "com.gu" %% "pan-domain-auth-play_2-5",
+      "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor"
+    )
   )
