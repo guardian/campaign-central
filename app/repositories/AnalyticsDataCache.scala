@@ -46,36 +46,6 @@ object AnalyticsDataCache {
     Dynamo.analyticsDataCacheTable.deleteItem("key", key, "dataType", dataType)
   }
 
-  def putCampaignPageViewsReport(campaignId: String, data: CampaignPageViewsReport, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId, "CampaignPageViewsReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
-
-  def putDailyUniqueUsersReport(campaignId: String, data: DailyUniqueUsersReport, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId, "DailyUniqueUsersReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
-
-  def putCampaignSummary(campaignId: String, data: CampaignSummary, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId, "CampaignSummary", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
-
-  def putOverallSummary(data: OverallSummaryReport): Unit = {
-    val entry = AnalyticsDataCacheEntry("overall", "CampaignSummary", Json.toJson(data).toString(), None, System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
-
-  def putCampaignCtaClicksReport(campaignId: String, data: CtaClicksReport, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId, "CtaClicksReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
-
-  def putQualifiedPercentagesReport(campaignId: String, data: QualifiedPercentagesReport, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId, "QualifiedPercentagesReport", Json.toJson(data).toString(), validToTimestamp, System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
-
   def putCampaignTrafficDriverGroupStats( campaignId: String, data: Seq[TrafficDriverGroupStats]): Unit = {
     val entry = AnalyticsDataCacheEntry(
       key = campaignId,
@@ -98,30 +68,6 @@ object AnalyticsDataCache {
         case _ => Hit(report)
       }
     }.getOrElse(Miss)
-  }
-
-  def getCampaignPageViewsReport(campaignId: String): CacheResult[CampaignPageViewsReport] = {
-    getEntry[CampaignPageViewsReport](campaignId, "CampaignPageViewsReport")
-  }
-
-  def getDailyUniqueUsersReport(campaignId: String): CacheResult[DailyUniqueUsersReport] = {
-    getEntry[DailyUniqueUsersReport](campaignId, "DailyUniqueUsersReport")
-  }
-
-  def getCampaignSummary(campaignId: String): CacheResult[CampaignSummary] = {
-    getEntry[CampaignSummary](campaignId, "CampaignSummary")
-  }
-
-  def getOverallSummary(): CacheResult[OverallSummaryReport] = {
-    getEntry[OverallSummaryReport]("overall", "CampaignSummary")
-  }
-
-  def getCampaignCtaClicksReport(campaignId: String): CacheResult[CtaClicksReport] = {
-    getEntry[CtaClicksReport](campaignId, "CtaClicksReport")
-  }
-
-  def getCampaignQualifiedPercentagesReport(campaignId: String): CacheResult[QualifiedPercentagesReport] = {
-    getEntry[QualifiedPercentagesReport](campaignId, "QualifiedPercentagesReport")
   }
 
   def summariseContents = {

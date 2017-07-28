@@ -24,7 +24,6 @@ object AnalyticsDataCacheEntrySummary {
 }
 
 case class AnalyticsDataCacheEntry(key: String, dataType: String, data: String, expires: Option[Long], written: Long) {
-  //def toItem = Item.fromJSON(Json.toJson(this).toString())
 
   def toItem = {
     val item = new Item()

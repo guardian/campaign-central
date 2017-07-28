@@ -1,14 +1,10 @@
 package controllers
 
-import java.util.UUID
-
-import com.gu.pandomainauth.model.{User => PandaUser}
 import model._
-import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
-import repositories.{ClientRepository}
+import repositories.ClientRepository
 
 class ClientApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 

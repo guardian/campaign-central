@@ -3,7 +3,6 @@ package controllers
 import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
-import model.reports._
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json._
@@ -17,10 +16,6 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
   def getAllCampaigns() = APIAuthAction { req =>
     Ok(Json.toJson(CampaignRepository.getAllCampaigns()))
-  }
-
-  def getAnalyticsSummary() = APIAuthAction { req =>
-    Ok(Json.toJson(OverallSummaryReport.getOverallSummaryReport().getOrElse(OverallSummaryReport(Map()))))
   }
 
   def getCampaign(id: String) = APIAuthAction { req =>
@@ -43,10 +38,6 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     NoContent
   }
 
-  def getCampaignPageViews(id: String) = APIAuthAction { req =>
-    CampaignPageViewsReport.getCampaignPageViewsReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
-  }
-
   def getCampaignPageViewsFromDatalake(id: String) = APIAuthAction { req =>
     val pageViews = CampaignService.getPageViews(id)
     Ok(Json.toJson(pageViews))
@@ -54,20 +45,6 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
   def getCampaignUniquesFromDatalake(id: String) = APIAuthAction { req =>
     val uniques = CampaignService.getUniques(id)
     Ok(Json.toJson(uniques))
-  }
-
-  def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { req =>
-    DailyUniqueUsersReport.getDailyUniqueUsersReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
-  }
-
-  def getCampaignQualifiedPercentagesReport(id: String) = APIAuthAction { req =>
-    QualifiedPercentagesReport.getQualifiedPercentagesReportForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
-  }
-
-  def getCampaignTargetsReport(id: String) = APIAuthAction { req =>
-    Ok(Json.toJson(
-      CampaignTargetsReport.getCampaignTargetsReport(id).getOrElse(CampaignTargetsReport(Map()))
-    ))
   }
 
   def getCampaignContent(id: String) =  APIAuthAction { req =>
@@ -182,7 +159,4 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
     Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))
   }
 
-  def getCampaignCtaStats(campaignId: String) = APIAuthAction { req =>
-    Ok(toJson(CtaClicksReport.getCtaClicksForCampaign(campaignId)))
-  }
 }

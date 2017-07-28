@@ -59,7 +59,7 @@ class CampaignList extends React.Component {
           </tr>
         </thead>
           <tbody>
-            {this.props.campaigns.map((c) => <CampaignListItem campaign={c} analyticsSummary={this.props.overallAnalyticsSummary[c.id]} key={c.id} />)}
+            {this.props.campaigns.map((c) => <CampaignListItem campaign={c} key={c.id} />)}
           </tbody>
       </table>
     );

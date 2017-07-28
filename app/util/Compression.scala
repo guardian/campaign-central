@@ -13,16 +13,16 @@ object Compression {
     val zipOutputStream = new GZIPOutputStream(arrOutputStream)
     zipOutputStream.write(data.getBytes)
     zipOutputStream.close()
-    val bytes = (arrOutputStream.toByteArray)
+    val bytes = arrOutputStream.toByteArray
     arrOutputStream.close()
     bytes
   }
 
   def decompress(compressed: Array[Byte]): String = {
-    val bis = new ByteArrayInputStream(compressed);
-    val gis = new GZIPInputStream(bis);
-    val bytes = IOUtils.toByteArray(gis);
-    return new String(bytes, "UTF-8");
+    val bis = new ByteArrayInputStream(compressed)
+    val gis = new GZIPInputStream(bis)
+    val bytes = IOUtils.toByteArray(gis)
+    return new String(bytes, "UTF-8")
   }
 
 }

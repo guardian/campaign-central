@@ -16,16 +16,11 @@ GET            /reauth            controllers.App.reauth
 #Campaign Api
 
 GET /api/campaigns                          controllers.CampaignApi.getAllCampaigns
-GET /api/campaigns/analytics                controllers.CampaignApi.getAnalyticsSummary
 GET /api/campaigns/:id                      controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id                      controllers.CampaignApi.updateCampaign(id: String)
 DELETE /api/campaigns/:id                   controllers.CampaignApi.deleteCampaign(id: String)
-GET /api/campaigns/:id/pageViews            controllers.CampaignApi.getCampaignPageViews(id: String)
 GET /api/v2/campaigns/:id/pageViews         controllers.CampaignApi.getCampaignPageViewsFromDatalake(id: String)
 GET /api/v2/campaigns/:id/uniques           controllers.CampaignApi.getCampaignUniquesFromDatalake(id: String)
-GET /api/campaigns/:id/dailyUniques         controllers.CampaignApi.getCampaignDailyUniqueUsers(id: String)
-GET /api/campaigns/:id/qualifiedReport      controllers.CampaignApi.getCampaignQualifiedPercentagesReport(id: String)
-GET /api/campaigns/:id/targetsReport        controllers.CampaignApi.getCampaignTargetsReport(id: String)
 GET /api/campaigns/:id/content              controllers.CampaignApi.getCampaignContent(id: String)
 GET /api/campaigns/:id/notes                controllers.CampaignApi.getCampaignNotes(id: String)
 POST /api/campaigns/:id/notes               controllers.CampaignApi.addCampaignNote(id: String)
@@ -37,7 +32,6 @@ GET /api/campaigns/:id/suggest-drivers      controllers.CampaignApi.getSuggested
 PUT /api/campaigns/:id/driver/:driverId     controllers.CampaignApi.acceptSuggestedCampaignTrafficDriver(id: String, driverId: Long)
 PUT /api/campaigns/:id/not-driver/:driverId controllers.CampaignApi.rejectSuggestedCampaignTrafficDriver(id: String, driverId: Long)
 GET /api/campaigns/:id/driverstats          controllers.CampaignApi.getCampaignTrafficDriverStats(id: String)
-GET /api/campaigns/:id/ctastats             controllers.CampaignApi.getCampaignCtaStats(id: String)
 
 
 #Clients Api
@@ -48,17 +42,11 @@ PUT /api/clients/:id              controllers.ClientApi.updateClient(id: String)
 
 #Management Api
 
-GET    /management/api/analytics                        controllers.ManagementApi.getAnalyticsCacheSummary()
-POST   /management/api/analytics/:dataType/:key         controllers.ManagementApi.refreshAnalyticsCacheEntry(dataType: String, key: String)
+GET    /management/api/analytics                        controllers.ManagementApi.getAnalyticsCacheSummary
 DELETE /management/api/analytics/:dataType/:key         controllers.ManagementApi.deleteAnalyticsCacheEntry(dataType: String, key: String)
-POST   /management/api/analytics/:dataType              controllers.ManagementApi.refreshAnalyticsCacheForType(dataType: String)
 POST   /management/api/refreshExpiringCampaigns         controllers.ManagementApi.refreshExpiringCampaigns
 
 GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
-
-# Migration
-GET /migration/buildDailyReports   controllers.Migration.buildDailyReports
-GET /migration/rebuildCampaignSummaries   controllers.Migration.rebuildCampaignSummaries
 
 
 # Management
