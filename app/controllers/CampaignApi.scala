@@ -11,6 +11,7 @@ import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
 import repositories._
+import services.CampaignService
 
 class CampaignApi(override val wsClient: WSClient) extends Controller with PandaAuthActions {
 
@@ -44,6 +45,15 @@ class CampaignApi(override val wsClient: WSClient) extends Controller with Panda
 
   def getCampaignPageViews(id: String) = APIAuthAction { req =>
     CampaignPageViewsReport.getCampaignPageViewsReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
+  }
+
+  def getCampaignPageViewsFromDatalake(id: String) = APIAuthAction { req =>
+    val pageViews = CampaignService.getPageViews(id)
+    Ok(Json.toJson(pageViews))
+  }
+  def getCampaignUniquesFromDatalake(id: String) = APIAuthAction { req =>
+    val uniques = CampaignService.getUniques(id)
+    Ok(Json.toJson(uniques))
   }
 
   def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { req =>

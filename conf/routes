@@ -21,6 +21,8 @@ GET /api/campaigns/:id                      controllers.CampaignApi.getCampaign(
 PUT /api/campaigns/:id                      controllers.CampaignApi.updateCampaign(id: String)
 DELETE /api/campaigns/:id                   controllers.CampaignApi.deleteCampaign(id: String)
 GET /api/campaigns/:id/pageViews            controllers.CampaignApi.getCampaignPageViews(id: String)
+GET /api/v2/campaigns/:id/pageViews         controllers.CampaignApi.getCampaignPageViewsFromDatalake(id: String)
+GET /api/v2/campaigns/:id/uniques           controllers.CampaignApi.getCampaignUniquesFromDatalake(id: String)
 GET /api/campaigns/:id/dailyUniques         controllers.CampaignApi.getCampaignDailyUniqueUsers(id: String)
 GET /api/campaigns/:id/qualifiedReport      controllers.CampaignApi.getCampaignQualifiedPercentagesReport(id: String)
 GET /api/campaigns/:id/targetsReport        controllers.CampaignApi.getCampaignTargetsReport(id: String)
