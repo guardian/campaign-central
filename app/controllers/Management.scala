@@ -1,11 +1,12 @@
 package controllers
 
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{Action, Controller}
 
-class Management(components: ControllerComponents) extends AbstractController(components) {
+class Management extends Controller {
 
   def healthCheck = Action {
     Ok("OK")
   }
 
 }
+
