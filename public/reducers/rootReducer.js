@@ -3,11 +3,6 @@ import error from './errorReducer';
 import config from './configReducer';
 import campaigns from './campaignsReducer';
 import campaign from './campaignReducer';
-import campaignPageViews from './campaignPageViewsReducer';
-import campaignDailyUniques from './campaignDailyUniquesReducer';
-import campaignTargetsReport from './campaignTargetsReportReducer';
-import campaignQualifiedReport from './campaignQualifiedReportReducer';
-import campaignCtaStats from './campaignCtaStatsReducer';
 import clients from './clientsReducer';
 import client from './clientReducer';
 import campaignContent from './campaignContentReducer';
@@ -18,18 +13,12 @@ import campaignTrafficDriverSuggestionsDirty from './campaignTrafficDriverSugges
 import campaignTrafficDriverStats from './campaignTrafficDriverStatsReducer';
 import campaignNotes from './campaignNotesReducer';
 import campaignSort from './campaignSortReducer';
-import overallAnalyticsSummary from './overallAnalyticsSummaryReducer';
 
 export default combineReducers({
   error,
   config,
   campaigns,
   campaign,
-  campaignPageViews,
-  campaignDailyUniques,
-  campaignTargetsReport,
-  campaignQualifiedReport,
-  campaignCtaStats,
   clients,
   client,
   campaignContent,
@@ -39,6 +28,5 @@ export default combineReducers({
   campaignTrafficDriverSuggestionsDirty,
   campaignTrafficDriverStats,
   campaignNotes,
-  campaignSort,
-  overallAnalyticsSummary
+  campaignSort
 });

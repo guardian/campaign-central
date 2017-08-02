@@ -2,17 +2,15 @@ package controllers
 
 import java.util.concurrent.Executors
 
-import com.gu.pandahmac.HMACAuthActions
-import model.{TrafficDriverGroupStats, User}
+import model.User
 import model.command.RefreshCampaignFromCAPICommand
-import model.reports._
 import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
-import repositories.{AnalyticsDataCache, CampaignRepository, GoogleAnalytics}
+import repositories.{AnalyticsDataCache, CampaignRepository}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class ManagementApi(override val wsClient: WSClient) extends Controller with HMACPandaAuthActions {
 
@@ -22,53 +20,11 @@ class ManagementApi(override val wsClient: WSClient) extends Controller with HMA
     Ok(Json.toJson(AnalyticsDataCache.summariseContents))
   }
 
-  def refreshAnalyticsCacheEntry(dataType: String, key: String) = APIHMACAuthAction { req =>
-    refreshEntry(dataType, key)
-
-    NoContent
-  }
 
   def deleteAnalyticsCacheEntry(dataType: String, key: String) = APIHMACAuthAction { req =>
     AnalyticsDataCache.deleteCacheEntry(key, dataType)
 
     NoContent
-  }
-
-  def refreshAnalyticsCacheForType(dataType: String) = APIHMACAuthAction { req =>
-    AnalyticsDataCache.summariseContents.filter{ e =>
-      val expired = e.expires.map(_ < System.currentTimeMillis).getOrElse(false)
-      e.dataType == dataType && expired
-    }.foreach{ e =>
-      refreshEntry(e.dataType, e.key)
-    }
-
-    NoContent
-  }
-
-  private def refreshEntry(dataType: String, key: String) = {
-    dataType match {
-      case "CtaClicksReport" => {
-        Logger.info(s"manually clearing GA CTA CTR analytics for $key")
-        Future {CtaClicksReport.getCtaClicksForCampaign(key)}
-      }
-      case "DailyUniqueUsersReport" => {
-        Logger.info(s"manually clearing DailyUniqueUsersReport analytics for $key")
-        Future {DailyUniqueUsersReport.getDailyUniqueUsersReport(key)}
-      }
-      case "CampaignPageViewsReport" => {
-        Logger.info(s"manually clearing CampaignPageViewsReport analytics for $key")
-        Future {CampaignPageViewsReport.getCampaignPageViewsReport(key)}
-      }
-      case "TrafficDriverGroupStats" => {
-        Logger.info(s"manually clearing Traffic driver stats for $key")
-        Future {TrafficDriverGroupStats.forCampaign(key)}
-      }
-      case "QualifiedPercentagesReport" => {
-        Logger.info(s"manually clearing Qualified stats for $key")
-        Future {QualifiedPercentagesReport.getQualifiedPercentagesReportForCampaign(key)}
-      }
-      case s => Logger.warn(s"manual clear invoked for unexpected data type $dataType")
-    }
   }
 
   def refreshExpiringCampaigns = APIHMACAuthAction { req =>

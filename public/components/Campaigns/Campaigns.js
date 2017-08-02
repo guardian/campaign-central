@@ -61,7 +61,6 @@ class Campaigns extends Component {
 
   componentDidMount() {
     this.props.campaignActions.getCampaigns();
-    this.props.analyticsActions.getOverallAnalyticsSummary();
   }
 
   render() {
@@ -69,7 +68,7 @@ class Campaigns extends Component {
     return (
       <div className="campaigns">
         <h2 className="campaigns__header">Campaigns</h2>
-        <CampaignList campaigns={this.filterCampaigns(this.sortCampaigns(this.props.campaigns))} overallAnalyticsSummary={this.props.overallAnalyticsSummary} />
+        <CampaignList campaigns={this.filterCampaigns(this.sortCampaigns(this.props.campaigns))} />
       </div>
     );
   }
@@ -79,12 +78,10 @@ class Campaigns extends Component {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as getCampaigns from '../../actions/CampaignActions/getCampaigns';
-import * as getOverallAnalyticsSummary from '../../actions/CampaignActions/getOverallAnalyticsSummary';
 
 function mapStateToProps(state) {
   return {
     campaigns: state.campaigns,
-    overallAnalyticsSummary: state.overallAnalyticsSummary,
     campaignSortColumn: state.campaignSort.campaignSortColumn,
     campaignSortOrder: state.campaignSort.campaignSortOrder
   };
@@ -92,8 +89,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaigns), dispatch),
-    analyticsActions: bindActionCreators(Object.assign({}, getOverallAnalyticsSummary), dispatch)
+    campaignActions: bindActionCreators(Object.assign({}, getCampaigns), dispatch)
   };
 }
 

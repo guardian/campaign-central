@@ -5,34 +5,12 @@ import {tagEditUrl} from '../../util/urlBuilder';
 class CampaignLevelAssets extends React.Component {
 
   componentWillMount() {
-    this.props.campaignCtaStatsActions.getCampaignCtaStats(this.props.campaign.id);
+
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign.id !== this.props.campaign.id) {
-      this.props.campaignCtaStatsActions.getCampaignCtaStats(nextProps.campaign.id);
-    }
+
   }
-
-  getCtr = () => {
-    if(this.props.campaignCtaStats && this.props.campaignPageViews) {
-      var count = this.props.campaignCtaStats['logo'];
-      if(!count) {count = 0}
-
-      var latestStats = this.props.campaignPageViews.pageCountStats[this.props.campaignPageViews.pageCountStats.length - 1];
-      var uniqueCount = latestStats["cumulative-unique-total"];
-
-      var ctr = '';
-      if (uniqueCount && uniqueCount !== 0) {
-        ctr =  '(ctr: ' + ((count / uniqueCount) * 100 ).toFixed(2) + '%)';
-      }
-
-      return (<p>Logo clicks: {this.props.campaignCtaStats['logo']} {ctr}</p>);
-    }
-
-    return undefined;
-  };
-
 
   renderTagInformation = () => {
 
@@ -47,7 +25,7 @@ class CampaignLevelAssets extends React.Component {
 
         </span>
         <span className="campaign-assets__field__value">
-          {this.getCtr()}
+
         </span>
         </div>
       )
@@ -62,21 +40,12 @@ class CampaignLevelAssets extends React.Component {
 
   render () {
 
-    var ctaBlock;
-    if(this.props.campaign.type === 'hosted') {
-      ctaBlock = (
-        <CampaignCtas campaign={this.props.campaign} campaignCtaStats={this.props.campaignCtaStats} campaignAnalytics={this.props.campaignPageViews} />
-      );
-    }
-
     return (
       <div className="campaign-assets">
         <div className="campaign-assets__field">
           <label>Tag</label>
           {this.renderTagInformation()}
         </div>
-
-        {ctaBlock}
       </div>
     );
   }
@@ -86,18 +55,16 @@ class CampaignLevelAssets extends React.Component {
 //REDUX CONNECTIONS
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as getCampaignCtaStats from '../../actions/CampaignActions/getCampaignCtaStats';
 
 function mapStateToProps(state) {
   return {
-    campaignPageViews: state.campaignPageViews,
-    campaignCtaStats: state.campaignCtaStats
+
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignCtaStatsActions: bindActionCreators(Object.assign({}, getCampaignCtaStats), dispatch)
+
   };
 }
 

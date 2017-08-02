@@ -10,23 +10,6 @@ class Campaign extends React.Component {
     this.props.campaignActions.getCampaign(this.props.params.id);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign && (!this.props.campaign || nextProps.campaign.id !== this.props.campaign.id)) {
-      this.props.campaignAnalyticsActions.clearCampaignAnalytics();
-      if (this.isAnalysisAvailable(nextProps.campaign)) {
-        this.props.campaignAnalyticsActions.getCampaignPageViews(nextProps.campaign.id);
-        this.props.campaignAnalyticsActions.getCampaignDailyUniques(nextProps.campaign.id);
-        this.props.campaignAnalyticsActions.getCampaignTargetsReport(nextProps.campaign.id);
-        this.props.campaignAnalyticsActions.getCampaignQualifiedReport(nextProps.campaign.id);
-      }
-    }
-  }
-
-  isAnalysisAvailable(campaign) {
-    const analysableStatus = campaign.status === 'live' || campaign.status === 'dead';
-    return (analysableStatus && campaign.startDate && campaign.pathPrefix );
-  }
-
   deleteCampaign = () => {
     this.props.campaignActions.deleteCampaign(this.props.campaign.id);
   }
@@ -64,11 +47,6 @@ import * as updateCampaign from '../../actions/CampaignActions/updateCampaign';
 import * as saveCampaign from '../../actions/CampaignActions/saveCampaign';
 import * as deleteCampaign from '../../actions/CampaignActions/deleteCampaign';
 import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
-import * as getCampaignPageViews from '../../actions/CampaignActions/getCampaignPageViews';
-import * as getCampaignDailyUniques from '../../actions/CampaignActions/getCampaignDailyUniques';
-import * as getCampaignTargetsReport from '../../actions/CampaignActions/getCampaignTargetsReport';
-import * as getCampaignQualifiedReport from '../../actions/CampaignActions/getCampaignQualifiedReport';
-import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
 
 function mapStateToProps(state) {
   return {
@@ -78,8 +56,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignDailyUniques, getCampaignTargetsReport, getCampaignQualifiedReport, clearCampaignAnalytics), dispatch)
+    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch)
   };
 }
 

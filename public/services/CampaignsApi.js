@@ -33,46 +33,6 @@ export function deleteCampaign(id) {
   });
 }
 
-export function fetchOverallAnalyticsSummary() {
-  return AuthedReqwest({
-    url: '/api/campaigns/analytics',
-    contentType: 'application/json',
-    method: 'get'
-  });
-}
-
-export function fetchCampaignPageViews(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/pageViews',
-    contentType: 'application/json',
-    method: 'get'
-  });
-}
-
-export function fetchCampaignDailyUniques(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/dailyUniques',
-    contentType: 'application/json',
-    method: 'get'
-  });
-}
-
-export function fetchCampaignTargetsReport(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/targetsReport',
-    contentType: 'application/json',
-    method: 'get'
-  });
-}
-
-export function fetchCampaignQualifiedReport(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/qualifiedReport',
-    contentType: 'application/json',
-    method: 'get'
-  });
-}
-
 export function fetchCampaignContent(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/content',
@@ -118,14 +78,6 @@ export function rejectSuggestedCampaignTrafficDriver(campaignId, trafficDriverId
 export function fetchCampaignTrafficDriverStats(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/driverstats',
-    contentType: 'application/json',
-    method: 'get'
-  });
-}
-
-export function fetchCampaignCtaStats(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/ctastats',
     contentType: 'application/json',
     method: 'get'
   });
