@@ -127,7 +127,7 @@ object DayStats {
   implicit val jsonFormat = Json.format[DayStats]
 
   def fromDfpReport(report: BufferedSource): Seq[DayStats] = {
-    report.getLines.toSeq.tail.map { line =>
+    report.getLines.toSeq.drop(1).map { line =>
       val parts = line.split(",")
       DayStats(LocalDate.parse(parts(0)), PerformanceStats(parts(1).toInt, parts(2).toInt))
     }
