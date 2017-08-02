@@ -2,11 +2,11 @@ import controllers._
 import play.api.{Application, ApplicationLoader, BuiltInComponentsFromContext, Logger}
 import play.api.ApplicationLoader.Context
 import play.api.libs.ws.ahc.AhcWSComponents
-import play.api.mvc.EssentialFilter
 import play.api.routing.Router
-import play.filters.HttpFiltersComponents
 import services.{AWS, LogShipping}
 import router.Routes
+
+
 
 class AppLoader extends ApplicationLoader {
   def load(context: Context): Application = {
@@ -14,15 +14,7 @@ class AppLoader extends ApplicationLoader {
   }
 }
 
-class AppComponents(context: Context)
-  extends BuiltInComponentsFromContext(context)
-    with AhcWSComponents
-    with AssetsComponents
-    with HttpFiltersComponents {
-
-  // disabling some default filters until value is clear in this context
-  override def httpFilters: Seq[EssentialFilter] =
-    super.httpFilters.filterNot(filter => filter == csrfFilter || filter == allowedHostsFilter)
+class AppComponents(context: Context) extends BuiltInComponentsFromContext(context) with AhcWSComponents {
 
   Logger.info("bootstrapping AWS")
   AWS.init(configuration.getString("aws.profile"))
@@ -31,14 +23,13 @@ class AppComponents(context: Context)
   LogShipping.init
 
   Logger.info("bootstrapping controllers")
-
-  val appController = new App(wsClient, controllerComponents)
-  val campaignApiController = new CampaignApi(wsClient, controllerComponents)
-  val clientApiController = new ClientApi(wsClient, controllerComponents)
-  val managementApiController = new ManagementApi(wsClient, controllerComponents)
-  val migrationController = new Migration(wsClient, controllerComponents)
-  val managementController = new Management(controllerComponents)
-  val assetsController = new Assets(httpErrorHandler, assetsMetadata)
+  val appController = new App(wsClient)
+  val campaignApiController = new CampaignApi(wsClient)
+  val clientApiController = new ClientApi(wsClient)
+  val managementApiController = new ManagementApi(wsClient)
+  val migrationController = new Migration(wsClient)
+  val managementController = new Management()
+  val assetsController = new Assets(httpErrorHandler)
 
   def router: Router = new Routes(
     httpErrorHandler,

@@ -58,6 +58,7 @@ object CtaClicksReport {
         startDate <- campaign.startDate;
         sectionId <- campaign.pathPrefix
       ) yield {
+        campaign.pathPrefix
         "logo" -> GoogleAnalytics.loadSponsorLogoClicks(sectionId, startDate, campaign.endDate)
       }
 

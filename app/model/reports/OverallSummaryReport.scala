@@ -18,15 +18,15 @@ object OverallSummaryReport {
   def getOverallSummaryReport(): Option[OverallSummaryReport] = {
     AnalyticsDataCache.getOverallSummary() match {
       case Hit(report) => {
-        Logger.debug("getting overall summary - cache hit")
+        Logger.debug(s"getting overall summary - cache hit")
         Some(report)
       }
       case Stale(report) => {
-        Logger.debug("getting overall summary - cache stale")
+        Logger.debug(s"getting overall summary - cache stale")
         Some(report)
       }
       case Miss => {
-        Logger.debug("getting overall summary - cache miss")
+        Logger.debug(s"getting overall summary - cache miss")
         None
       }
     }
