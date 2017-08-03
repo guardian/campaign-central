@@ -21,7 +21,7 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
   }
 
   def getAnalyticsSummary() = APIAuthAction {
-    Ok(Json.toJson(OverallSummaryReport.getOverallSummaryReport().getOrElse(OverallSummaryReport(Map()))))
+    Ok(Json.toJson(CampaignService.getOverallSummary()))
   }
 
   def getCampaign(id: String) = APIAuthAction {
@@ -55,35 +55,7 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
 
 
   def getCampaignUniquesFromDatalake(id: String) = APIAuthAction { req =>
-    val campaignUniques = CampaignService.getUniques(id)
-    val initialDataPoint = campaignUniques.headOption.map { item =>
-      item.copy(reportExecutionTimestamp = new DateTime(item.reportExecutionTimestamp).minusDays(1).toString, uniques = 0L)
-    }
-
-    val uniqueItems = initialDataPoint ++ campaignUniques
-    val target = CampaignRepository.getCampaign(id).flatMap(_.targets.get("uniques"))
-
-    target match {
-      case Some(t) =>
-        val runRateStep = {
-          val numItems = uniqueItems.size.toLong
-          if (numItems == 0) 1
-          else t / numItems
-        }
-        val runRate = Seq.range[Long](0, t + runRateStep, runRateStep)
-        val dataPoints = (uniqueItems zip runRate).map { case (unique, rate) =>
-          GraphDataPoint(
-            name = unique.reportExecutionTimestamp,
-            dataPoint = unique.uniques,
-            target = rate
-          )
-        }
-
-        Ok(Json.toJson(dataPoints))
-
-      case None => NotFound
-    }
-
+    CampaignService.getUniquesDataForGraph(id).map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound
   }
 
   def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { req =>
