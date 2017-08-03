@@ -15,14 +15,14 @@ class CampaignLevelAssets extends React.Component {
   }
 
   getCtr = () => {
-    if(this.props.campaignCtaStats && this.props.campaignPageViews) {
-      var count = this.props.campaignCtaStats['logo'];
+    if(this.props.campaignCtaStats && this.props.campaignPageViews && this.props.campaignPageViews.pageCountStats) {
+      let count = this.props.campaignCtaStats['logo'];
       if(!count) {count = 0}
 
-      var latestStats = this.props.campaignPageViews.pageCountStats[this.props.campaignPageViews.pageCountStats.length - 1];
-      var uniqueCount = latestStats["cumulative-unique-total"];
+      const latestStats = this.props.campaignPageViews.pageCountStats[this.props.campaignPageViews.pageCountStats.length - 1];
+      const uniqueCount = latestStats["cumulative-unique-total"];
 
-      var ctr = '';
+      let ctr = '';
       if (uniqueCount && uniqueCount !== 0) {
         ctr =  '(ctr: ' + ((count / uniqueCount) * 100 ).toFixed(2) + '%)';
       }

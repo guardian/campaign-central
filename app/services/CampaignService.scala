@@ -26,7 +26,11 @@ object CampaignService {
     val maybeTarget = CampaignRepository.getCampaign(campaignId).flatMap(_.targets.get("uniques"))
 
     maybeTarget map { target =>
-      val runRateStep = target / uniqueItems.size.toLong
+      val runRateStep = {
+        val numItems = uniqueItems.size.toLong
+        if (numItems == 0) 1
+        else target / numItems
+      }
       val runRate = Seq.range[Long](0, target + runRateStep, runRateStep)
       (uniqueItems zip runRate).map { case (unique, rate) =>
         GraphDataPoint(
