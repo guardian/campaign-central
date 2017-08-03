@@ -84,11 +84,11 @@ object DailyUniqueUsersReport {
   }
 
   def generateReport(campaignId: String): Option[DailyUniqueUsersReport] = {
-    for (
-      campaign <- CampaignRepository.getCampaign(campaignId);
+    for {
+      campaign <- CampaignRepository.getCampaign(campaignId)
       startDate <- campaign.startDate
-    ) yield {
-      val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate).map{ dt =>
+    } yield {
+      val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate).map { dt =>
         Thread.sleep(3000) // try to avoid rate limiting
         loadCampaignDailyUniquesForDay(campaign, dt)
       }

@@ -4,7 +4,7 @@ import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import model.reports._
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, _}
 import play.api.Logger
 import play.api.libs.json.Json._
 import play.api.libs.json._
@@ -52,9 +52,34 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
     val pageViews = CampaignService.getPageViews(id)
     Ok(Json.toJson(pageViews))
   }
+
+
   def getCampaignUniquesFromDatalake(id: String) = APIAuthAction { req =>
-    val uniques = CampaignService.getUniques(id)
-    Ok(Json.toJson(uniques))
+    val campaignUniques = CampaignService.getUniques(id)
+    val initialDataPoint = campaignUniques.headOption.map { item =>
+      item.copy(reportExecutionTimestamp = new DateTime(item.reportExecutionTimestamp).minusDays(1).toString, uniques = 0L)
+    }
+
+    val uniqueItems = initialDataPoint ++ campaignUniques
+    val target = CampaignRepository.getCampaign(id).flatMap(_.targets.get("uniques"))
+
+    target match {
+      case Some(t) =>
+        val runRateStep = t / uniqueItems.size.toLong
+        val runRate = Seq.range[Long](0, t + runRateStep, runRateStep)
+        val dataPoints = (uniqueItems zip runRate).map { case (unique, rate) =>
+          GraphDataPoint(
+            name = unique.reportExecutionTimestamp,
+            dataPoint = unique.uniques,
+            target = rate
+          )
+        }
+
+        Ok(Json.toJson(dataPoints))
+
+      case None => NotFound
+    }
+
   }
 
   def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { req =>
