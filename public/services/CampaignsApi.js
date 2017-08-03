@@ -3,7 +3,6 @@ import {AuthedReqwest} from '../util/pandaReqwest';
 export function fetchCampaigns() {
   return AuthedReqwest({
     url: '/api/campaigns',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -11,7 +10,6 @@ export function fetchCampaigns() {
 export function fetchCampaign(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id,
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -36,7 +34,6 @@ export function deleteCampaign(id) {
 export function fetchOverallAnalyticsSummary() {
   return AuthedReqwest({
     url: '/api/campaigns/analytics',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -44,7 +41,6 @@ export function fetchOverallAnalyticsSummary() {
 export function fetchCampaignPageViews(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/pageViews',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -52,7 +48,6 @@ export function fetchCampaignPageViews(id) {
 export function fetchCampaignDailyUniques(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/dailyUniques',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -60,7 +55,6 @@ export function fetchCampaignDailyUniques(id) {
 export function fetchCampaignTargetsReport(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/targetsReport',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -68,7 +62,6 @@ export function fetchCampaignTargetsReport(id) {
 export function fetchCampaignQualifiedReport(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/qualifiedReport',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -76,7 +69,6 @@ export function fetchCampaignQualifiedReport(id) {
 export function fetchCampaignContent(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/content',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -84,7 +76,6 @@ export function fetchCampaignContent(id) {
 export function fetchCampaignTrafficDrivers(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/drivers',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -92,7 +83,6 @@ export function fetchCampaignTrafficDrivers(id) {
 export function fetchCampaignTrafficDriverSuggestions(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/suggest-drivers',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -118,7 +108,6 @@ export function rejectSuggestedCampaignTrafficDriver(campaignId, trafficDriverId
 export function fetchCampaignTrafficDriverStats(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/driverstats',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -126,7 +115,6 @@ export function fetchCampaignTrafficDriverStats(id) {
 export function fetchCampaignCtaStats(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/ctastats',
-    contentType: 'application/json',
     method: 'get'
   });
 }
@@ -134,7 +122,6 @@ export function fetchCampaignCtaStats(id) {
 export function fetchCampaignNotes(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/notes',
-    contentType: 'application/json',
     method: 'get'
   });
 }

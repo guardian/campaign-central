@@ -71,11 +71,11 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
     ))
   }
 
-  def getCampaignContent(id: String) =  APIAuthAction { req =>
+  def getCampaignContent(id: String) = APIAuthAction { req =>
     Ok(Json.toJson(CampaignContentRepository.getContentForCampaign(id)))
   }
 
-  def getCampaignNotes(id: String) =  APIAuthAction { req =>
+  def getCampaignNotes(id: String) = APIAuthAction { req =>
     Ok(Json.toJson(CampaignNotesRepository.getNotesForCampaign(id)))
   }
 
