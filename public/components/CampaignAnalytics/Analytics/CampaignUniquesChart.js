@@ -9,17 +9,17 @@ export default class CampaignUniquesChart extends React.Component {
 
   render () {
 
-    let data = [];
-    if (this.props.data) {
-      data = this.props.data.map((item) => {
-        return {
-          name: Moment(item.name).format("YYYY-MM-DD"),
-          uniques: item.dataPoint,
-          target: item.target
-        }
-        }
-      )
+    if (!this.props.data) {
+      return null;
     }
+
+    const data = this.props.data.map((item) => {
+      return {
+        name: Moment(item.name).format("YYYY-MM-DD"),
+        uniques: item.dataPoint,
+        target: item.target
+      }
+    });
 
     return(
       <div className="analytics-chart">
