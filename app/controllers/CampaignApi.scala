@@ -63,11 +63,13 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
     val uniqueItems = initialDataPoint ++ campaignUniques
     val target = CampaignRepository.getCampaign(id).flatMap(_.targets.get("uniques"))
 
-    def safeDivide(num: Long, div: Long): Long = if (div == 0) 0 else num / div
-    
     target match {
       case Some(t) =>
-        val runRateStep = safeDivide(t, uniqueItems.size.toLong)
+        val runRateStep = {
+          val numItems = uniqueItems.size.toLong
+          if (numItems == 0) 1
+          else t / numItems
+        }
         val runRate = Seq.range[Long](0, t + runRateStep, runRateStep)
         val dataPoints = (uniqueItems zip runRate).map { case (unique, rate) =>
           GraphDataPoint(
