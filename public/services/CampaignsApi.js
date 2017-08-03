@@ -49,9 +49,9 @@ export function fetchCampaignPageViews(id) {
   });
 }
 
-export function fetchCampaignDailyUniques(id) {
+export function fetchCampaignUniques(id) {
   return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/dailyUniques',
+    url: '/api/v2/campaigns/' + id + '/uniques',
     contentType: 'application/json',
     method: 'get'
   });

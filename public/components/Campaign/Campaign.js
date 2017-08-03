@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import {Link} from 'react-router';
 import CampaignEdit from '../CampaignInformationEdit/CampaignEdit';
 import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
+import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
 import CampaignTrafficDriversAndSuggestions from '../CampaignInformationEdit/CampaignTrafficDriversAndSuggestions';
 
 class Campaign extends React.Component {
@@ -15,7 +16,7 @@ class Campaign extends React.Component {
       this.props.campaignAnalyticsActions.clearCampaignAnalytics();
       if (this.isAnalysisAvailable(nextProps.campaign)) {
         this.props.campaignAnalyticsActions.getCampaignPageViews(nextProps.campaign.id);
-        this.props.campaignAnalyticsActions.getCampaignDailyUniques(nextProps.campaign.id);
+        this.props.campaignAnalyticsActions.getCampaignUniques(nextProps.campaign.id);
         this.props.campaignAnalyticsActions.getCampaignTargetsReport(nextProps.campaign.id);
         this.props.campaignAnalyticsActions.getCampaignQualifiedReport(nextProps.campaign.id);
       }
@@ -46,6 +47,7 @@ class Campaign extends React.Component {
         </Link>
         <div className="campaign__row">
           <CampaignEdit campaign={campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
+          <CampaignAnalytics campaign={this.props.campaign} />
           <CampaignAssets campaign={campaign}
                           getCampaign={this.props.campaignActions.getCampaign}
                           getCampaignContent={this.props.campaignActions.getCampaignContent} />
@@ -65,7 +67,7 @@ import * as saveCampaign from '../../actions/CampaignActions/saveCampaign';
 import * as deleteCampaign from '../../actions/CampaignActions/deleteCampaign';
 import * as getCampaignContent from '../../actions/CampaignActions/getCampaignContent';
 import * as getCampaignPageViews from '../../actions/CampaignActions/getCampaignPageViews';
-import * as getCampaignDailyUniques from '../../actions/CampaignActions/getCampaignDailyUniques';
+import * as getCampaignUniques from '../../actions/CampaignActions/getCampaignUniques';
 import * as getCampaignTargetsReport from '../../actions/CampaignActions/getCampaignTargetsReport';
 import * as getCampaignQualifiedReport from '../../actions/CampaignActions/getCampaignQualifiedReport';
 import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
@@ -79,7 +81,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignDailyUniques, getCampaignTargetsReport, getCampaignQualifiedReport, clearCampaignAnalytics), dispatch)
+    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignUniques, getCampaignTargetsReport, getCampaignQualifiedReport, clearCampaignAnalytics), dispatch)
   };
 }
 

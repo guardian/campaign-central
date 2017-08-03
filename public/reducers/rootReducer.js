@@ -4,7 +4,7 @@ import config from './configReducer';
 import campaigns from './campaignsReducer';
 import campaign from './campaignReducer';
 import campaignPageViews from './campaignPageViewsReducer';
-import campaignDailyUniques from './campaignDailyUniquesReducer';
+import campaignUniques from './campaignUniquesReducer';
 import campaignTargetsReport from './campaignTargetsReportReducer';
 import campaignQualifiedReport from './campaignQualifiedReportReducer';
 import campaignCtaStats from './campaignCtaStatsReducer';
@@ -26,7 +26,7 @@ export default combineReducers({
   campaigns,
   campaign,
   campaignPageViews,
-  campaignDailyUniques,
+  campaignUniques,
   campaignTargetsReport,
   campaignQualifiedReport,
   campaignCtaStats,

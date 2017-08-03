@@ -35,6 +35,12 @@
   width: calc(33% - 20px);
 }
 
+.analytics-chart--two-thirds-width {
+
+  @extend %analytics-chart;
+  width: calc(66% - 20px);
+}
+
 .analytics-chart__label {
   position: absolute;
 
