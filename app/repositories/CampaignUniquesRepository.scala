@@ -1,12 +1,25 @@
 package repositories
 
-import model.{CampaignUniquesItem}
+import com.amazonaws.services.dynamodbv2.document.ScanFilter
+import model.CampaignUniquesItem
+import org.joda.time.DateTime
 import services.Dynamo
+import scala.collection.JavaConverters._
 
 import scala.collection.JavaConversions._
 
 object CampaignUniquesRepository {
-  def getCampaignUniques(campaignId: String) = {
-    Dynamo.campaignUniquesTable.query("campaignId", campaignId).map{ CampaignUniquesItem.fromItem }.toList
+
+  private val ReportExecutionTimestampField = "reportExecutionTimestamp"
+
+  def getCampaignUniques(campaignId: String): Seq[CampaignUniquesItem] = {
+    Dynamo.campaignUniquesTable.query("campaignId", campaignId).map(CampaignUniquesItem.fromItem).toList
   }
+
+  def getLatestCampaignUniques(): Seq[CampaignUniquesItem] = {
+    val yesterday = DateTime.now.minusDays(1).toString("YYYY-MM-dd")
+    val reportExecutionTimestampFilter = new ScanFilter(ReportExecutionTimestampField).gt(yesterday)
+    Dynamo.campaignUniquesTable.scan(reportExecutionTimestampFilter).asScala.toList.map(CampaignUniquesItem.fromItem)
+  }
+
 }
