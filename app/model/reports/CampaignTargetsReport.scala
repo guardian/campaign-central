@@ -3,6 +3,8 @@ package model.reports
 import ai.x.play.json.Jsonx
 import org.joda.time.{DateTime, Duration}
 import play.api.libs.json.Format
+import play.api.libs.json.JodaReads._
+import play.api.libs.json.JodaWrites._
 import repositories.CampaignRepository
 
 case class CampaignTargetRunRateElement(date: DateTime, expected: Long)

@@ -33,7 +33,7 @@ object ContentApi {
           .pageSize(10).page(page)
     )
 
-    val resultPage = Await.result(response, 5 seconds)
+    val resultPage = Await.result(response, 5.seconds)
 
     val allContent = content ::: resultPage.results.toList
 
