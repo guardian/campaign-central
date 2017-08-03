@@ -3,6 +3,8 @@ package model.external
 import ai.x.play.json.Jsonx
 import org.joda.time.DateTime
 import play.api.libs.json.Format
+import play.api.libs.json.JodaReads._
+import play.api.libs.json.JodaWrites._
 
 case class SponsorshipTargeting(publishedSince: Option[DateTime], validEditions: Option[List[String]])
 
