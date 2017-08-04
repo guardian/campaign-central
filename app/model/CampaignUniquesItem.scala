@@ -9,8 +9,6 @@ import scala.util.control.NonFatal
 
 case class CampaignUniquesItem (
                                    campaignId: String,
-                                   startDate:Long,
-                                   endDate:Long,
                                    reportExecutionTimestamp: String,
                                    uniques: Long
                                  ){

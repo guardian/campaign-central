@@ -9,8 +9,6 @@ import scala.util.control.NonFatal
 
 case class CampaignPageViewsItem (
   campaignId: String,
-  startDate:Long,
-  endDate:Long,
   reportExecutionTimestamp: String,
   pageviews: Long
 ){
