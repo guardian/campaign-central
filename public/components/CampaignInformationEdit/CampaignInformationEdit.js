@@ -63,7 +63,7 @@ class CampaignInformationEdit extends React.Component {
     if (this.props.campaign.startDate && this.props.campaign.endDate) {
       const now = new Date();
       const oneDayMillis = 24 * 60 * 60 * 1000;
-      const days = Math.round((this.props.campaign.endDate - now) / oneDayMillis);
+      const days = Math.round((new Date(this.props.campaign.endDate) - now) / oneDayMillis);
 
       daysLeft = ' - ' + days + ' days left';
     }
