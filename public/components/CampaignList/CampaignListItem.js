@@ -48,8 +48,6 @@ class CampaignListItem extends React.Component {
 
       <div className="campaign-list__helper" onClick={e => e.stopPropagation()}>
         {daysGone} days into campaign ({Math.round(100*daysGone/days)}%)<br/>
-        {!!targetToDate && targetToDate + " uniques expected so far "}
-        {!!targetToDate && !!target && "(" + Math.round(100*targetToDate/target) +"% of target)"}
       </div>
     </td>);
 

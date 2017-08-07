@@ -5,7 +5,7 @@ class CampaignAnalytics extends React.Component {
 
   render () {
 
-    if(!this.props.campaignUniques) return null;
+    if(!this.props.campaignUniques || !this.props.campaignUniques.length > 0) return null;
 
     return (
       <CampaignUniquesChart data={this.props.campaignUniques}/>
