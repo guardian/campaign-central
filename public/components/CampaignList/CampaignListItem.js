@@ -27,8 +27,8 @@ class CampaignListItem extends React.Component {
     const totalUniques = this.props.analyticsSummary.totalUniques;
     const targetToDate = this.props.analyticsSummary.targetToDate;
     const now = new Date();
-    const endDate = this.props.campaign.endDate;
-    const startDate = this.props.campaign.startDate;
+    const endDate = new Date(this.props.campaign.endDate);
+    const startDate = new Date(this.props.campaign.startDate);
     const target = this.props.campaign.targets && this.props.campaign.targets.uniques;
     const ahead = 'campaign-list__item--ahead';
     const behind = 'campaign-list__item--behind';
@@ -64,8 +64,7 @@ class CampaignListItem extends React.Component {
 
     var daysLeft = '';
     if (this.props.campaign.startDate && this.props.campaign.endDate) {
-      const days = this.daysBetween(new Date(), this.props.campaign.endDate);
-
+      const days = this.daysBetween(new Date(), new Date(this.props.campaign.endDate));
       var dayWord = Math.abs(days) === 1 ? ' day' : ' days';
 
       daysLeft = days < 0 ? 'Ended ' + (-days) + dayWord + ' ago' : days + dayWord + ' left';
