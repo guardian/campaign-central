@@ -204,24 +204,18 @@ Resources:
         AttributeType: S
       - AttributeName: platformUrlComponent
         AttributeType: S
-      - AttributeName: clicks
-        AttributeType: N
-      - AttributeName: firstReferral
-        AttributeType: S
-      - AttributeName: lastReferral
-        AttributeType: S
       KeySchema:
       - AttributeName: campaignId
         KeyType: HASH
       - AttributeName: platformUrlComponent
         KeyType: RANGE
       ProvisionedThroughput:
-        ReadCapacityUnits: '10'
-        WriteCapacityUnits: '10'
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
       TableName:
         Fn::Join:
         - "-"
         - - campaign-central
           - Ref: Stage
-          - campaign-referrals
+          - referrals
     DeletionPolicy: Retain
