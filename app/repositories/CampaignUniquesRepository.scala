@@ -18,7 +18,7 @@ object CampaignUniquesRepository {
 
   def getLatestCampaignUniques(): Seq[CampaignUniquesItem] = {
     val yesterday = DateTime.now.minusDays(1).toString("YYYY-MM-dd")
-    val reportExecutionTimestampFilter = new ScanFilter(ReportExecutionTimestampField).gt(yesterday)
+    val reportExecutionTimestampFilter: ScanFilter = new ScanFilter(ReportExecutionTimestampField).eq(yesterday)
     Dynamo.campaignUniquesTable.scan(reportExecutionTimestampFilter).asScala.toList.map(CampaignUniquesItem.fromItem)
   }
 
