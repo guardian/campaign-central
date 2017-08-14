@@ -219,3 +219,24 @@ Resources:
           - Ref: Stage
           - referrals
     DeletionPolicy: Retain
+
+  CampaignAnalyticsLatestDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - analytics
+          - latest
+    DeletionPolicy: Retain
