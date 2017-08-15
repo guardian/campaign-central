@@ -17,6 +17,8 @@ GET            /reauth            controllers.App.reauth
 
 GET /api/campaigns                          controllers.CampaignApi.getAllCampaigns
 GET /api/campaigns/analytics                controllers.CampaignApi.getAnalyticsSummary
+GET /api/v2/campaigns/:id/analytics/latest  controllers.CampaignApi.getAnalyticsSummaryForCampaign(id: String)
+
 GET /api/campaigns/:id                      controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id                      controllers.CampaignApi.updateCampaign(id: String)
 DELETE /api/campaigns/:id                   controllers.CampaignApi.deleteCampaign(id: String)

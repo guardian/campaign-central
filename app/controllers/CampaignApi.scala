@@ -24,6 +24,10 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
     Ok(Json.toJson(CampaignService.getOverallSummary()))
   }
 
+  def getAnalyticsSummaryForCampaign(campaignId: String) = APIAuthAction {
+    Ok(Json.toJson(CampaignService.getLatestAnalyticsForCampaign(campaignId)))
+  }
+
   def getCampaign(id: String) = APIAuthAction {
     CampaignRepository.getCampaign(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
   }
@@ -52,7 +56,6 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
     val pageViews = CampaignService.getPageViews(id)
     Ok(Json.toJson(pageViews))
   }
-
 
   def getCampaignUniquesFromDatalake(id: String) = APIAuthAction { req =>
     CampaignService.getUniquesDataForGraph(id).map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound

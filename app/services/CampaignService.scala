@@ -1,9 +1,9 @@
 package services
 
-import model.{CampaignPageViewsItem, CampaignUniquesItem, GraphDataPoint}
+import model.{CampaignAnalyticsLatestItem, CampaignPageViewsItem, CampaignUniquesItem, GraphDataPoint}
 import model.reports.{CampaignSummary, OverallSummaryReport}
 import org.joda.time.DateTime
-import repositories.{CampaignPageViewsRepository, CampaignRepository, CampaignUniquesRepository}
+import repositories.{CampaignAnalyticsLatestRepository, CampaignPageViewsRepository, CampaignRepository, CampaignUniquesRepository}
 
 object CampaignService {
 
@@ -13,6 +13,10 @@ object CampaignService {
 
   def getUniques(campaignId: String): Seq[CampaignUniquesItem] = {
     CampaignUniquesRepository.getCampaignUniques(campaignId)
+  }
+
+  def getLatestAnalyticsForCampaign(campaignId: String): Option[CampaignAnalyticsLatestItem] = {
+    CampaignAnalyticsLatestRepository.getLatestCampaignAnalytics(campaignId)
   }
 
   def getUniquesDataForGraph(campaignId: String): Option[Seq[GraphDataPoint]] = {
@@ -43,13 +47,13 @@ object CampaignService {
   }
 
   def getOverallSummary(): OverallSummaryReport = {
-    val latestCampaignUniques = CampaignUniquesRepository.getLatestCampaignUniques()
-    val latestCampaignUniqueIds = latestCampaignUniques.map(_.campaignId)
+    val latestCampaignAnalytics = CampaignAnalyticsLatestRepository.getLatestCampaignAnalytics()
+    val latestCampaignUniqueIds = latestCampaignAnalytics.map(_.campaignId)
     val campaignsWeHaveUniquesFor = CampaignRepository.getAllCampaigns().filter(c => latestCampaignUniqueIds.contains(c.id))
 
     val campaignSummaries = campaignsWeHaveUniquesFor flatMap { campaign =>
       for {
-        uniques <- latestCampaignUniques.find(_.campaignId == campaign.id).map(_.uniques)
+        uniques <- latestCampaignAnalytics.find(_.campaignId == campaign.id).map(_.uniques)
       } yield campaign.id -> CampaignSummary(uniques, campaign.targets.getOrElse("uniques", 0))
     }
 
