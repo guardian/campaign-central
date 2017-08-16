@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react';
 import CampaignInformationEdit from './CampaignInformationEdit';
 import CampaignTargetsEdit from './CampaignTargetsEdit';
 import CampaignNotes from '../CampaignNotes/CampaignNotes';
+import CampaignPerformanceOverview from '../CampaignPerformanceOverview/CampaignPerformanceOverview';
 
 class CampaignEdit extends React.Component {
 
@@ -43,12 +44,19 @@ class CampaignEdit extends React.Component {
         </div>
         <div className="campaign-box__body">
           <div className="campaign__column">
-            <CampaignInformationEdit campaign={this.props.campaign} updateCampaign={this.triggerUpdate} />
+            <CampaignPerformanceOverview
+              campaign={this.props.campaign}
+              latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}/>
+          </div>
+          <div className="campaign__column">
+            <CampaignInformationEdit
+              campaign={this.props.campaign}
+              latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
+              updateCampaign={this.triggerUpdate} />
           </div>
           <div className="campaign__column">
             <CampaignTargetsEdit campaign={this.props.campaign} updateCampaign={this.triggerUpdate} />
-          </div>
-          <div className="campaign__column">
+            <br/>
             <CampaignNotes campaign={this.props.campaign} />
           </div>
         </div>
