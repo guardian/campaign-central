@@ -21,11 +21,11 @@ class CampaignListItem extends React.Component {
   };
 
   renderProgressSummary = () => {
-    if (!this.props.analyticsSummary) {
+    if (!this.props.latestAnalytics) {
       return <td className="campaign-list__item">-</td>;
     }
-    const totalUniques = this.props.analyticsSummary.totalUniques;
-    const targetToDate = this.props.analyticsSummary.targetToDate;
+    const totalUniques = this.props.latestAnalytics.uniques;
+    const targetToDate = this.props.latestAnalytics.uniquesTarget;
     const now = new Date();
     const endDate = new Date(this.props.campaign.endDate);
     const startDate = new Date(this.props.campaign.startDate);

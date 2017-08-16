@@ -16,20 +16,20 @@ import services.CampaignService
 class CampaignApi(override val wsClient: WSClient, components: ControllerComponents)
   extends CentralController(components) with PandaAuthActions {
 
+  def getCampaign(id: String) = APIAuthAction {
+    CampaignRepository.getCampaign(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
+  }
+
   def getAllCampaigns() = APIAuthAction {
     Ok(Json.toJson(CampaignRepository.getAllCampaigns()))
   }
 
-  def getAnalyticsSummary() = APIAuthAction {
-    Ok(Json.toJson(CampaignService.getOverallSummary()))
+  def getLatestCampaignAnalytics() = APIAuthAction {
+    Ok(Json.toJson(CampaignService.getLatestCampaignAnalytics()))
   }
 
-  def getAnalyticsSummaryForCampaign(campaignId: String) = APIAuthAction {
+  def getLatestAnalyticsForCampaign(campaignId: String) = APIAuthAction {
     Ok(Json.toJson(CampaignService.getLatestAnalyticsForCampaign(campaignId)))
-  }
-
-  def getCampaign(id: String) = APIAuthAction {
-    CampaignRepository.getCampaign(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
   }
 
   def updateCampaign(id: String) = APIAuthAction { req =>

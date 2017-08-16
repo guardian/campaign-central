@@ -42,7 +42,7 @@ sealed trait Config {
   def trafficDriverRejectTableName = s"campaign-central-$stage-drivers-rejected"
   def campaignPageviewsTableName = s"campaign-central-$stage-campaign-page-views"
   def campaignUniquesTableName = s"campaign-central-$stage-campaign-uniques"
-  def campaignAnalyticsLatestTableName = s"campaign-central-$stage-analytics-latest"
+  def latestCampaignAnalyticsTableName = s"campaign-central-$stage-analytics-latest"
 
   def tagManagerApiUrl: String
   def composerUrl: String

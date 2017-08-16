@@ -1,11 +1,16 @@
 package services
 
-import model.{CampaignAnalyticsLatestItem, CampaignPageViewsItem, CampaignUniquesItem, GraphDataPoint}
-import model.reports.{CampaignSummary, OverallSummaryReport}
+import model.{CampaignPageViewsItem, CampaignUniquesItem, GraphDataPoint, LatestCampaignAnalytics}
 import org.joda.time.DateTime
-import repositories.{CampaignAnalyticsLatestRepository, CampaignPageViewsRepository, CampaignRepository, CampaignUniquesRepository}
+import repositories.{LatestCampaignAnalyticsRepository, CampaignPageViewsRepository, CampaignRepository, CampaignUniquesRepository}
 
 object CampaignService {
+
+  object DeviceTypes {
+    val MobileDeviceTypes = Set("PDA", "SMARTPHONE", "TABLET", "WEARABLE_COMPUTER", "GUARDIAN_ANDROID_NATIVE_APP", "GUARDIAN_IOS_NATIVE_APP", "GUARDIAN_WINDOWS_APP")
+    val DesktopDeviceTypes = Set("GAME_CONSOLE", "PERSONAL_COMPUTER", "SMART_TV")
+    val ExcludedDeviceTypes = Set("UNKNOWN", "OTHER")
+  }
 
   def getPageViews(campaignId: String): Seq[CampaignPageViewsItem] = {
     CampaignPageViewsRepository.getCampaignPageViews(campaignId)
@@ -15,8 +20,33 @@ object CampaignService {
     CampaignUniquesRepository.getCampaignUniques(campaignId)
   }
 
-  def getLatestAnalyticsForCampaign(campaignId: String): Option[CampaignAnalyticsLatestItem] = {
-    CampaignAnalyticsLatestRepository.getLatestCampaignAnalytics(campaignId)
+  def getLatestAnalyticsForCampaign(campaignId: String): Option[LatestCampaignAnalytics] = {
+    for {
+      campaign <- CampaignRepository.getCampaign(campaignId)
+      latest <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(campaignId)
+    } yield {
+      val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
+      val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
+      LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews)
+
+    }
+  }
+
+  def getLatestCampaignAnalytics(): Map[String, LatestCampaignAnalytics] = {
+    val latestCampaignAnalytics = LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics()
+    val campaignsWeHaveUniquesFor = CampaignRepository.getAllCampaigns().filter(c => latestCampaignAnalytics.map(_.campaignId).contains(c.id))
+
+    val results = campaignsWeHaveUniquesFor flatMap { campaign =>
+      for {
+        latest <- latestCampaignAnalytics.find(_.campaignId == campaign.id)
+      } yield {
+        val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
+        val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
+        campaign.id -> LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews)
+      }
+    }
+
+    results.toMap
   }
 
   def getUniquesDataForGraph(campaignId: String): Option[Seq[GraphDataPoint]] = {
@@ -46,17 +76,16 @@ object CampaignService {
     }
   }
 
-  def getOverallSummary(): OverallSummaryReport = {
-    val latestCampaignAnalytics = CampaignAnalyticsLatestRepository.getLatestCampaignAnalytics()
-    val latestCampaignUniqueIds = latestCampaignAnalytics.map(_.campaignId)
-    val campaignsWeHaveUniquesFor = CampaignRepository.getAllCampaigns().filter(c => latestCampaignUniqueIds.contains(c.id))
+  case class DeviceBreakdown(mobile: Long, desktop: Long)
 
-    val campaignSummaries = campaignsWeHaveUniquesFor flatMap { campaign =>
-      for {
-        uniques <- latestCampaignAnalytics.find(_.campaignId == campaign.id).map(_.uniques)
-      } yield campaign.id -> CampaignSummary(uniques, campaign.targets.getOrElse("uniques", 0))
-    }
+  private def breakdownUniquesByMobileAndDesktop(totalUniques: Long, uniquesPerDevice: Map[String, Long]): DeviceBreakdown = {
+    val uniquesFromOther: Long = uniquesPerDevice.filter { case (key, _) => DeviceTypes.ExcludedDeviceTypes.contains(key) }.values.sum
+    val uniquesByDeviceWithoutExcludes = uniquesPerDevice -- DeviceTypes.ExcludedDeviceTypes
+    val (mobile, _) = uniquesByDeviceWithoutExcludes.partition { case (key, _) => DeviceTypes.MobileDeviceTypes.contains(key) }
 
-    OverallSummaryReport(campaignSummaries.toMap)
+    val uniquesFromMobile = mobile.values.sum + (if (uniquesFromOther > 0) uniquesFromOther / 2 else 0)
+    val uniquesFromDesktop = totalUniques - uniquesFromMobile
+
+    DeviceBreakdown(uniquesFromMobile, uniquesFromDesktop)
   }
 }

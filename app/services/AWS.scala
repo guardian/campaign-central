@@ -67,6 +67,6 @@ object Dynamo {
 
   lazy val campaignPageviewsTable = dynamoDb.getTable(Config().campaignPageviewsTableName)
   lazy val campaignUniquesTable = dynamoDb.getTable(Config().campaignUniquesTableName)
-  lazy val campaignAnalyticsLatestTable = dynamoDb.getTable(Config().campaignAnalyticsLatestTableName)
+  lazy val latestCampaignAnalyticsTable = dynamoDb.getTable(Config().latestCampaignAnalyticsTableName)
 
 }

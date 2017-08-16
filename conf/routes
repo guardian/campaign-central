@@ -15,9 +15,9 @@ GET            /reauth            controllers.App.reauth
 
 #Campaign Api
 
-GET /api/campaigns                          controllers.CampaignApi.getAllCampaigns
-GET /api/campaigns/analytics                controllers.CampaignApi.getAnalyticsSummary
-GET /api/v2/campaigns/:id/analytics/latest  controllers.CampaignApi.getAnalyticsSummaryForCampaign(id: String)
+GET /api/campaigns                         controllers.CampaignApi.getAllCampaigns
+GET /api/v2/campaigns/latestAnalytics      controllers.CampaignApi.getLatestCampaignAnalytics
+GET /api/v2/campaigns/:id/latestAnalytics  controllers.CampaignApi.getLatestAnalyticsForCampaign(id: String)
 
 GET /api/campaigns/:id                      controllers.CampaignApi.getCampaign(id: String)
 PUT /api/campaigns/:id                      controllers.CampaignApi.updateCampaign(id: String)

@@ -31,9 +31,16 @@ export function deleteCampaign(id) {
   });
 }
 
-export function fetchOverallAnalyticsSummary() {
+export function fetchLatestAnalytics() {
   return AuthedReqwest({
-    url: '/api/campaigns/analytics',
+    url: '/api/v2/campaigns/latestAnalytics',
+    method: 'get'
+  });
+}
+
+export function fetchLatestAnalyticsForCampaign(id) {
+  return AuthedReqwest({
+    url: '/api/v2/campaigns/' + id + '/latestAnalytics',
     method: 'get'
   });
 }

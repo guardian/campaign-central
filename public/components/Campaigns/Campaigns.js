@@ -61,7 +61,7 @@ class Campaigns extends Component {
 
   componentDidMount() {
     this.props.campaignActions.getCampaigns();
-    this.props.analyticsActions.getOverallAnalyticsSummary();
+    this.props.analyticsActions.getLatestAnalytics();
   }
 
   render() {
@@ -69,7 +69,7 @@ class Campaigns extends Component {
     return (
       <div className="campaigns">
         <h2 className="campaigns__header">Campaigns</h2>
-        <CampaignList campaigns={this.filterCampaigns(this.sortCampaigns(this.props.campaigns))} overallAnalyticsSummary={this.props.overallAnalyticsSummary} />
+        <CampaignList campaigns={this.filterCampaigns(this.sortCampaigns(this.props.campaigns))} latestAnalytics={this.props.latestAnalytics} />
       </div>
     );
   }
@@ -79,12 +79,12 @@ class Campaigns extends Component {
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as getCampaigns from '../../actions/CampaignActions/getCampaigns';
-import * as getOverallAnalyticsSummary from '../../actions/CampaignActions/getOverallAnalyticsSummary';
+import * as getLatestAnalytics from '../../actions/CampaignActions/getLatestAnalytics';
 
 function mapStateToProps(state) {
   return {
     campaigns: state.campaigns,
-    overallAnalyticsSummary: state.overallAnalyticsSummary,
+    latestAnalytics: state.latestAnalytics,
     campaignSortColumn: state.campaignSort.campaignSortColumn,
     campaignSortOrder: state.campaignSort.campaignSortOrder
   };
@@ -93,7 +93,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     campaignActions: bindActionCreators(Object.assign({}, getCampaigns), dispatch),
-    analyticsActions: bindActionCreators(Object.assign({}, getOverallAnalyticsSummary), dispatch)
+    analyticsActions: bindActionCreators(Object.assign({}, getLatestAnalytics), dispatch)
   };
 }
 

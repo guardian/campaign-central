@@ -18,7 +18,8 @@ import campaignTrafficDriverSuggestionsDirty from './campaignTrafficDriverSugges
 import campaignTrafficDriverStats from './campaignTrafficDriverStatsReducer';
 import campaignNotes from './campaignNotesReducer';
 import campaignSort from './campaignSortReducer';
-import overallAnalyticsSummary from './overallAnalyticsSummaryReducer';
+import latestAnalytics from './latestAnalyticsReducer';
+import latestAnalyticsForCampaign from './latestAnalyticsForCampaignReducer';
 
 export default combineReducers({
   error,
@@ -40,5 +41,6 @@ export default combineReducers({
   campaignTrafficDriverStats,
   campaignNotes,
   campaignSort,
-  overallAnalyticsSummary
+  latestAnalytics,
+  latestAnalyticsForCampaign
 });

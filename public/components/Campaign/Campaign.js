@@ -9,6 +9,7 @@ class Campaign extends React.Component {
 
   componentWillMount() {
     this.props.campaignActions.getCampaign(this.props.params.id);
+    this.props.analyticsActions.getLatestAnalyticsForCampaign(this.props.params.id);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -19,6 +20,8 @@ class Campaign extends React.Component {
         this.props.campaignAnalyticsActions.getCampaignUniques(nextProps.campaign.id);
         this.props.campaignAnalyticsActions.getCampaignTargetsReport(nextProps.campaign.id);
         this.props.campaignAnalyticsActions.getCampaignQualifiedReport(nextProps.campaign.id);
+
+        this.props.analyticsActions.getLatestAnalyticsForCampaign(nextProps.campaign.id);
       }
     }
   }
@@ -46,8 +49,11 @@ class Campaign extends React.Component {
           Delete Campaign <i className="i-delete"/>
         </Link>
         <div className="campaign__row">
-          <CampaignEdit campaign={campaign} updateCampaign={this.props.campaignActions.updateCampaign} saveCampaign={this.props.campaignActions.saveCampaign}/>
-          <CampaignAnalytics campaign={this.props.campaign} />
+          <CampaignEdit campaign={campaign}
+                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
+                        updateCampaign={this.props.campaignActions.updateCampaign}
+                        saveCampaign={this.props.campaignActions.saveCampaign}/>
+          <CampaignAnalytics campaign={campaign} />
           <CampaignAssets campaign={campaign}
                           getCampaign={this.props.campaignActions.getCampaign}
                           getCampaignContent={this.props.campaignActions.getCampaignContent} />
@@ -71,16 +77,19 @@ import * as getCampaignUniques from '../../actions/CampaignActions/getCampaignUn
 import * as getCampaignTargetsReport from '../../actions/CampaignActions/getCampaignTargetsReport';
 import * as getCampaignQualifiedReport from '../../actions/CampaignActions/getCampaignQualifiedReport';
 import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
+import * as getLatestAnalyticsForCampaign from '../../actions/CampaignActions/getLatestAnalyticsForCampaign';
 
 function mapStateToProps(state) {
   return {
-    campaign: state.campaign
+    campaign: state.campaign,
+    latestAnalyticsForCampaign: state.latestAnalyticsForCampaign
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
+    analyticsActions: bindActionCreators(Object.assign({}, getLatestAnalyticsForCampaign), dispatch),
     campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignUniques, getCampaignTargetsReport, getCampaignQualifiedReport, clearCampaignAnalytics), dispatch)
   };
 }
