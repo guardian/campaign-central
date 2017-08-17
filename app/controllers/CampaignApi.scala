@@ -190,4 +190,9 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
   def getCampaignCtaStats(campaignId: String) = APIAuthAction { req =>
     Ok(toJson(CtaClicksReport.getCtaClicksForCampaign(campaignId)))
   }
+
+  def getCampaignReferrals(campaignId: String) = APIAuthAction { request =>
+    Logger.info(s"Loading on-platform referrals for campaign $campaignId")
+    Ok(toJson(CampaignReferral.forCampaign(campaignId)))
+  }
 }

@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.ec2.AmazonEC2Client
 import com.amazonaws.services.ec2.model.{DescribeTagsRequest, Filter}
 import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.waf.AWSWAFRegionalClientBuilder
 import com.amazonaws.util.EC2MetadataUtils
 import play.api.Logger
 
@@ -68,5 +69,5 @@ object Dynamo {
   lazy val campaignPageviewsTable = dynamoDb.getTable(Config().campaignPageviewsTableName)
   lazy val campaignUniquesTable = dynamoDb.getTable(Config().campaignUniquesTableName)
   lazy val latestCampaignAnalyticsTable = dynamoDb.getTable(Config().latestCampaignAnalyticsTableName)
-
+  lazy val campaignReferralTable = dynamoDb.getTable(Config().campaignReferralTableName)
 }
