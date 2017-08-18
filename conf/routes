@@ -40,7 +40,7 @@ PUT /api/campaigns/:id/driver/:driverId     controllers.CampaignApi.acceptSugges
 PUT /api/campaigns/:id/not-driver/:driverId controllers.CampaignApi.rejectSuggestedCampaignTrafficDriver(id: String, driverId: Long)
 GET /api/campaigns/:id/driverstats          controllers.CampaignApi.getCampaignTrafficDriverStats(id: String)
 GET /api/campaigns/:id/ctastats             controllers.CampaignApi.getCampaignCtaStats(id: String)
-GET /api/campaigns/:id/referrals            controllers.CampaignApi.getCampaignReferrals(id: String)
+GET /api/v2/campaigns/:id/referrals         controllers.CampaignApi.getCampaignReferrals(id: String)
 
 
 #Clients Api

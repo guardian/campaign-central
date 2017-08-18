@@ -127,7 +127,8 @@ object StagingDfpProperties {
 }
 
 class DevConfig extends Config {
-  override def stage = "DEV"
+  // todo
+  override def stage = "PROD"
 
   override def logShippingStreamName = Some("elk-CODE-KinesisStream-M03ERGK5PVD9")
 
