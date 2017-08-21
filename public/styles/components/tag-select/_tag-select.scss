@@ -1,26 +1,11 @@
-.tag-select {
-
-  @extend %fs-data-3;
-
-  display: inline-block;
-  position: relative;
-
-  min-width: 200px;
-}
-
-.tag-select__input {
-  width: 100%;
-}
-
 .tag-select__suggestions {
 
   position: absolute;
-  top: 20px;
+  top: 300px;
+  left:415px;
 
   border: 1px solid $c-grey-300;
   background-color: $c-grey-100;
-
-  width: 100%;
 
   z-index: 2;
 
