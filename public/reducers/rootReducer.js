@@ -11,6 +11,7 @@ import campaignCtaStats from './campaignCtaStatsReducer';
 import clients from './clientsReducer';
 import client from './clientReducer';
 import campaignContent from './campaignContentReducer';
+import campaignReferrals from './campaignReferralReducer';
 import campaignTrafficDrivers from './campaignTrafficDriverReducer';
 import campaignTrafficDriversDirty from './campaignTrafficDriversDirtyReducer';
 import campaignTrafficDriverSuggestions from './campaignTrafficDriverSuggestionsReducer';
@@ -34,6 +35,7 @@ export default combineReducers({
   clients,
   client,
   campaignContent,
+  campaignReferrals,
   campaignTrafficDrivers,
   campaignTrafficDriversDirty,
   campaignTrafficDriverSuggestions,

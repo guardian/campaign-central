@@ -1,5 +1,6 @@
 package model
 
+import java.math.BigInteger
 import java.time.LocalDate
 
 import com.amazonaws.services.dynamodbv2.document.Item
@@ -9,17 +10,37 @@ import repositories.CampaignReferralRepository
 
 import scala.util.control.NonFatal
 
-// A referral to any item in a campaign from an on-platform source in a particular period
-case class CampaignReferral(
-  campaignId: String,
+case class Component(
   platform: String,
   edition: String,
   path: String,
-  numClicks: Int,
   containerIndex: Int,
   containerName: String,
   cardIndex: Int,
-  cardName: String,
+  cardName: String
+) {
+
+  object MD5 {
+    def hash(s: String): String = {
+      val digest = java.security.MessageDigest.getInstance("MD5")
+      val bytes  = s.getBytes("UTF-8")
+      digest.update(bytes, 0, bytes.length)
+      new BigInteger(1, digest.digest()).toString(16)
+    }
+  }
+
+  val hash: String = MD5.hash(toString)
+}
+
+object Component {
+  implicit val componentWrites: Writes[Component] = Json.writes[Component]
+}
+
+// A referral to any item in a campaign from an on-platform source in a particular period
+case class CampaignReferral(
+  campaignId: String,
+  component: Component,
+  numClicks: Int,
   firstReferral: LocalDate,
   lastReferral: LocalDate
 )
@@ -44,14 +65,16 @@ object CampaignReferral {
     JsSuccess(
       CampaignReferral(
         campaignId = (json \ "campaignId").as[String],
-        platform = ifPresent(platformUrlComponent.headOption.map(platform)),
-        edition = ifPresent(platformUrlComponent.lift(3)),
-        path = ifPresent(platformUrlComponent.lift(4)),
+        component = Component(
+          platform = ifPresent(platformUrlComponent.headOption.map(platform)),
+          edition = ifPresent(platformUrlComponent.lift(3)),
+          path = ifPresent(platformUrlComponent.lift(4)),
+          containerIndex = indexIfPresent(platformUrlComponent.lift(5), "container-"),
+          containerName = ifPresent(platformUrlComponent.lift(6)),
+          cardIndex = indexIfPresent(platformUrlComponent.lift(8), "card-"),
+          cardName = ifPresent(platformUrlComponent.lift(9))
+        ),
         numClicks = (json \ "clicks").as[Int],
-        containerIndex = indexIfPresent(platformUrlComponent.lift(5), "container-"),
-        containerName = ifPresent(platformUrlComponent.lift(6)),
-        cardIndex = indexIfPresent(platformUrlComponent.lift(8), "card-"),
-        cardName = ifPresent(platformUrlComponent.lift(9)),
         firstReferral = asDate(json \ "firstReferral"),
         lastReferral = asDate(json \ "lastReferral")
       )
@@ -61,7 +84,7 @@ object CampaignReferral {
   implicit val referralWrites: Writes[CampaignReferral] = Json.writes[CampaignReferral]
 
   def forCampaign(campaignId: String): Seq[CampaignReferral] = {
-    val (unknown, known) = CampaignReferralRepository.getCampaignReferrals(campaignId) partition (_.path == "unknown")
+    val (unknown, known) = CampaignReferralRepository.getCampaignReferrals(campaignId) partition (_.component.path == "unknown")
     unknown foreach { referral =>
       Logger.warn(s"Unknown referral: $referral")
     }

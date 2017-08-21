@@ -119,6 +119,13 @@ export function fetchCampaignTrafficDriverStats(id) {
   });
 }
 
+export function fetchCampaignReferrals(id) {
+  return AuthedReqwest({
+    url: '/api/v2/campaigns/' + id + '/referrals',
+    method: 'get'
+  });
+}
+
 export function fetchCampaignCtaStats(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/ctastats',

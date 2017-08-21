@@ -8,5 +8,10 @@ import scala.collection.JavaConversions._
 object CampaignReferralRepository {
 
   def getCampaignReferrals(campaignId: String): Seq[CampaignReferral] =
-    Dynamo.campaignReferralTable.query("campaignId", campaignId).flatMap(CampaignReferral.fromItem).toList
+    Dynamo.campaignReferralTable
+      .query("campaignId", campaignId)
+      .flatMap(CampaignReferral.fromItem)
+      .toList
+      .sortBy(_.numClicks)
+      .reverse
 }
