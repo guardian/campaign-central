@@ -1,0 +1,64 @@
+.campaign-referral-list__item {
+  border-bottom: 1px solid $c-grey-300;
+}
+
+.campaign-referral-list__row {
+  @extend %table__row;
+  border-bottom: none;
+}
+
+.campaign-referral-list__platform,
+.campaign-referral-list__edition,
+.campaign-referral-list__path,
+.campaign-referral-list__container,
+.campaign-referral-list__card,
+.campaign-referral-list__clicks,
+.campaign-referral-list__date {
+  @extend %table__cell;
+  white-space: normal;
+  position: relative;
+  overflow: auto;
+  border-bottom: none;
+
+  &--header {
+    @extend %table__cell;
+    background-color: $c-grey-200;
+    font-weight: bold;
+    white-space: normal;
+  }
+}
+
+.campaign-referral-list__platform,
+.campaign-referral-list__platform--header {
+  width: 10%;
+}
+
+.campaign-referral-list__edition,
+.campaign-referral-list__edition--header {
+  width: 10%;
+}
+
+.campaign-referral-list__path,
+.campaign-referral-list__path--header {
+  width: 20%;
+}
+
+.campaign-referral-list__container,
+.campaign-referral-list__container--header {
+  width: 15%;
+}
+
+.campaign-referral-list__card,
+.campaign-referral-list__card--header {
+  width: 15%;
+}
+
+.campaign-referral-list__clicks,
+.campaign-referral-list__clicks--header {
+  width: 10%;
+}
+
+.campaign-referral-list__date,
+.campaign-referral-list__date--header {
+  width: 10%;
+}
