@@ -220,6 +220,30 @@ Resources:
           - referrals
     DeletionPolicy: Retain
 
+  CampaignReferralsV2DBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      - AttributeName: hash
+        AttributeType: S
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      - AttributeName: hash
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - referralsv2
+    DeletionPolicy: Retain
+
   CampaignAnalyticsLatestDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
