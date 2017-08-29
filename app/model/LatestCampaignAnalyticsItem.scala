@@ -15,7 +15,9 @@ case class LatestCampaignAnalyticsItem(
                                  pageviewsByCountryCode: Map[String, Long],
                                  uniquesByCountryCode: Map[String, Long],
                                  pageviewsByDevice: Map[String, Long],
-                                 uniquesByDevice: Map[String, Long]
+                                 uniquesByDevice: Map[String, Long],
+                                 medianAttentionTimeSeconds: Option[Long],
+                                 medianAttentionTimeByPlatform: Option[Map[String, Long]]
                                ){
   def toItem = Item.fromJSON(Json.toJson(this).toString())
 }

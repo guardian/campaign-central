@@ -27,7 +27,7 @@ object CampaignService {
     } yield {
       val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
       val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
-      LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews)
+      LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByPlatform)
 
     }
   }
@@ -42,7 +42,7 @@ object CampaignService {
       } yield {
         val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
         val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
-        campaign.id -> LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews)
+        campaign.id -> LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByPlatform)
       }
     }
 

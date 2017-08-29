@@ -1,4 +1,25 @@
 import React, { PropTypes } from 'react';
+import R from 'ramda';
+
+class AttentionTimePerPlatform extends React.Component {
+  render () {
+    const items = Object.keys(this.props.medianAttentionTimeSeconds).map ( (platform) => {
+        return (
+          <div key={platform}>
+            <label className="popover-key">{platform}</label>
+            <span className="popover-value">{this.props.medianAttentionTimeSeconds[platform]} seconds</span>
+          </div>
+      )
+    });
+
+    return (
+      <div className="hover-popover">
+        {items}
+      </div>
+    )
+  }
+}
+
 
 export default class CampaignPerformanceOverview extends React.Component {
 
@@ -23,6 +44,9 @@ export default class CampaignPerformanceOverview extends React.Component {
     const uniquesFromMobilePercentage = Math.round(100 * uniquesFromMobile/uniquesSoFar);
     const uniquesFromDesktopPercentage = Math.round(100 * uniquesFromDesktop/uniquesSoFar);
 
+    const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
+    const medianPerPlatform = this.props.latestAnalyticsForCampaign.medianAttentionTimeByPlatform || {};
+
     return (
       <div className="campaign-info campaign-box-section">
         <div className="campaign-box-section__header">
@@ -36,6 +60,16 @@ export default class CampaignPerformanceOverview extends React.Component {
           <div className="campaign-info__field">
             <label>Uniques so far</label>
             <span className="campaign-info__field__value">{uniquesSoFar ? uniquesSoFar : "none available"} {this.renderPercentageOfTarget(uniquesSoFar, uniquesTarget)} ({uniquesFromMobilePercentage}% on mobile, {uniquesFromDesktopPercentage}% on desktop)</span>
+          </div>
+          <div className="campaign-info__field">
+            <label className={ R.isEmpty(medianPerPlatform) ? "" : "hover" }>
+              Median attention time (All platforms)
+              <div className="hover-content">
+                <AttentionTimePerPlatform medianAttentionTimeSeconds={ medianPerPlatform } />
+              </div>
+            </label>
+            <span className="campaign-info__field__value">{ medianAttentionTime ? `${medianAttentionTime} seconds` : "not available" }</span>
+
           </div>
         </div>
       </div>

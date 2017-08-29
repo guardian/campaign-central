@@ -9,7 +9,9 @@ case class LatestCampaignAnalytics(
                                     uniquesFromMobile: Long,
                                     uniquesFromDesktop: Long,
                                     uniquesTarget: Long,
-                                    pageviews: Long)
+                                    pageviews: Long,
+                                    medianAttentionTimeSeconds: Option[Long],
+                                    medianAttentionTimeByPlatform: Option[Map[String, Long]])
 
 object LatestCampaignAnalytics {
   implicit val latestCampaignAnalyticsFormat: Format[LatestCampaignAnalytics] = Jsonx.formatCaseClass[LatestCampaignAnalytics]
