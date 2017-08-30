@@ -42,6 +42,7 @@
   color: rgb(237, 237, 237);
   border-radius: 5px;
   padding: 1em;
+  margin-top: 6px;
   width: auto;
   position: absolute;
 }
@@ -62,6 +63,10 @@
 }
 
 .hover-content {
+  visibility: hidden;
+}
+
+.hover-popover:hover {
   visibility: hidden;
 }
 
