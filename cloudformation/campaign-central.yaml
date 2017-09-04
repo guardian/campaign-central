@@ -89,7 +89,7 @@ Resources:
         - Action: sts:AssumeRole
           Effect: Allow
           Principal:
-            AWS: !Sub arn:aws:iam::${OphanAccountNumber}:root  
+            AWS: !Sub arn:aws:iam::${OphanAccountNumber}:root
 
   CampaignCentralDescribeEC2Policy:
     Type: AWS::IAM::Policy
@@ -206,7 +206,7 @@ Resources:
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-page-views
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-uniques
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaigns
-          - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-referrals
+          - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-referralsv2
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-analytics-latest
       Roles:
       - Ref: OphanExcavatorCrossAccountRole
@@ -355,7 +355,7 @@ Resources:
       - Key: App
         Value: campaign-central
         PropagateAtLaunch: 'true'
-        
+
   CampaignCentralLaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Properties:
