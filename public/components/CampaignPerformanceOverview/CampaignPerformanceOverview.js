@@ -3,9 +3,6 @@ import R from 'ramda';
 
 class AttentionTimePerPlatform extends React.Component {
   render() {
-
-    console.log(this.props.medianAttentionTimeSeconds);
-    console.log(Object.keys(this.props.medianAttentionTimeSeconds));
     const items = Object.keys(this.props.medianAttentionTimeSeconds).sort().map((deviceType) => {
       return (
         <div key={deviceType}>
