@@ -27,7 +27,7 @@ object CampaignService {
     } yield {
       val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
       val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
-      LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByPlatform)
+      LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByDevice.map(normaliseDeviceData))
 
     }
   }
@@ -42,7 +42,7 @@ object CampaignService {
       } yield {
         val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
         val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
-        campaign.id -> LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByPlatform)
+        campaign.id -> LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByDevice.map(normaliseDeviceData))
       }
     }
 
@@ -87,5 +87,17 @@ object CampaignService {
     val uniquesFromDesktop = totalUniques - uniquesFromMobile
 
     DeviceBreakdown(uniquesFromMobile, uniquesFromDesktop)
+  }
+
+  private def normaliseDeviceData(data: Map[String, Long]): Map[String, Long] = {
+    data.map { case (deviceType, medianAttentionTime) =>
+        deviceType match {
+          case "GUARDIAN_IOS_NATIVE_APP" => "IOS APP" -> medianAttentionTime
+          case "GUARDIAN_ANDROID_NATIVE_APP" => "ANDROID APP" -> medianAttentionTime
+          case "PERSONAL_COMPUTER" => "DESKTOP" -> medianAttentionTime
+          case "SMARTPHONE" => "MOBILE" -> medianAttentionTime
+          case other => other -> medianAttentionTime
+        }
+    }
   }
 }
