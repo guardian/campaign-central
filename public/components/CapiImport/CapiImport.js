@@ -123,8 +123,7 @@ class CapiImport extends Component {
 
   performSearch(searchTerm) {
     const searchParams = {query: searchTerm || this.state.searchTerm};
-    if (this.props.type) {searchParams.type = this.props.type};
-    if (this.props.subtype) {searchParams.subType = this.props.subtype};
+    searchParams.type = 'paidContent';
 
     searchTags(searchParams)
       .then((tags) => {
