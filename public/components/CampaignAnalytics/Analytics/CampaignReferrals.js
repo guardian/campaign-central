@@ -17,14 +17,14 @@ class CampaignReferrals extends React.Component {
     }
   }
 
-  renderReferral = (referral) => {
+  renderReferral = (referral, index) => {
 
     const dateFormat = (date) => {
       return new Date(date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})
     };
 
     return (
-      <div key={referral.hash} className="campaign-referral-list__item">
+      <div key={index} className="campaign-referral-list__item">
         <div className="campaign-referral-list__row">
           <div className="campaign-referral-list__platform">{referral.component.platform}</div>
           <div className="campaign-referral-list__edition">{referral.component.edition}</div>
@@ -45,7 +45,6 @@ class CampaignReferrals extends React.Component {
       return (
         <div className="campaign-info campaign-box">
           <div className="campaign-box__header">Referrals from on-platform</div>
-          <div>*** Under construction ***</div>
           <div className="campaign-box__body">
             <ProgressSpinner/>
           </div>
@@ -57,7 +56,6 @@ class CampaignReferrals extends React.Component {
       return (
         <div className="campaign-info campaign-box">
           <div className="campaign-box__header">Referrals from on-platform</div>
-          <div>*** Under construction ***</div>
           <div className="campaign-box__body">
             <div className="campaign-referral-list campaign-assets__field__value">
               <div className="campaign-referral-list__row">
@@ -80,7 +78,6 @@ class CampaignReferrals extends React.Component {
     return (
       <div className="campaign-info campaign-box">
         <div className="campaign-box__header">Referrals from on-platform</div>
-        <div>*** Under construction ***</div>
         <div className="campaign-box__body">
           <span className="campaign-assets__field__value">No traffic has been referred from on-platform to this campaign yet.</span>
         </div>
