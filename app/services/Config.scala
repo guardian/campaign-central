@@ -43,7 +43,7 @@ sealed trait Config {
   def campaignPageviewsTableName = s"campaign-central-$stage-campaign-page-views"
   def campaignUniquesTableName = s"campaign-central-$stage-campaign-uniques"
   def latestCampaignAnalyticsTableName = s"campaign-central-$stage-analytics-latest"
-  def campaignReferralTableName = s"campaign-central-$stage-referrals"
+  def campaignReferralTableName = s"campaign-central-$stage-referralsv2"
 
   def tagManagerApiUrl: String
   def composerUrl: String
@@ -127,7 +127,8 @@ object StagingDfpProperties {
 }
 
 class DevConfig extends Config {
-  // todo
+
+  //  override def stage = "DEV"
   override def stage = "PROD"
 
   override def logShippingStreamName = Some("elk-CODE-KinesisStream-M03ERGK5PVD9")
