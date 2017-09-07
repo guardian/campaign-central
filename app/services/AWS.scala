@@ -21,13 +21,10 @@ object AWS {
 
   var creds: AWSCredentialsProvider = null
 
-  def init(profile: Option[String]): Unit = {
-    creds = profile map {p =>
-      Logger.info(s"using local aws profile $p")
-      new ProfileCredentialsProvider(p)
-    } getOrElse{
-      Logger.info("using default AWS profile")
-      new DefaultAWSCredentialsProviderChain()
+  def init(profile: String): Unit = {
+    creds = {
+      Logger.info(s"using local aws profile $profile")
+      new ProfileCredentialsProvider(profile)
     }
   }
 

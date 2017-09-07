@@ -25,7 +25,7 @@ class AppComponents(context: Context)
     super.httpFilters.filterNot(filter => filter == csrfFilter || filter == allowedHostsFilter)
 
   Logger.info("bootstrapping AWS")
-  AWS.init(configuration.getString("aws.profile"))
+  AWS.init(configuration.get[String]("aws.profile"))
 
   Logger.info("bootstrapping log shipping")
   LogShipping.init
