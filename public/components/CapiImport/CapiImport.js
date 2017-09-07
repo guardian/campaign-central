@@ -77,11 +77,7 @@ class CapiImport extends Component {
         this.context.router.push('/campaign/' + campaign.id);
       }).catch((error) => {
         console.error(error);
-        if (error.response) {
-          this.setState({importing: false, error: error.response});
-        } else {
-          this.setState({importing: false});
-        }
+        this.setState({importing: false, error: 'Something went wrong; please try again'});
       });
 
     } else {
