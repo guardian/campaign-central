@@ -1,14 +1,14 @@
 package services
 
-import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.AWSCredentialsProvider
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
-import com.amazonaws.services.dynamodbv2.document.DynamoDB
-import com.amazonaws.services.ec2.AmazonEC2Client
+import com.amazonaws.regions.Region
+import com.amazonaws.regions.Regions.EU_WEST_1
+import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Table}
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 import com.amazonaws.services.ec2.model.{DescribeTagsRequest, Filter}
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.waf.AWSWAFRegionalClientBuilder
+import com.amazonaws.services.ec2.{AmazonEC2, AmazonEC2ClientBuilder}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import com.amazonaws.util.EC2MetadataUtils
 import play.api.Logger
 
@@ -17,9 +17,9 @@ import scala.collection.JavaConverters._
 
 object AWS {
 
-  lazy val region = Region getRegion Regions.EU_WEST_1
+  lazy val region: Region = Region getRegion EU_WEST_1
 
-  var creds: AWSCredentialsProvider = null
+  var creds: AWSCredentialsProvider = _
 
   def init(profile: String): Unit = {
     creds = {
@@ -28,18 +28,21 @@ object AWS {
     }
   }
 
-  def credentialsProvider = creds
+  def credentialsProvider: AWSCredentialsProvider = creds
 
-  lazy val EC2Client = region.createClient(classOf[AmazonEC2Client], creds, null)
-  lazy val DynamoClient = AWS.region.createClient(classOf[AmazonDynamoDBClient], creds, null)
-  lazy val S3Client  = region.createClient(classOf[AmazonS3Client], creds, null)
+  lazy val EC2Client: AmazonEC2 =
+    AmazonEC2ClientBuilder.standard().withRegion(EU_WEST_1).withCredentials(creds).build()
+  lazy val DynamoClient: AmazonDynamoDB =
+    AmazonDynamoDBClientBuilder.standard().withRegion(EU_WEST_1).withCredentials(creds).build()
+  lazy val S3Client: AmazonS3 =
+    AmazonS3ClientBuilder.standard().withRegion(EU_WEST_1).withCredentials(creds).build()
 
 }
 
 trait AwsInstanceTags {
   lazy val instanceId = Option(EC2MetadataUtils.getInstanceId)
 
-  def readTag(tagName: String) = {
+  def readTag(tagName: String): Option[String] = {
     instanceId.flatMap { id =>
       val tagsResult = AWS.EC2Client.describeTags(
         new DescribeTagsRequest().withFilters(
@@ -56,15 +59,15 @@ trait AwsInstanceTags {
 object Dynamo {
   lazy val dynamoDb = new DynamoDB(AWS.DynamoClient)
 
-  lazy val campaignTable = dynamoDb.getTable(Config().campaignTableName)
-  lazy val campaignNotesTable = dynamoDb.getTable(Config().campaignNotesTableName)
-  lazy val campaignContentTable = dynamoDb.getTable(Config().campaignContentTableName)
-  lazy val clientTable = dynamoDb.getTable(Config().clientTableName)
-  lazy val analyticsDataCacheTable = dynamoDb.getTable(Config().analyticsDataCacheTableName)
-  lazy val trafficDriverRejectTable = dynamoDb.getTable(Config().trafficDriverRejectTableName)
+  lazy val campaignTable: Table = dynamoDb.getTable(Config().campaignTableName)
+  lazy val campaignNotesTable: Table = dynamoDb.getTable(Config().campaignNotesTableName)
+  lazy val campaignContentTable: Table = dynamoDb.getTable(Config().campaignContentTableName)
+  lazy val clientTable: Table = dynamoDb.getTable(Config().clientTableName)
+  lazy val analyticsDataCacheTable: Table = dynamoDb.getTable(Config().analyticsDataCacheTableName)
+  lazy val trafficDriverRejectTable: Table = dynamoDb.getTable(Config().trafficDriverRejectTableName)
 
-  lazy val campaignPageviewsTable = dynamoDb.getTable(Config().campaignPageviewsTableName)
-  lazy val campaignUniquesTable = dynamoDb.getTable(Config().campaignUniquesTableName)
-  lazy val latestCampaignAnalyticsTable = dynamoDb.getTable(Config().latestCampaignAnalyticsTableName)
-  lazy val campaignReferralTable = dynamoDb.getTable(Config().campaignReferralTableName)
+  lazy val campaignPageviewsTable: Table = dynamoDb.getTable(Config().campaignPageviewsTableName)
+  lazy val campaignUniquesTable: Table = dynamoDb.getTable(Config().campaignUniquesTableName)
+  lazy val latestCampaignAnalyticsTable: Table = dynamoDb.getTable(Config().latestCampaignAnalyticsTableName)
+  lazy val campaignReferralTable: Table = dynamoDb.getTable(Config().campaignReferralTableName)
 }
