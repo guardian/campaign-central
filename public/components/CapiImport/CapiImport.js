@@ -75,14 +75,21 @@ class CapiImport extends Component {
 
         this.setState({importing: false});
         this.context.router.push('/campaign/' + campaign.id);
-      })
+      }).catch((error) => {
+        console.error(error);
+        if (error.response) {
+          this.setState({importing: false, error: error.response});
+        } else {
+          this.setState({importing: false});
+        }
+      });
 
     } else {
       this.setState({
         error: 'All required fields must be present before the campaign can be imported.'
       });
     }
-  }
+  };
 
   validateNumericInput = (value, errorState, successState) => {
     const numValue = parseInt(value);
