@@ -8,7 +8,7 @@ deployments:
     app: campaign-central
     parameters:
       amiTags:
-        Recipe: editorial-tools-xenial-java8
+        Recipe: xenial-commercial-dev
         AmigoStage: PROD
         BuiltBy: amigo
   campaign-central:

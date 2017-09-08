@@ -39,11 +39,6 @@ Parameters:
     Type: String
     Default: 77.91.248.0/21
 
-  GithubTeamName:
-    Description: Github team name, used for giving ssh access to members of the team.
-    Type: String
-    Default: Editorial-Tools-SSHAccess
-
   LogsKinesisStreamName:
     Description: The kinesis stream to send logs to
     Type: String
@@ -156,11 +151,11 @@ Resources:
           Action:
           - s3:GetObject
           Resource:
-          - arn:aws:s3:::github-team-keys/*
+          - arn:aws:s3:::github-public-keys/*
         - Effect: Allow
           Action:
           - s3:ListBucket
-          Resource: arn:aws:s3:::github-team-keys
+          Resource: arn:aws:s3:::github-public-keys
       Roles:
       - Ref: CampaignCentralRole
 
