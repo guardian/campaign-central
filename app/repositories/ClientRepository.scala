@@ -8,29 +8,29 @@ import services.Dynamo
 import scala.collection.JavaConversions._
 import scala.util.Random
 
-object ClientRepository {
+class ClientRepository(dynamo: Dynamo) {
 
-  def getClient(clientId: String) = {
-    Option(Dynamo.clientTable.getItem("id", clientId)).map{ Client.fromItem }
+  def getClient(clientId: String): Option[Client] = {
+    Option(dynamo.clientTable.getItem("id", clientId)).map { Client.fromItem }
   }
 
   def getClientByName(clientName: String): Option[Client] = {
-    Dynamo.clientTable.scan(new ScanFilter("name").eq(clientName)).headOption.map{ Client.fromItem }
+    val filter: ScanFilter = new ScanFilter("name").eq(clientName)
+    dynamo.clientTable.scan(filter).headOption.map { Client.fromItem }
   }
 
-  def getAllClients() = {
-    Dynamo.clientTable.scan().map{ Client.fromItem }.toList
+  def getAllClients(): List[Client] = {
+    dynamo.clientTable.scan().map { Client.fromItem }.toList
   }
 
-  def putClient(client: Client) = {
+  def putClient(client: Client): Option[Client] = {
     try {
-      Dynamo.clientTable.putItem(client.toItem)
+      dynamo.clientTable.putItem(client.toItem)
       Some(client)
     } catch {
-      case e: Error => {
+      case e: Error =>
         Logger.error(s"failed to persist client $client", e)
         None
-      }
     }
   }
 

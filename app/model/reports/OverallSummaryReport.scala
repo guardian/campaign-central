@@ -7,7 +7,7 @@ import repositories.{AnalyticsDataCache, Hit, Miss, Stale}
 
 
 case class OverallSummaryReport(summaries: Map[String, CampaignSummary]) {
-  def storeLatestUniquesForCampaign(campaignId: String, summary: CampaignSummary) = {
+  def storeLatestUniquesForCampaign(campaignId: String, summary: CampaignSummary): OverallSummaryReport = {
     OverallSummaryReport(summaries + (campaignId -> summary))
   }
 }
@@ -15,27 +15,24 @@ case class OverallSummaryReport(summaries: Map[String, CampaignSummary]) {
 object OverallSummaryReport {
   implicit val overallSummaryReportFormat: Format[OverallSummaryReport] = Jsonx.formatCaseClass[OverallSummaryReport]
 
-  def getOverallSummaryReport(): Option[OverallSummaryReport] = {
-    AnalyticsDataCache.getOverallSummary() match {
-      case Hit(report) => {
+  def getOverallSummaryReport(analyticsDataCache: AnalyticsDataCache): Option[OverallSummaryReport] = {
+    analyticsDataCache.getOverallSummary() match {
+      case Hit(report) =>
         Logger.debug("getting overall summary - cache hit")
         Some(report)
-      }
-      case Stale(report) => {
+      case Stale(report) =>
         Logger.debug("getting overall summary - cache stale")
         Some(report)
-      }
-      case Miss => {
+      case Miss =>
         Logger.debug("getting overall summary - cache miss")
         None
-      }
     }
   }
 
-  def storeLatestUniquesForCampaign(campaignId: String, summary: CampaignSummary) = {
-    val report = getOverallSummaryReport.getOrElse(OverallSummaryReport(Map()))
+  def storeLatestUniquesForCampaign(analyticsDataCache: AnalyticsDataCache,campaignId: String, summary: CampaignSummary) = {
+    val report = getOverallSummaryReport(analyticsDataCache).getOrElse(OverallSummaryReport(Map()))
     val updated = report.storeLatestUniquesForCampaign(campaignId: String, summary: CampaignSummary)
 
-    AnalyticsDataCache.putOverallSummary(updated)
+    analyticsDataCache.putOverallSummary(updated)
   }
 }

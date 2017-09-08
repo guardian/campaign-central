@@ -14,37 +14,33 @@ import play.api.Logger
 
 import scala.collection.JavaConverters._
 
+class AWS(val profile: String) {
 
-object AWS {
+  private val defaultRegion = EU_WEST_1
+  lazy val region: Region   = Region.getRegion(defaultRegion)
 
-  lazy val region: Region = Region getRegion EU_WEST_1
-
-  var creds: AWSCredentialsProvider = _
-
-  def init(profile: String): Unit = {
-    creds = {
-      Logger.info(s"using local aws profile $profile")
-      new ProfileCredentialsProvider(profile)
-    }
+  lazy val credentialsProvider: AWSCredentialsProvider = {
+    Logger.info(s"using local aws profile $profile")
+    new ProfileCredentialsProvider(profile)
   }
 
-  def credentialsProvider: AWSCredentialsProvider = creds
-
   lazy val EC2Client: AmazonEC2 =
-    AmazonEC2ClientBuilder.standard().withRegion(EU_WEST_1).withCredentials(creds).build()
+    AmazonEC2ClientBuilder.standard().withRegion(defaultRegion).withCredentials(credentialsProvider).build()
   lazy val DynamoClient: AmazonDynamoDB =
-    AmazonDynamoDBClientBuilder.standard().withRegion(EU_WEST_1).withCredentials(creds).build()
+    AmazonDynamoDBClientBuilder.standard().withRegion(defaultRegion).withCredentials(credentialsProvider).build()
   lazy val S3Client: AmazonS3 =
-    AmazonS3ClientBuilder.standard().withRegion(EU_WEST_1).withCredentials(creds).build()
-
+    AmazonS3ClientBuilder.standard().withRegion(defaultRegion).withCredentials(credentialsProvider).build()
 }
 
 trait AwsInstanceTags {
+
+  def aws: AWS
+
   lazy val instanceId = Option(EC2MetadataUtils.getInstanceId)
 
   def readTag(tagName: String): Option[String] = {
     instanceId.flatMap { id =>
-      val tagsResult = AWS.EC2Client.describeTags(
+      val tagsResult = aws.EC2Client.describeTags(
         new DescribeTagsRequest().withFilters(
           new Filter("resource-type").withValues("instance"),
           new Filter("resource-id").withValues(id),
@@ -56,18 +52,17 @@ trait AwsInstanceTags {
   }
 }
 
-object Dynamo {
-  lazy val dynamoDb = new DynamoDB(AWS.DynamoClient)
+class Dynamo(aws: AWS, config: Config) {
+  lazy val dynamoDb = new DynamoDB(aws.DynamoClient)
 
-  lazy val campaignTable: Table = dynamoDb.getTable(Config().campaignTableName)
-  lazy val campaignNotesTable: Table = dynamoDb.getTable(Config().campaignNotesTableName)
-  lazy val campaignContentTable: Table = dynamoDb.getTable(Config().campaignContentTableName)
-  lazy val clientTable: Table = dynamoDb.getTable(Config().clientTableName)
-  lazy val analyticsDataCacheTable: Table = dynamoDb.getTable(Config().analyticsDataCacheTableName)
-  lazy val trafficDriverRejectTable: Table = dynamoDb.getTable(Config().trafficDriverRejectTableName)
-
-  lazy val campaignPageviewsTable: Table = dynamoDb.getTable(Config().campaignPageviewsTableName)
-  lazy val campaignUniquesTable: Table = dynamoDb.getTable(Config().campaignUniquesTableName)
-  lazy val latestCampaignAnalyticsTable: Table = dynamoDb.getTable(Config().latestCampaignAnalyticsTableName)
-  lazy val campaignReferralTable: Table = dynamoDb.getTable(Config().campaignReferralTableName)
+  lazy val campaignTable: Table                = dynamoDb.getTable(config.campaignTableName)
+  lazy val campaignNotesTable: Table           = dynamoDb.getTable(config.campaignNotesTableName)
+  lazy val campaignContentTable: Table         = dynamoDb.getTable(config.campaignContentTableName)
+  lazy val clientTable: Table                  = dynamoDb.getTable(config.clientTableName)
+  lazy val analyticsDataCacheTable: Table      = dynamoDb.getTable(config.analyticsDataCacheTableName)
+  lazy val trafficDriverRejectTable: Table     = dynamoDb.getTable(config.trafficDriverRejectTableName)
+  lazy val campaignPageviewsTable: Table       = dynamoDb.getTable(config.campaignPageviewsTableName)
+  lazy val campaignUniquesTable: Table         = dynamoDb.getTable(config.campaignUniquesTableName)
+  lazy val latestCampaignAnalyticsTable: Table = dynamoDb.getTable(config.latestCampaignAnalyticsTableName)
+  lazy val campaignReferralTable: Table        = dynamoDb.getTable(config.campaignReferralTableName)
 }

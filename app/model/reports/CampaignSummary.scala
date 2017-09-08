@@ -9,47 +9,48 @@ import repositories.{AnalyticsDataCache, Hit, Miss, Stale}
 
 case class CampaignSummary(totalUniques: Long, targetToDate: Long)
 
-object CampaignSummary{
+object CampaignSummary {
 
   implicit val campaignSummaryFormat: Format[CampaignSummary] = Jsonx.formatCaseClass[CampaignSummary]
 
-  def getCampaignSummary(campaignId: String): Option[CampaignSummary] = {
-    AnalyticsDataCache.getCampaignSummary(campaignId) match {
-      case Hit(report) => {
+  def getCampaignSummary(analyticsDataCache: AnalyticsDataCache, campaignId: String): Option[CampaignSummary] = {
+    analyticsDataCache.getCampaignSummary(campaignId) match {
+      case Hit(report) =>
         Logger.debug(s"getting campaign summary for campaign $campaignId - cache hit")
         Some(report)
-      }
-      case Stale(report) => {
+      case Stale(report) =>
         Logger.debug(s"getting campaign summary for campaign $campaignId - cache stale")
         Some(report)
-      }
-      case Miss => {
+      case Miss =>
         Logger.debug(s"getting campaign summary for campaign $campaignId - cache miss")
         None
-      }
     }
   }
 
-  def storeLatestUniquesForCampaign(campaign: Campaign, latestUniquesOption: Option[DailyUniqueUserEntry]) = {
-    latestUniquesOption.foreach{ latestUniques =>
+  def storeLatestUniquesForCampaign(
+    analyticsDataCache: AnalyticsDataCache,
+    campaign: Campaign,
+    latestUniquesOption: Option[DailyUniqueUserEntry]
+  ): Unit = {
+    latestUniquesOption.foreach { latestUniques =>
       val targetToDate = calculateTargetToDate(campaign, latestUniques.date)
-      val summary = CampaignSummary(latestUniques.cumulativeUniqueUsers, targetToDate)
+      val summary      = CampaignSummary(latestUniques.cumulativeUniqueUsers, targetToDate)
 
-      AnalyticsDataCache.putCampaignSummary(campaign.id, summary, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
+      analyticsDataCache.putCampaignSummary(campaign.id,
+                                            summary,
+                                            analyticsDataCache.calculateValidToDateForDailyStats(campaign))
 
-      OverallSummaryReport.storeLatestUniquesForCampaign(campaign.id, summary)
+      OverallSummaryReport.storeLatestUniquesForCampaign(analyticsDataCache, campaign.id, summary)
     }
   }
 
   def calculateTargetToDate(campaign: Campaign, date: DateTime): Long = {
-    val targetToDate = for (
-      startDate <- campaign.startDate;
-      endDate <- campaign.endDate;
-      uniqueTarget <- campaign.targets.get("uniques")
-    ) yield {
+    val targetToDate = for (startDate <- campaign.startDate;
+                            endDate      <- campaign.endDate;
+                            uniqueTarget <- campaign.targets.get("uniques")) yield {
 
       val campaignLength = new Duration(startDate, endDate).getStandardDays
-      val daysIn = new Duration(startDate, date).getStandardDays
+      val daysIn         = new Duration(startDate, date).getStandardDays
 
       val dailyRunRate = uniqueTarget.toDouble / campaignLength
 
