@@ -17,6 +17,7 @@ dependencies:
   # Cache the resolution-cache and build streams to speed things up
   cache_directories:
     - "~/.sbt"
+    - "~/.coursier"
     - "target/resolution-cache"
     - "target/streams"
     - "project/target/resolution-cache"

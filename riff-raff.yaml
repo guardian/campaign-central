@@ -3,7 +3,17 @@ stacks:
 regions:
 - eu-west-1
 deployments:
+  ami-update:
+    type: ami-cloudformation-parameter
+    app: campaign-central
+    parameters:
+      amiTags:
+        Recipe: xenial-commercial-dev
+        AmigoStage: PROD
+        BuiltBy: amigo
   campaign-central:
     type: autoscaling
     parameters:
       bucket: composer-dist
+    dependencies:
+    - ami-update
