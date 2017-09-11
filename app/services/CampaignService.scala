@@ -2,7 +2,7 @@ package services
 
 import model.{CampaignPageViewsItem, CampaignUniquesItem, GraphDataPoint, LatestCampaignAnalytics}
 import org.joda.time.DateTime
-import repositories.{LatestCampaignAnalyticsRepository, CampaignPageViewsRepository, CampaignRepository, CampaignUniquesRepository}
+import repositories.{CampaignPageViewsRepository, CampaignRepository, CampaignUniquesRepository, LatestCampaignAnalyticsRepository}
 
 object CampaignService {
 
@@ -21,18 +21,35 @@ object CampaignService {
   }
 
   def getLatestAnalyticsForCampaign(campaignId: String): Option[LatestCampaignAnalytics] = {
+
+    import util.DoubleUtils._
+
     for {
       campaign <- CampaignRepository.getCampaign(campaignId)
       latest <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(campaignId)
     } yield {
       val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
       val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
-      LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByDevice.map(normaliseDeviceData))
+      LatestCampaignAnalytics(
+        latest.campaignId,
+        latest.uniques,
+        uniquesDeviceBreakdown.mobile,
+        uniquesDeviceBreakdown.desktop,
+        uniquesTarget,
+        latest.pageviews,
+        latest.medianAttentionTimeSeconds,
+        latest.medianAttentionTimeByDevice.map(normaliseDeviceData),
+        latest.weightedAverageDwellTimeForCampaign.to2Dp,
+        latest.averageDwellTimePerPathSeconds.mapValues(_.to2Dp)
+      )
 
     }
   }
 
   def getLatestCampaignAnalytics(): Map[String, LatestCampaignAnalytics] = {
+
+    import util.DoubleUtils._
+
     val latestCampaignAnalytics = LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics()
     val campaignsWeHaveUniquesFor = CampaignRepository.getAllCampaigns().filter(c => latestCampaignAnalytics.map(_.campaignId).contains(c.id))
 
@@ -42,7 +59,18 @@ object CampaignService {
       } yield {
         val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
         val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
-        campaign.id -> LatestCampaignAnalytics(latest.campaignId, latest.uniques, uniquesDeviceBreakdown.mobile, uniquesDeviceBreakdown.desktop, uniquesTarget, latest.pageviews, latest.medianAttentionTimeSeconds, latest.medianAttentionTimeByDevice.map(normaliseDeviceData))
+        campaign.id ->
+          LatestCampaignAnalytics(
+            latest.campaignId,
+            latest.uniques,
+            uniquesDeviceBreakdown.mobile,
+            uniquesDeviceBreakdown.desktop,
+            uniquesTarget, latest.pageviews,
+            latest.medianAttentionTimeSeconds,
+            latest.medianAttentionTimeByDevice.map(normaliseDeviceData),
+            latest.weightedAverageDwellTimeForCampaign.to2Dp,
+            latest.averageDwellTimePerPathSeconds.mapValues(_.to2Dp)
+          )
       }
     }
 
