@@ -51,7 +51,6 @@ class CapiImport extends Component {
 
     const isCampaignValueSet = this.state.campaignValue && this.state.campaignValue > 0;
     const isUniquesTargetSet = this.state.uniquesTarget && this.state.uniquesTarget > 0;
-    const isPageviewsTargetSet = this.state.pageviewsTarget && this.state.pageviewsTarget > 0;
     const selectedTag = this.state.selectedTag;
 
     const payload = {
