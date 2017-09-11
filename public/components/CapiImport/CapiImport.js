@@ -54,11 +54,17 @@ class CapiImport extends Component {
     const isPageviewsTargetSet = this.state.pageviewsTarget && this.state.pageviewsTarget > 0;
     const selectedTag = this.state.selectedTag;
 
+    const payload = {
+      tag: this.state.selectedTag,
+      campaignValue: this.state.campaignValue,
+      uniquesTarget: this.state.uniquesTarget,
+      pageviewTarget: this.state.pageviewsTarget
+    };
 
     if (isCampaignValueSet && isUniquesTargetSet && selectedTag) {
       this.setState({importing: true});
 
-      importCampaignFromTag(selectedTag).then((campaign) => {
+      importCampaignFromTag(payload).then((campaign) => {
 
         let updatedTargets = undefined;
 
@@ -87,41 +93,41 @@ class CapiImport extends Component {
     }
   };
 
-  validateNumericInput = (value, errorState, successState) => {
-    const numValue = parseInt(value);
-
-    if (!value) {
+  validateNumericInput = (originalValue, parsedAsInt, errorState, successState) => {
+    if (!originalValue) {
       this.setState({error: ''});
-    } else if (isNaN(numValue) || numValue != value) {
+    } else if (isNaN(parsedAsInt) || parsedAsInt != originalValue) {
       this.setState(errorState);
     } else {
       this.setState(successState);
     }
-
   };
 
   onCampaignValueChange = (e) => {
     const campaignValue = e.target.value;
-    const successState = { error: '', campaignValue: campaignValue };
+    const campaignValueAsInt = parseInt(e.target.value);
+    const successState = { error: '', campaignValue: campaignValueAsInt };
     const errorState = { error: 'Campaign value has to be a number!' };
 
-    this.validateNumericInput(campaignValue, errorState, successState);
+    this.validateNumericInput(campaignValue, campaignValueAsInt, errorState, successState);
   };
 
   onPageviewsTargetChange = (e) => {
     const pageviewsTarget = e.target.value;
-    const successState = { error: '', pageviewsTarget: pageviewsTarget };
+    const pageviewsTargetAsInt = parseInt(e.target.value);
+    const successState = { error: '', pageviewsTarget: pageviewsTargetAsInt };
     const errorState = { error: 'Pageviews target value has to be a number!' };
 
-    this.validateNumericInput(pageviewsTarget, errorState, successState);
+    this.validateNumericInput(pageviewsTarget, pageviewsTargetAsInt, errorState, successState);
   };
 
   onUniquesTargetChange = (e) => {
     const uniquesTarget = e.target.value;
-    const successState = { error: '', uniquesTarget: uniquesTarget };
+    const uniquesTargetAsInt = parseInt(e.target.value);
+    const successState = { error: '', uniquesTarget: uniquesTargetAsInt };
     const errorState = { error: 'Uniques target value has to be a number!' };
 
-    this.validateNumericInput(uniquesTarget, errorState, successState);
+    this.validateNumericInput(uniquesTarget, uniquesTargetAsInt, errorState, successState);
   };
 
   performSearch(searchTerm) {
@@ -157,7 +163,7 @@ class CapiImport extends Component {
       return(<ProgressSpinner />);
     }
     return;
-  }
+  };
 
   render() {
 
