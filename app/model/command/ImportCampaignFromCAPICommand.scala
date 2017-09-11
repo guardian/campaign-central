@@ -106,9 +106,9 @@ object ImportTag {
 
 case class ImportCampaignFromCAPICommand(
                                         tag: ImportTag,
+                                        campaignValue: Long,
                                         uniquesTarget: Long,
-                                        pageviewTarget: Long,
-                                        campaignValue: Option[Long]
+                                        pageviewTarget: Option[Long]
                                         ) extends CAPIImportCommand {
 
 
@@ -143,6 +143,8 @@ case class ImportCampaignFromCAPICommand(
         case None => InvalidCampaignTagType
       }
 
+      Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _).toMap
+
       val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
         Campaign(
           id = UUID.randomUUID().toString,
@@ -156,9 +158,9 @@ case class ImportCampaignFromCAPICommand(
           createdBy = userOrDefault,
           lastModified = now,
           lastModifiedBy = userOrDefault,
-          nominalValue = Some(10000),         // default targets and values
-          actualValue = Some(10000),          // these will be set in the UI manually
-          targets = Map("uniques" -> 10000L)
+          nominalValue = None,                        // default targets and values
+          actualValue = Some(campaignValue),          // these will be set in the UI manually
+          targets = (Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _)).toMap
         )
       }
 
