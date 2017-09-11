@@ -65,20 +65,6 @@ class CapiImport extends Component {
       this.setState({importing: true});
 
       importCampaignFromTag(payload).then((campaign) => {
-
-        let updatedTargets = undefined;
-
-        if (isPageviewsTargetSet) {
-          updatedTargets = Object.assign({}, campaign.targets, { ['uniques']: this.state.uniquesTarget, ['pageviews']: this.state.pageviewsTarget });
-        } else {
-          updatedTargets = Object.assign({}, campaign.targets, { ['uniques']: this.state.uniquesTarget });
-        }
-
-        this.props.updateCampaign(Object.assign({}, campaign, {
-          actualValue: this.state.campaignValue,
-          targets: updatedTargets
-        }));
-
         this.setState({importing: false});
         this.context.router.push('/campaign/' + campaign.id);
       }).catch((error) => {
