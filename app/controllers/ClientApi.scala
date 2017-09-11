@@ -1,23 +1,25 @@
 package controllers
 
+import com.gu.googleauth.AuthAction
 import model._
 import play.api.libs.json._
-import play.api.libs.ws.WSClient
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, AnyContent, ControllerComponents}
 import repositories.ClientRepository
 
-class ClientApi(override val wsClient: WSClient, components: ControllerComponents)
-  extends CentralController(components) with PandaAuthActions {
+class ClientApi(components: ControllerComponents, authAction: AuthAction[AnyContent])
+  extends AbstractController(components) {
 
-  def getAllClients() = APIAuthAction { req =>
+  def getAllClients() = authAction { _ =>
     Ok(Json.toJson(ClientRepository.getAllClients()))
   }
 
-  def getClient(id: String) = APIAuthAction { req =>
-    ClientRepository.getClient(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
+  def getClient(id: String) = authAction { _ =>
+    ClientRepository.getClient(id) map { c =>
+      Ok(Json.toJson(c))
+    } getOrElse NotFound
   }
 
-  def updateClient(id: String) = APIAuthAction { req =>
+  def updateClient(id: String) = authAction { req =>
     req.body.asJson.flatMap(_.asOpt[Client]) match {
       case None => BadRequest("Could not convert json to client")
       case Some(client) =>
