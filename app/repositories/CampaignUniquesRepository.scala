@@ -5,10 +5,10 @@ import services.Dynamo
 
 import scala.collection.JavaConversions._
 
-class CampaignUniquesRepository(dynamo: Dynamo) {
+object CampaignUniquesRepository {
 
   def getCampaignUniques(campaignId: String): Seq[CampaignUniquesItem] = {
-    dynamo.campaignUniquesTable.query("campaignId", campaignId).map(CampaignUniquesItem.fromItem).toList
+    Dynamo.campaignUniquesTable.query("campaignId", campaignId).map(CampaignUniquesItem.fromItem).toList
   }
 
 }

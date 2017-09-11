@@ -31,6 +31,6 @@ object CampaignReferral {
 
   implicit val referralWrites: Writes[CampaignReferral] = Json.writes[CampaignReferral]
 
-  def forCampaign(campaignReferralRepository: CampaignReferralRepository, campaignId: String): Seq[CampaignReferral] =
-    campaignReferralRepository.getCampaignReferrals(campaignId)
+  def forCampaign(campaignId: String): Seq[CampaignReferral] =
+    CampaignReferralRepository.getCampaignReferrals(campaignId)
 }

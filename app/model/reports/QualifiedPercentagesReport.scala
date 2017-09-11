@@ -7,7 +7,7 @@ import play.api.Logger
 import play.api.libs.json.Format
 import repositories._
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 
 case class QualifiedMetricReport(total: Long, qualifiedCount: Long, percentage: Double)
 
@@ -17,42 +17,37 @@ object QualifiedMetricReport {
 
 case class QualifiedPercentagesReport(campaignId: String, metrics: Map[String, QualifiedMetricReport]) {
 
-  def refresh(
-    campaignRepository: CampaignRepository,
-    analyticsDataCache: AnalyticsDataCache,
-    googleAnalytics: GoogleAnalytics
-  ): Option[QualifiedPercentagesReport] =
-    QualifiedPercentagesReport.generateReport(campaignRepository, analyticsDataCache, googleAnalytics, campaignId)
+  def refresh = QualifiedPercentagesReport.generateReport(campaignId)
 
 }
 
 object QualifiedPercentagesReport {
 
-  implicit val qualifiedPercentagesReportFormat: Format[QualifiedPercentagesReport] =
-    Jsonx.formatCaseClass[QualifiedPercentagesReport]
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
-  def getQualifiedPercentagesReportForCampaign(campaignRepository: CampaignRepository,
-                                               analyticsDataCache: AnalyticsDataCache,
-                                               googleAnalytics: GoogleAnalytics,
-                                               campaignId: String): Option[QualifiedPercentagesReport] = {
-    implicit val ec: ExecutionContextExecutor = analyticsDataCache.analyticsExecutionContext
+  implicit val qualifiedPercentagesReportFormat: Format[QualifiedPercentagesReport] = Jsonx.formatCaseClass[QualifiedPercentagesReport]
 
-    analyticsDataCache.getCampaignQualifiedPercentagesReport(campaignId) match {
-      case Hit(report) =>
+  def getQualifiedPercentagesReportForCampaign(campaignId: String): Option[QualifiedPercentagesReport] = {
+
+    AnalyticsDataCache.getCampaignQualifiedPercentagesReport(campaignId) match {
+      case Hit(report) => {
         Logger.debug(s"getting qualified percentages for campaign $campaignId - cache hit")
         Some(report)
-      case Stale(report) =>
+      }
+      case Stale(report) => {
         Logger.debug(s"getting qualified percentages for campaign $campaignId - cache stale spawning async refresh")
 
-        Future {
+        Future{
           Logger.debug(s"async refresh of qualified percentages for campaign $campaignId")
-          report.refresh(campaignRepository, analyticsDataCache, googleAnalytics)
+          report.refresh
         } // serve stale but spawn refresh future
         Some(report)
-      case Miss =>
+      }
+      case Miss => {
         Logger.debug(s"getting qualified percentages for campaign $campaignId - cache miss fetching sync")
 
-        generateReport(campaignRepository, analyticsDataCache, googleAnalytics, campaignId)
+        generateReport(campaignId)
+      }
     }
   }
 
@@ -63,24 +58,19 @@ object QualifiedPercentagesReport {
     VideoCompletionMetricFetcher()
   )
 
-  def generateReport(campaignRepository: CampaignRepository,
-                     analyticsDataCache: AnalyticsDataCache,
-                     googleAnalytics: GoogleAnalytics,
-                     campaignId: String): Option[QualifiedPercentagesReport] = {
-    campaignRepository.getCampaign(campaignId) flatMap { campaign =>
-      for (startDate <- campaign.startDate) yield {
+  def generateReport(campaignId: String): Option[QualifiedPercentagesReport] = {
+    CampaignRepository.getCampaign(campaignId) flatMap { campaign =>
+      for (
+        startDate <- campaign.startDate
+      ) yield {
 
-        val reportLines = qualifiedMetricFetchers.foldLeft(Map[String, QualifiedMetricReport]()) { (m, fetcher) =>
-          m ++ fetcher.fetch(googleAnalytics, campaign, startDate, campaign.endDate)
+        val reportLines = qualifiedMetricFetchers.foldLeft(Map[String, QualifiedMetricReport]()){(m, fetcher) =>
+          m ++ fetcher.fetch(campaign, startDate, campaign.endDate)
         }
 
         val report = QualifiedPercentagesReport(campaignId, reportLines)
 
-        analyticsDataCache.putQualifiedPercentagesReport(
-          campaignId,
-          report,
-          analyticsDataCache.calculateValidToDateForDailyStats(campaign)
-        )
+        AnalyticsDataCache.putQualifiedPercentagesReport(campaignId, report, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
 
         report
       }
@@ -89,48 +79,24 @@ object QualifiedPercentagesReport {
 }
 
 sealed trait QualifiedMetricReportFetcher {
-  def fetch(
-    googleAnalytics: GoogleAnalytics,
-    campaign: Campaign,
-    startDate: DateTime,
-    endDate: Option[DateTime]
-  ): Map[String, QualifiedMetricReport]
+  def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Map[String, QualifiedMetricReport]
 }
 
-case class ContentTypeDwellTimeMetric(contentType: String, qualifiedDwellTime: Int)
-  extends QualifiedMetricReportFetcher {
+case class ContentTypeDwellTimeMetric(contentType: String, qualifiedDwellTime: Int) extends QualifiedMetricReportFetcher {
 
-  override def fetch(
-    googleAnalytics: GoogleAnalytics,
-    campaign: Campaign,
-    startDate: DateTime,
-    endDate: Option[DateTime]
-  ): Map[String, QualifiedMetricReport] = {
+  override def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Map[String, QualifiedMetricReport] = {
 
     val campaignFilter = if (campaign.`type` == "hosted") {
       campaign.gaFilterExpression
     } else {
-      campaign.pathPrefix.map { section =>
-        s"ga:dimension4==$section"
-      }
+      campaign.pathPrefix.map{ section =>s"ga:dimension4==${section}"}
     }
 
-    val report = campaignFilter.map { filter =>
-      val totalHits = googleAnalytics.loadTotalCampaignContentTypeViews(filter, contentType, startDate, endDate)
+    val report = campaignFilter.map{ filter =>
+      val totalHits = GoogleAnalytics.loadTotalCampaignContentTypeViews(filter, contentType, startDate, endDate);
       if (totalHits > 0) {
-        val qualifiedHits = googleAnalytics.loadCampaignContentTypeViewsWithDwellTime(
-          filter,
-          contentType,
-          qualifiedDwellTime,
-          startDate,
-          endDate
-        )
-        Map(
-          s"${contentType}DwellTime" -> QualifiedMetricReport(
-            totalHits,
-            qualifiedHits,
-            (qualifiedHits.toDouble / totalHits) * 100
-          ))
+        val qualifiedHits = GoogleAnalytics.loadCampaignContentTypeViewsWithDwellTime(filter, contentType, qualifiedDwellTime, startDate, endDate)
+        Map(s"${contentType}DwellTime" -> (QualifiedMetricReport(totalHits, qualifiedHits, (qualifiedHits.toDouble / totalHits) * 100)))
       } else {
         Map[String, QualifiedMetricReport]()
       }
@@ -140,42 +106,25 @@ case class ContentTypeDwellTimeMetric(contentType: String, qualifiedDwellTime: I
   }
 }
 
-case class VideoCompletionMetricFetcher() extends QualifiedMetricReportFetcher {
-  override def fetch(
-    googleAnalytics: GoogleAnalytics,
-    campaign: Campaign,
-    startDate: DateTime,
-    endDate: Option[DateTime]
-  ): Map[String, QualifiedMetricReport] = {
+case class VideoCompletionMetricFetcher() extends QualifiedMetricReportFetcher{
+  override def fetch(campaign: Campaign, startDate: DateTime, endDate: Option[DateTime]): Map[String, QualifiedMetricReport] = {
     val campaignFilter = if (campaign.`type` == "hosted") {
       campaign.gaFilterExpression
     } else {
-      campaign.pathPrefix.map { section =>
-        s"ga:dimension4==$section"
-      }
+      campaign.pathPrefix.map{ section =>s"ga:dimension4==${section}"}
     }
 
     val report = campaignFilter.map { filter =>
-      val totalHits = googleAnalytics.loadTotalCampaignContentTypeViews(filter, "video", startDate, endDate)
+      val totalHits = GoogleAnalytics.loadTotalCampaignContentTypeViews(filter, "video", startDate, endDate);
       if (totalHits > 0) {
-        val completionCounts = googleAnalytics.loadVideoCompletionCounts(filter, startDate, endDate)
+        val completionCounts = GoogleAnalytics.loadVideoCompletionCounts(filter, startDate, endDate);
 
         Map(
-          "videoPlays" -> QualifiedMetricReport(totalHits,
-                                                completionCounts.playMedia,
-                                                (completionCounts.playMedia.toDouble / totalHits) * 100),
-          "video25Percent" -> QualifiedMetricReport(totalHits,
-                                                    completionCounts.media25Complete,
-                                                    (completionCounts.media25Complete.toDouble / totalHits) * 100),
-          "video50Percent" -> QualifiedMetricReport(totalHits,
-                                                    completionCounts.media50Complete,
-                                                    (completionCounts.media50Complete.toDouble / totalHits) * 100),
-          "video75Percent" -> QualifiedMetricReport(totalHits,
-                                                    completionCounts.media75Complete,
-                                                    (completionCounts.media75Complete.toDouble / totalHits) * 100),
-          "videoComplete" -> QualifiedMetricReport(totalHits,
-                                                   completionCounts.media100Complete,
-                                                   (completionCounts.media100Complete.toDouble / totalHits) * 100)
+          "videoPlays" -> QualifiedMetricReport(totalHits, completionCounts.playMedia, (completionCounts.playMedia.toDouble / totalHits) * 100),
+          "video25Percent" -> QualifiedMetricReport(totalHits, completionCounts.media25Complete, (completionCounts.media25Complete.toDouble / totalHits) * 100),
+          "video50Percent" -> QualifiedMetricReport(totalHits, completionCounts.media50Complete, (completionCounts.media50Complete.toDouble / totalHits) * 100),
+          "video75Percent" -> QualifiedMetricReport(totalHits, completionCounts.media75Complete, (completionCounts.media75Complete.toDouble / totalHits) * 100),
+          "videoComplete" -> QualifiedMetricReport(totalHits, completionCounts.media100Complete, (completionCounts.media100Complete.toDouble / totalHits) * 100)
         )
       } else {
         Map[String, QualifiedMetricReport]()

@@ -3,25 +3,16 @@ package controllers
 import model.reports.{CampaignPageViewsReport, CampaignSummary, DailyUniqueUsersReport}
 import play.api.Logger
 import play.api.libs.ws.WSClient
-import play.api.mvc.ControllerComponents
-import repositories.{AnalyticsDataCache, CampaignRepository, GoogleAnalytics}
-import services.{AWS, Config}
+import play.api.mvc.{AbstractController, ControllerComponents, ControllerHelpers, PlayBodyParsers}
+import repositories.{AnalyticsDataCache, CampaignRepository}
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-class Migration(
-  override val wsClient: WSClient,
-  components: ControllerComponents,
-  val aws: AWS,
-  val config: Config,
-  campaignRepository: CampaignRepository,
-  analyticsDataCache: AnalyticsDataCache,
-  googleAnalytics: GoogleAnalytics
-) extends CentralController(components)
-  with PandaAuthActions {
+class Migration(override val wsClient: WSClient, components: ControllerComponents)
+  extends CentralController(components) with PandaAuthActions {
 
-  implicit val ec: ExecutionContextExecutor = analyticsDataCache.analyticsExecutionContext
+  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
 
   def addCampaignType() = APIAuthAction {
 //    val campaigns = CampaignRepository.getAllCampaigns
@@ -36,41 +27,29 @@ class Migration(
 
   def buildDailyReports() = APIAuthAction {
     Future {
-      val allCampaigns     = campaignRepository.getAllCampaigns()
-      val analyticsReports = analyticsDataCache.summariseContents
+      val allCampaigns = CampaignRepository.getAllCampaigns()
+      val analyticsReports = AnalyticsDataCache.summariseContents
 
       def reportExists(campaignId: String, reportName: String) = {
-        analyticsReports.exists { r =>
-          r.dataType == reportName && r.key == campaignId
-        }
+        analyticsReports.exists{r => r.dataType == reportName && r.key == campaignId}
       }
 
-      allCampaigns
-        .filter { c =>
-          c.startDate.isDefined && c.pathPrefix.isDefined
-        }
-        .foreach { c =>
-          if (!reportExists(c.id, "CampaignPageViewsReport")) {
-            try {
-              CampaignPageViewsReport
-                .getCampaignPageViewsReport(campaignRepository, analyticsDataCache, googleAnalytics, c.id)
-            } catch {
-              case NonFatal(e) =>
-                Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)
-            }
+      allCampaigns.filter { c =>
+        c.startDate.isDefined && c.pathPrefix.isDefined
+      }.foreach { c =>
+        if (!reportExists(c.id, "CampaignPageViewsReport")) {
+          try { CampaignPageViewsReport.getCampaignPageViewsReport(c.id) } catch { case NonFatal(e) =>
+            Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)
           }
-
-          if (!reportExists(c.id, "DailyUniqueUsersReport")) {
-            try {
-              DailyUniqueUsersReport
-                .getDailyUniqueUsersReport(campaignRepository, analyticsDataCache, googleAnalytics, c.id)
-            } catch {
-              case NonFatal(e) =>
-                Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)
-            }
-          }
-
         }
+
+        if(!reportExists(c.id, "DailyUniqueUsersReport")) {
+          try { DailyUniqueUsersReport.getDailyUniqueUsersReport(c.id) } catch { case NonFatal(e) =>
+            Logger.error(s"failed to generate CampaignPageViewsReport for ${c.id}", e)
+          }
+        }
+
+      }
 
     }
 
@@ -80,19 +59,14 @@ class Migration(
 
   def rebuildCampaignSummaries() = APIAuthAction {
     Future {
-      val allCampaigns = campaignRepository.getAllCampaigns()
+      val allCampaigns = CampaignRepository.getAllCampaigns()
 
-      allCampaigns
-        .filter { c =>
-          c.startDate.isDefined && c.pathPrefix.isDefined
-        }
-        .foreach { c =>
-          val uuReport = DailyUniqueUsersReport
-            .getDailyUniqueUsersReport(campaignRepository, analyticsDataCache, googleAnalytics, c.id)
-          uuReport.foreach { r =>
-            CampaignSummary.storeLatestUniquesForCampaign(analyticsDataCache, c, r.dailyUniqueUsers.lastOption)
-          }
-        }
+      allCampaigns.filter { c =>
+        c.startDate.isDefined && c.pathPrefix.isDefined
+      }.foreach { c =>
+        val uuReport = DailyUniqueUsersReport.getDailyUniqueUsersReport(c.id)
+        uuReport.foreach{ r => CampaignSummary.storeLatestUniquesForCampaign(c, r.dailyUniqueUsers.lastOption) }
+      }
     }
 
     Ok("build kicked off")
