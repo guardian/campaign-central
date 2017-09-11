@@ -10,19 +10,15 @@ import services.{AWS, Config}
 
 trait PandaAuthActions extends AuthActions {
 
-  def config: Config
+  override lazy val domain: String = Config().pandaDomain
 
-  def aws: AWS
-
-  override lazy val domain: String = config.pandaDomain
-
-  override def authCallbackUrl: String = config.pandaAuthCallback
+  override def authCallbackUrl: String = Config().pandaAuthCallback
 
   override lazy val system: String = "campaignCentral"
 
   override def cacheValidation = true
 
-  override lazy val awsCredentialsProvider: AWSCredentialsProvider = aws.credentialsProvider
+  override lazy val awsCredentialsProvider: AWSCredentialsProvider = AWS.credentialsProvider
 
   override def validateUser(authedUser: AuthenticatedUser): Boolean = {
     Logger.info(s"validating user $authedUser")
@@ -33,5 +29,5 @@ trait PandaAuthActions extends AuthActions {
 
 trait HMACPandaAuthActions extends PandaAuthActions with HMACAuthActions {
 
-  override def secret: String = config.pandaHMACSecret
+  override def secret: String = Config().pandaHMACSecret
 }

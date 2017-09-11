@@ -7,15 +7,17 @@ import net.logstash.logback.layout.LogstashLayout
 import org.slf4j.{LoggerFactory, Logger => SLFLogger}
 import play.api.Logger
 
-class LogShipping(config: Config, val aws: AWS) extends AwsInstanceTags {
-  val rootLogger: LogbackLogger = LoggerFactory.getLogger(SLFLogger.ROOT_LOGGER_NAME).asInstanceOf[LogbackLogger]
+object LogShipping extends AwsInstanceTags {
+  val rootLogger = LoggerFactory.getLogger(SLFLogger.ROOT_LOGGER_NAME).asInstanceOf[LogbackLogger]
 
-  def init(): Unit = {
+  def init {
     rootLogger.info("bootstrapping kinesis appender if configured correctly")
-    for (stack      <- readTag("Stack");
-         app        <- readTag("App");
-         stage      <- readTag("Stage");
-         streamName <- config.logShippingStreamName) {
+    for (
+      stack <- readTag("Stack");
+      app <- readTag("App");
+      stage <- readTag("Stage");
+      streamName <- Config().logShippingStreamName
+    ) {
 
       Logger.info(s"bootstrapping kinesis appender with $stack -> $app -> $stage")
       val context = rootLogger.getLoggerContext
@@ -27,7 +29,7 @@ class LogShipping(config: Config, val aws: AWS) extends AwsInstanceTags {
 
       val appender = new KinesisAppender[ILoggingEvent]()
       appender.setBufferSize(1000)
-      appender.setRegion(aws.region.getName)
+      appender.setRegion(AWS.region.getName)
       appender.setStreamName(streamName)
       appender.setContext(context)
       appender.setLayout(layout)

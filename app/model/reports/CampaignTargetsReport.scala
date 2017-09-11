@@ -10,8 +10,7 @@ import repositories.CampaignRepository
 case class CampaignTargetRunRateElement(date: DateTime, expected: Long)
 
 object CampaignTargetRunRateElement {
-  implicit val campaignTargetRunRateElemenFormat: Format[CampaignTargetRunRateElement] =
-    Jsonx.formatCaseClass[CampaignTargetRunRateElement]
+  implicit val campaignTargetRunRateElemenFormat: Format[CampaignTargetRunRateElement] = Jsonx.formatCaseClass[CampaignTargetRunRateElement]
 }
 
 case class CampaignTarget(target: Long, runRate: List[CampaignTargetRunRateElement])
@@ -26,23 +25,22 @@ object CampaignTargetsReport {
 
   implicit val campaignTargetsReportFormat: Format[CampaignTargetsReport] = Jsonx.formatCaseClass[CampaignTargetsReport]
 
-  def getCampaignTargetsReport(
-    campaignRepository: CampaignRepository,
-    campaignId: String
-  ): Option[CampaignTargetsReport] = {
-    for (campaign  <- campaignRepository.getCampaign(campaignId);
-         startDate <- campaign.startDate;
-         endDate   <- campaign.endDate) yield {
+  def getCampaignTargetsReport(campaignId: String): Option[CampaignTargetsReport] = {
+    for (
+      campaign <- CampaignRepository.getCampaign(campaignId);
+      startDate <- campaign.startDate;
+      endDate <- campaign.endDate
+    ) yield {
 
       val campaignLength = new Duration(startDate, endDate).getStandardDays
-      val reportRange    = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate)
+      val reportRange = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate)
 
       CampaignTargetsReport(
         campaign.targets.keys.map { targetName =>
-          val target       = campaign.targets(targetName)
+          val target = campaign.targets(targetName)
           val dailyRunRate = target.toDouble / campaignLength
 
-          val runRate = reportRange.map { date =>
+          val runRate = reportRange.map{ date =>
             val daysIn = new Duration(startDate, date).getStandardDays
             CampaignTargetRunRateElement(date, (daysIn * dailyRunRate).toLong)
           }

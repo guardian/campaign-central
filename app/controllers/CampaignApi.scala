@@ -4,124 +4,95 @@ import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import model.reports._
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, _}
 import play.api.Logger
 import play.api.libs.json.Json._
 import play.api.libs.json._
 import play.api.libs.ws.WSClient
 import play.api.mvc._
 import repositories._
-import services.{AWS, CampaignService, Config}
+import services.CampaignService
 
-class CampaignApi(
-  override val wsClient: WSClient,
-  components: ControllerComponents,
-  val aws: AWS,
-  val config: Config,
-  campaignService: CampaignService,
-  campaignRepository: CampaignRepository,
-  campaignContentRepository: CampaignContentRepository,
-  campaignNotesRepository: CampaignNotesRepository,
-  campaignReferralRepository: CampaignReferralRepository,
-  clientRepository: ClientRepository,
-  trafficDriverRejectRepository: TrafficDriverRejectRepository,
-  analyticsDataCache: AnalyticsDataCache,
-  googleAnalytics: GoogleAnalytics,
-  contentApi: ContentApi,
-  tagManagerApi: TagManagerApi
-) extends CentralController(components)
-  with PandaAuthActions {
+class CampaignApi(override val wsClient: WSClient, components: ControllerComponents)
+  extends CentralController(components) with PandaAuthActions {
 
   def getCampaign(id: String) = APIAuthAction {
-    campaignRepository.getCampaign(id) map { c =>
-      Ok(Json.toJson(c))
-    } getOrElse NotFound
+    CampaignRepository.getCampaign(id) map { c => Ok(Json.toJson(c))} getOrElse NotFound
   }
 
   def getAllCampaigns() = APIAuthAction {
-    Ok(Json.toJson(campaignRepository.getAllCampaigns()))
+    Ok(Json.toJson(CampaignRepository.getAllCampaigns()))
   }
 
   def getLatestCampaignAnalytics() = APIAuthAction {
-    Ok(Json.toJson(campaignService.getLatestCampaignAnalytics()))
+    Ok(Json.toJson(CampaignService.getLatestCampaignAnalytics()))
   }
 
   def getLatestAnalyticsForCampaign(campaignId: String) = APIAuthAction {
-    Ok(Json.toJson(campaignService.getLatestAnalyticsForCampaign(campaignId)))
+    Ok(Json.toJson(CampaignService.getLatestAnalyticsForCampaign(campaignId)))
   }
 
   def updateCampaign(id: String) = APIAuthAction { req =>
     req.body.asJson.flatMap(_.asOpt[Campaign]) match {
       case None => BadRequest("Could not convert json to campaign")
       case Some(campaign) =>
-        campaignRepository.putCampaign(campaign)
+        CampaignRepository.putCampaign(campaign)
         Ok(Json.toJson(campaign))
     }
   }
 
-  def deleteCampaign(id: String) = APIAuthAction { _ =>
-    campaignNotesRepository.deleteNotesForCampaign(id)
-    campaignContentRepository.deleteContentForCampaign(id)
-    campaignRepository.deleteCampaign(id)
+  def deleteCampaign(id: String) = APIAuthAction { req =>
+    CampaignNotesRepository.deleteNotesForCampaign(id)
+    CampaignContentRepository.deleteContentForCampaign(id)
+    CampaignRepository.deleteCampaign(id)
     NoContent
   }
 
-  def getCampaignPageViews(id: String) = APIAuthAction { _ =>
-    CampaignPageViewsReport
-      .getCampaignPageViewsReport(campaignRepository, analyticsDataCache, googleAnalytics, id)
-      .map { c =>
-        Ok(Json.toJson(c))
-      } getOrElse NotFound
+  def getCampaignPageViews(id: String) = APIAuthAction { req =>
+    CampaignPageViewsReport.getCampaignPageViewsReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
-  def getCampaignPageViewsFromDatalake(id: String) = APIAuthAction { _ =>
-    val pageViews = campaignService.getPageViews(id)
+  def getCampaignPageViewsFromDatalake(id: String) = APIAuthAction { req =>
+    val pageViews = CampaignService.getPageViews(id)
     Ok(Json.toJson(pageViews))
   }
 
-  def getCampaignUniquesFromDatalake(id: String) = APIAuthAction { _ =>
-    campaignService.getUniquesDataForGraph(id).map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound
+  def getCampaignUniquesFromDatalake(id: String) = APIAuthAction { req =>
+    CampaignService.getUniquesDataForGraph(id).map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound
   }
 
-  def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { _ =>
-    DailyUniqueUsersReport.getDailyUniqueUsersReport(campaignRepository, analyticsDataCache, googleAnalytics, id).map {
-      c =>
-        Ok(Json.toJson(c))
-    } getOrElse NotFound
+  def getCampaignDailyUniqueUsers(id: String) = APIAuthAction { req =>
+    DailyUniqueUsersReport.getDailyUniqueUsersReport(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
-  def getCampaignQualifiedPercentagesReport(id: String) = APIAuthAction { _ =>
-    QualifiedPercentagesReport
-      .getQualifiedPercentagesReportForCampaign(campaignRepository, analyticsDataCache, googleAnalytics, id)
-      .map { c =>
-        Ok(Json.toJson(c))
-      } getOrElse NotFound
+  def getCampaignQualifiedPercentagesReport(id: String) = APIAuthAction { req =>
+    QualifiedPercentagesReport.getQualifiedPercentagesReportForCampaign(id).map { c => Ok(Json.toJson(c)) } getOrElse NotFound
   }
 
-  def getCampaignTargetsReport(id: String) = APIAuthAction { _ =>
-    Ok(
-      Json.toJson(
-        CampaignTargetsReport.getCampaignTargetsReport(campaignRepository, id).getOrElse(CampaignTargetsReport(Map()))
-      ))
+  def getCampaignTargetsReport(id: String) = APIAuthAction { req =>
+    Ok(Json.toJson(
+      CampaignTargetsReport.getCampaignTargetsReport(id).getOrElse(CampaignTargetsReport(Map()))
+    ))
   }
 
-  def getCampaignContent(id: String) = APIAuthAction { _ =>
-    Ok(Json.toJson(campaignContentRepository.getContentForCampaign(id)))
+  def getCampaignContent(id: String) = APIAuthAction { req =>
+    Ok(Json.toJson(CampaignContentRepository.getContentForCampaign(id)))
   }
 
-  def getCampaignNotes(id: String) = APIAuthAction { _ =>
-    Ok(Json.toJson(campaignNotesRepository.getNotesForCampaign(id)))
+  def getCampaignNotes(id: String) = APIAuthAction { req =>
+    Ok(Json.toJson(CampaignNotesRepository.getNotesForCampaign(id)))
   }
 
   def addCampaignNote(id: String) = APIAuthAction { req =>
+
     val content = (req.body.asJson.get \ "content").as[String]
 
     if (content.isEmpty)
       BadRequest("Cannot add a note with no content")
     else {
-      val created        = DateTime.now()
-      val lastModified   = created
-      val createdBy      = User(req.user)
+      val created = DateTime.now()
+      val lastModified = created
+      val createdBy = User(req.user)
       val lastModifiedBy = createdBy
 
       val newNote = Note(
@@ -133,22 +104,24 @@ class CampaignApi(
         content = content
       )
 
-      campaignNotesRepository.putNote(newNote)
+      CampaignNotesRepository.putNote(newNote)
       Ok(Json.toJson(newNote))
     }
   }
 
-  def updateCampaignNote(id: String, date: String): Action[AnyContent] = {
+  def updateCampaignNote(id: String, date: String) = {
 
     APIAuthAction { req =>
+
       val dateCreated = new DateTime(date.toLong)
 
-      campaignNotesRepository.getNote(id, dateCreated) match {
+      CampaignNotesRepository.getNote(id, dateCreated) match {
         case None => NotFound
         case Some(note) =>
+
           val lastModified = DateTime.now()
-          val modifiedBy   = User(req.user)
-          val content      = (req.body.asJson.get \ "content").as[String]
+          val modifiedBy = User(req.user)
+          val content = (req.body.asJson.get \ "content").as[String]
 
           val updatedNote = note.copy(
             lastModified = lastModified,
@@ -156,18 +129,16 @@ class CampaignApi(
             content = content
           )
 
-          campaignNotesRepository.putNote(updatedNote)
+          CampaignNotesRepository.putNote(updatedNote)
           Ok(Json.toJson(updatedNote))
       }
     }
   }
 
   def importFromTag() = APIAuthAction { req =>
-    implicit val user: Option[User] = Option(User(req.user))
+    implicit val user = Option(User(req.user))
     req.body.asJson map { json =>
-      json
-        .as[ImportCampaignFromCAPICommand]
-        .process(campaignRepository, campaignContentRepository, clientRepository, contentApi, tagManagerApi) match {
+      json.as[ImportCampaignFromCAPICommand].process() match {
         case Left(e) =>
           commandErrorAsResult(e)
         case Right(campaign) =>
@@ -179,9 +150,8 @@ class CampaignApi(
   }
 
   def refreshCampaignFromCAPI(campaignId: String) = APIAuthAction { req =>
-    implicit val user: Option[User] = Option(User(req.user))
-    RefreshCampaignFromCAPICommand(campaignId)
-      .process(campaignRepository, campaignContentRepository, contentApi, tagManagerApi) match {
+    implicit val user = Option(User(req.user))
+    RefreshCampaignFromCAPICommand(campaignId).process() match {
       case Left(e) =>
         commandErrorAsResult(e)
       case Right(campaign) =>
@@ -189,48 +159,40 @@ class CampaignApi(
     }
   }
 
-  def getCampaignTrafficDrivers(campaignId: String) = APIAuthAction { _ =>
+
+  def getCampaignTrafficDrivers(campaignId: String) = APIAuthAction { req =>
     Logger.info(s"Loading traffic drivers for campaign $campaignId")
-    Ok(toJson(TrafficDriverGroup.forCampaign(config, campaignRepository, campaignId)))
+    Ok(toJson(TrafficDriverGroup.forCampaign(campaignId)))
   }
 
-  def getSuggestedCampaignTrafficDrivers(campaignId: String) = APIAuthAction { _ =>
+  def getSuggestedCampaignTrafficDrivers(campaignId: String) = APIAuthAction { req =>
     Logger.info(s"Loading suggested traffic drivers for campaign $campaignId")
-    val summary = LineItemSummary.suggestedTrafficDriversForCampaign(
-      config,
-      campaignRepository,
-      clientRepository,
-      trafficDriverRejectRepository,
-      campaignId
-    )
-    Ok(toJson(summary))
+    Ok(toJson(LineItemSummary.suggestedTrafficDriversForCampaign(campaignId)))
   }
 
-  def acceptSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = APIAuthAction { _ =>
+  def acceptSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = APIAuthAction { req =>
     Logger.info(s"Accepting traffic driver $lineItemId for campaign $campaignId")
-    LineItemSummary.acceptSuggestedTrafficDriver(config, campaignId, lineItemId)
+    LineItemSummary.acceptSuggestedTrafficDriver(campaignId, lineItemId)
     NoContent
   }
 
-  def rejectSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = APIAuthAction { _ =>
+  def rejectSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = APIAuthAction { req =>
     Logger.info(s"Rejecting traffic driver $lineItemId for campaign $campaignId")
-    LineItemSummary.rejectSuggestedTrafficDriver(trafficDriverRejectRepository, campaignId, lineItemId)
+    LineItemSummary.rejectSuggestedTrafficDriver(campaignId, lineItemId)
     NoContent
   }
 
-  def getCampaignTrafficDriverStats(campaignId: String) = APIAuthAction { _ =>
+  def getCampaignTrafficDriverStats(campaignId: String) = APIAuthAction { req =>
     Logger.info(s"Loading traffic driver stats for campaign $campaignId")
-    Ok(toJson(TrafficDriverGroupStats.forCampaign(config, campaignRepository, analyticsDataCache, campaignId)))
+    Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))
   }
 
-  def getCampaignCtaStats(campaignId: String) = APIAuthAction { _ =>
-    Ok(
-      toJson(
-        CtaClicksReport.getCtaClicksForCampaign(campaignRepository, analyticsDataCache, googleAnalytics, campaignId)))
+  def getCampaignCtaStats(campaignId: String) = APIAuthAction { req =>
+    Ok(toJson(CtaClicksReport.getCtaClicksForCampaign(campaignId)))
   }
 
-  def getCampaignReferrals(campaignId: String) = APIAuthAction { _ =>
+  def getCampaignReferrals(campaignId: String) = APIAuthAction { request =>
     Logger.info(s"Loading on-platform referrals for campaign $campaignId")
-    Ok(toJson(CampaignReferral.forCampaign(campaignReferralRepository, campaignId)))
+    Ok(toJson(CampaignReferral.forCampaign(campaignId)))
   }
 }
