@@ -151,19 +151,19 @@ class CapiImport extends Component {
           <fieldset>
             <div className="pure-control-group">
               <label htmlFor="name">Campaign Value (£)</label>
-              <input id="name" type="text" placeholder="" onChange={this.onInputChange.bind(this, 'campaignValue')} />
+              <input id="name" type="text" autoComplete="off" placeholder="" onChange={this.onInputChange.bind(this, 'campaignValue')} />
                 <span className="pure-form-message-inline">required</span>
             </div>
 
             <div className="pure-control-group">
               <label htmlFor="name">Uniques Target</label>
-              <input id="name" type="text" placeholder="" onChange={this.onInputChange.bind(this, 'uniquesTarget')} />
+              <input id="name" type="text" autoComplete="off" placeholder="" onChange={this.onInputChange.bind(this, 'uniquesTarget')} />
               <span className="pure-form-message-inline">required</span>
             </div>
 
             <div className="pure-control-group">
               <label htmlFor="name">Pageviews Target</label>
-              <input id="name" type="text" placeholder="" onChange={this.onInputChange.bind(this, 'pageviewsTarget')}/>
+              <input id="name" type="text" autoComplete="off" placeholder="" onChange={this.onInputChange.bind(this, 'pageviewsTarget')}/>
               <span className="pure-form-message-inline">optional</span>
             </div>
 
