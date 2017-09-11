@@ -93,42 +93,34 @@ class CapiImport extends Component {
     }
   };
 
-  validateNumericInput = (originalValue, parsedAsInt, errorState, successState) => {
-    if (!originalValue) {
-      this.setState({error: ''});
-    } else if (isNaN(parsedAsInt) || parsedAsInt != originalValue) {
-      this.setState(errorState);
+  validateState = () => {
+    const errors = ['campaignValue', 'uniquesTarget', 'pageviewsTarget'].reduce((errorsAccum, dataToCheck) => {
+      const value = this.state[dataToCheck];
+      if (value !== undefined && isNaN(value)) {
+        errorsAccum.push(`${dataToCheck} value has to be a number!`);
+      }
+
+      return errorsAccum;
+    }, []);
+
+    if (errors.length > 0) {
+      this.setState({error: errors[0]});
     } else {
-      this.setState(successState);
+      this.setState({error: ''});
     }
   };
 
-  onCampaignValueChange = (e) => {
-    const campaignValue = e.target.value;
-    const campaignValueAsInt = parseInt(e.target.value);
-    const successState = { error: '', campaignValue: campaignValueAsInt };
-    const errorState = { error: 'Campaign value has to be a number!' };
+  onInputChange = (keyName, event) => {
+    const newValue = event.target.value;
 
-    this.validateNumericInput(campaignValue, campaignValueAsInt, errorState, successState);
+    if (newValue === '' || newValue === undefined) {
+      this.setState({[keyName]: undefined}, this.validateState);
+    } else if (newValue) {
+      const valueAsInt = Number(newValue);
+      this.setState({[keyName]: valueAsInt}, this.validateState);
+    }
   };
 
-  onPageviewsTargetChange = (e) => {
-    const pageviewsTarget = e.target.value;
-    const pageviewsTargetAsInt = parseInt(e.target.value);
-    const successState = { error: '', pageviewsTarget: pageviewsTargetAsInt };
-    const errorState = { error: 'Pageviews target value has to be a number!' };
-
-    this.validateNumericInput(pageviewsTarget, pageviewsTargetAsInt, errorState, successState);
-  };
-
-  onUniquesTargetChange = (e) => {
-    const uniquesTarget = e.target.value;
-    const uniquesTargetAsInt = parseInt(e.target.value);
-    const successState = { error: '', uniquesTarget: uniquesTargetAsInt };
-    const errorState = { error: 'Uniques target value has to be a number!' };
-
-    this.validateNumericInput(uniquesTarget, uniquesTargetAsInt, errorState, successState);
-  };
 
   performSearch(searchTerm) {
     const searchParams = {query: searchTerm || this.state.searchTerm};
@@ -174,19 +166,19 @@ class CapiImport extends Component {
           <fieldset>
             <div className="pure-control-group">
               <label htmlFor="name">Campaign Value (£)</label>
-              <input id="name" type="text" placeholder="" onChange={this.onCampaignValueChange} />
+              <input id="name" type="text" placeholder="" onChange={this.onInputChange.bind(this, 'campaignValue')} />
                 <span className="pure-form-message-inline">required</span>
             </div>
 
             <div className="pure-control-group">
               <label htmlFor="name">Uniques Target</label>
-              <input id="name" type="text" placeholder="" onChange={this.onUniquesTargetChange} />
+              <input id="name" type="text" placeholder="" onChange={this.onInputChange.bind(this, 'uniquesTarget')} />
               <span className="pure-form-message-inline">required</span>
             </div>
 
             <div className="pure-control-group">
               <label htmlFor="name">Pageviews Target</label>
-              <input id="name" type="text" placeholder="" onChange={this.onPageviewsTargetChange}/>
+              <input id="name" type="text" placeholder="" onChange={this.onInputChange.bind(this, 'pageviewsTarget')}/>
               <span className="pure-form-message-inline">optional</span>
             </div>
 
