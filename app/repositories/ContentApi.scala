@@ -11,26 +11,27 @@ import play.api.Logger
 import services.Config
 
 import scala.annotation.tailrec
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 
+class ContentApi(config: Config) {
 
-object ContentApi {
+  private val previewApiClient = new DraftContentApiClass(config)
 
-  private val previewApiClient = new DraftContentApiClass(Config().capiKey)
-
-  private val executorService = Executors.newFixedThreadPool(2)
-  private implicit val executionContext = ExecutionContext.fromExecutor(executorService)
+  private implicit val executionContext: ExecutionContextExecutor =
+    ExecutionContext.fromExecutor(Executors.newFixedThreadPool(2))
 
   @tailrec
-  def loadAllContentInSection(pathPrefix: String, page: Int = 1, content: List[Content] = Nil): List[Content] = {
-    Logger.debug(s"Loading page ${page} of content for section ${pathPrefix}")
+  final def loadAllContentInSection(pathPrefix: String, page: Int = 1, content: List[Content] = Nil): List[Content] = {
+    Logger.debug(s"Loading page $page of content for section $pathPrefix")
     val response = previewApiClient.getResponse(
-      new SearchQuery().section(pathPrefix)
-          .showAtoms("all")
-          .showFields("internalComposerCode,isLive,firstPublicationDate,headline")
-          .showTags("all")
-          .pageSize(10).page(page)
+      SearchQuery()
+        .section(pathPrefix)
+        .showAtoms("all")
+        .showFields("internalComposerCode,isLive,firstPublicationDate,headline")
+        .showTags("all")
+        .pageSize(10)
+        .page(page)
     )
 
     val resultPage = Await.result(response, 5.seconds)
@@ -46,20 +47,21 @@ object ContentApi {
 
 }
 
-class DraftContentApiClass(override val apiKey: String) extends ContentApiClientLogic() {
-  override val targetUrl = Config().capiPreviewUrl
+class DraftContentApiClass(config: Config) extends ContentApiClientLogic() {
+  override val apiKey: String    = config.capiKey
+  override val targetUrl: String = config.capiPreviewUrl
 
-  override protected def get(url: String, headers: Map[String, String])
-                            (implicit context: ExecutionContext): Future[HttpResponse] = {
+  override protected def get(url: String, headers: Map[String, String])(
+    implicit context: ExecutionContext): Future[HttpResponse] = {
 
-    val headersWithAuth = headers ++ Map("Authorization" -> Credentials.basic(Config().capiPreviewUser, Config().capiPreviewPassword))
+    val headersWithAuth = headers ++ Map(
+      "Authorization" -> Credentials.basic(config.capiPreviewUser, config.capiPreviewPassword))
 
     val req = headersWithAuth.foldLeft(dispatch.url(url)) {
       case (r, (name, value)) => r.setHeader(name, value)
     }
 
-    def handler = new FunctionHandler(r => HttpResponse(r.getResponseBodyAsBytes(), r.getStatusCode, r.getStatusText))
+    def handler = new FunctionHandler(r => HttpResponse(r.getResponseBodyAsBytes, r.getStatusCode, r.getStatusText))
     http(req.toRequest, handler)
   }
 }
-

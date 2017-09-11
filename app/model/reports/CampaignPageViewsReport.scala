@@ -5,43 +5,50 @@ import model.Campaign
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Format
-import repositories.GoogleAnalytics.DailyViewCounts
 import repositories._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
+case class CampaignPageViewsReport(
+  campaignId: String,
+  seenPaths: Set[String],
+  pageCountStats: List[Map[String, Long]]
+) {
 
-case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], pageCountStats: List[Map[String, Long]]) {
-  def refresh = {
-    val refreshed = for (
-      campaign <- CampaignRepository.getCampaign(campaignId);
-      lastData <- pageCountStats.lastOption;
-      lastSeenDate <- lastData.get("date")
-    ) {
+  def refresh(
+    campaignRepository: CampaignRepository,
+    analyticsDataCache: AnalyticsDataCache,
+    googleAnalytics: GoogleAnalytics
+  ): Unit = {
+    val refreshed: Unit = for (campaign <- campaignRepository.getCampaign(campaignId);
+                               lastData     <- pageCountStats.lastOption;
+                               lastSeenDate <- lastData.get("date")) {
       val missingDays = DateBasedReport.calculateDatesToFetch(new DateTime(lastSeenDate).plusDays(1), campaign.endDate)
-      val dailyReports = missingDays.map(CampaignPageViewsReport.loadCampaignPageViewsForDay(campaign, _))
+      val dailyReports =
+        missingDays.map(CampaignPageViewsReport.loadCampaignPageViewsForDay(googleAnalytics, campaign, _))
 
-      val refreshed = dailyReports.foldLeft(this) { case (report: CampaignPageViewsReport, (date: DateTime, dailyViewCounts: DailyViewCounts)) =>
-        report.addDayCounts(date, dailyViewCounts)
+      val refreshed = dailyReports.foldLeft(this) {
+        case (report: CampaignPageViewsReport, (date: DateTime, dailyViewCounts: DailyViewCounts)) =>
+          report.addDayCounts(date, dailyViewCounts)
       }
-      AnalyticsDataCache.putCampaignPageViewsReport(campaignId, refreshed, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
-
+      analyticsDataCache.putCampaignPageViewsReport(campaignId,
+                                                    refreshed,
+                                                    analyticsDataCache.calculateValidToDateForDailyStats(campaign))
       refreshed
     }
-
   }
 
   def addDayCounts(date: DateTime, dailyViewCounts: DailyViewCounts): CampaignPageViewsReport = {
 
-    val newPaths = dailyViewCounts.seenPaths -- seenPaths
+    val newPaths               = dailyViewCounts.seenPaths -- seenPaths
     val backfilledCurrentStats = backfillNewPathData(newPaths, pageCountStats)
 
     val missingPathsInNewData = seenPaths -- dailyViewCounts.seenPaths
-    val newDayCounts = addMissingPathsToIncomingData(missingPathsInNewData, dailyViewCounts.countStats)
+    val newDayCounts          = addMissingPathsToIncomingData(missingPathsInNewData, dailyViewCounts.countStats)
 
-    val newCountsWithRunningTotals = backfilledCurrentStats.lastOption match{
+    val newCountsWithRunningTotals = backfilledCurrentStats.lastOption match {
       case Some(latest) => addRunningTotals(latest, newDayCounts)
-      case None => initialiseRunningTotals(newDayCounts)
+      case None         => initialiseRunningTotals(newDayCounts)
     }
 
     val newCountsWithDate = newCountsWithRunningTotals + ("date" -> date.getMillis)
@@ -49,10 +56,13 @@ case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], p
     CampaignPageViewsReport(campaignId, seenPaths ++ dailyViewCounts.seenPaths, pageCountStats :+ newCountsWithDate)
   }
 
-  private def addMissingPathsToIncomingData(missingPathsInNewData: Set[String], dailyViewCounts: Map[String, Long]): Map[String, Long] = {
+  private def addMissingPathsToIncomingData(
+    missingPathsInNewData: Set[String],
+    dailyViewCounts: Map[String, Long]
+  ): Map[String, Long] = {
     val zeroedStatsByPath = missingPathsInNewData map { p =>
       Map(
-        s"count$p" -> 0L,
+        s"count$p"  -> 0L,
         s"unique$p" -> 0L
       )
     }
@@ -63,9 +73,9 @@ case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], p
   private def backfillNewPathData(newPaths: Set[String], stats: List[Map[String, Long]]) = {
     val backfillZeroedStatsByPath = newPaths map { p =>
       Map(
-        s"count$p" -> 0L,
-        s"unique$p" -> 0L,
-        s"cumulative-count$p" -> 0L,
+        s"count$p"             -> 0L,
+        s"unique$p"            -> 0L,
+        s"cumulative-count$p"  -> 0L,
         s"cumulative-unique$p" -> 0L
       )
     }
@@ -76,15 +86,17 @@ case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], p
   }
 
   def addRunningTotals(latestCurrentStats: Map[String, Long], newDayCounts: Map[String, Long]): Map[String, Long] = {
-    newDayCounts.keys.foldLeft(newDayCounts){case (counts, statName) =>
-      val cumalativeStatName = s"cumulative-$statName"
-      counts + (cumalativeStatName -> (latestCurrentStats.getOrElse(cumalativeStatName, 0L) + newDayCounts(statName)))
+    newDayCounts.keys.foldLeft(newDayCounts) {
+      case (counts, statName) =>
+        val cumalativeStatName = s"cumulative-$statName"
+        counts + (cumalativeStatName -> (latestCurrentStats.getOrElse(cumalativeStatName, 0L) + newDayCounts(statName)))
     }
   }
 
   def initialiseRunningTotals(newDayCounts: Map[String, Long]): Map[String, Long] = {
-    newDayCounts.keys.foldLeft(newDayCounts){case (counts, statName) =>
-      counts + (s"cumulative-$statName" -> newDayCounts(statName))
+    newDayCounts.keys.foldLeft(newDayCounts) {
+      case (counts, statName) =>
+        counts + (s"cumulative-$statName" -> newDayCounts(statName))
     }
   }
 
@@ -92,60 +104,76 @@ case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], p
 
 object CampaignPageViewsReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
+  implicit val campaignPageViewsReportFormat: Format[CampaignPageViewsReport] =
+    Jsonx.formatCaseClass[CampaignPageViewsReport]
 
-  implicit val campaignPageViewsReportFormat: Format[CampaignPageViewsReport] = Jsonx.formatCaseClass[CampaignPageViewsReport]
+  def getCampaignPageViewsReport(
+    campaignRepository: CampaignRepository,
+    analyticsDataCache: AnalyticsDataCache,
+    googleAnalytics: GoogleAnalytics,
+    campaignId: String
+  ): Option[CampaignPageViewsReport] = {
+    implicit val ec: ExecutionContextExecutor = analyticsDataCache.analyticsExecutionContext
 
-  def getCampaignPageViewsReport(campaignId: String): Option[CampaignPageViewsReport] = {
-
-    AnalyticsDataCache.getCampaignPageViewsReport(campaignId) match {
-      case Hit(report) => {
+    analyticsDataCache.getCampaignPageViewsReport(campaignId) match {
+      case Hit(report) =>
         Logger.debug(s"getting page view report for campaign $campaignId - cache hit")
         Some(report)
-      }
-      case Stale(report) => {
+      case Stale(report) =>
         Logger.debug(s"getting page view report for campaign $campaignId - cache stale spawning async refresh")
 
-        Future{
+        Future {
           Logger.debug(s"async refresh of page view report for campaign $campaignId")
-          report.refresh
+          report.refresh(campaignRepository, analyticsDataCache, googleAnalytics)
         } // serve stale but spawn refresh future
         Some(report)
-      }
-      case Miss => {
+      case Miss =>
         Logger.debug(s"getting page view report for campaign $campaignId - cache miss fetching sync")
 
-        generateReport(campaignId)
-      }
+        generateReport(campaignRepository, analyticsDataCache, googleAnalytics, campaignId)
     }
   }
 
-  def generateReport(campaignId: String): Option[CampaignPageViewsReport] = {
-    for (
-      campaign <- CampaignRepository.getCampaign(campaignId);
-      startDate <- campaign.startDate
-    ) yield {
-      val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate).map{ dt =>
+  def generateReport(
+    campaignRepository: CampaignRepository,
+    analyticsDataCache: AnalyticsDataCache,
+    googleAnalytics: GoogleAnalytics,
+    campaignId: String
+  ): Option[CampaignPageViewsReport] = {
+    for (campaign  <- campaignRepository.getCampaign(campaignId);
+         startDate <- campaign.startDate) yield {
+      val dailyReports = DateBasedReport.calculateDatesToFetch(startDate, campaign.endDate).map { dt =>
         Thread.sleep(3000) // try to avoid rate limiting
-        loadCampaignPageViewsForDay(campaign, dt)
+        loadCampaignPageViewsForDay(googleAnalytics, campaign, dt)
       }
 
       val emptyReport = CampaignPageViewsReport(campaignId, Set(), Nil)
-      val report = dailyReports.foldLeft(emptyReport) { case (report: CampaignPageViewsReport, (date: DateTime, dailyViewCounts: DailyViewCounts)) =>
-        report.addDayCounts(date, dailyViewCounts)
+      val report = dailyReports.foldLeft(emptyReport) {
+        case (report: CampaignPageViewsReport, (date: DateTime, dailyViewCounts: DailyViewCounts)) =>
+          report.addDayCounts(date, dailyViewCounts)
       }
 
-      AnalyticsDataCache.putCampaignPageViewsReport(campaignId, report, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
+      analyticsDataCache.putCampaignPageViewsReport(
+        campaignId,
+        report,
+        analyticsDataCache.calculateValidToDateForDailyStats(campaign)
+      )
 
       report
     }
   }
 
-  def loadCampaignPageViewsForDay(campaign: Campaign, date: DateTime) = {
+  def loadCampaignPageViewsForDay(
+    googleAnalytics: GoogleAnalytics,
+    campaign: Campaign,
+    date: DateTime
+  ): (DateTime, DailyViewCounts) = {
     val dailyCounts = if (campaign.`type` == "hosted") {
-      campaign.gaFilterExpression.flatMap(GoogleAnalytics.loadPageViewsForDay(_, date))
+      campaign.gaFilterExpression.flatMap(googleAnalytics.loadPageViewsForDay(_, date))
     } else {
-      campaign.pathPrefix.flatMap{ section => GoogleAnalytics.loadPageViewsForDay(s"ga:dimension4==${section}", date)}
+      campaign.pathPrefix.flatMap { section =>
+        googleAnalytics.loadPageViewsForDay(s"ga:dimension4==$section", date)
+      }
     }
 
     date -> calculateDailyTotals(dailyCounts)
@@ -153,14 +181,13 @@ object CampaignPageViewsReport {
 
   private def calculateDailyTotals(dailyViewCounts: Option[DailyViewCounts]): DailyViewCounts = {
     dailyViewCounts match {
-      case Some(DailyViewCounts(seenPaths, countStats)) => {
+      case Some(DailyViewCounts(seenPaths, countStats)) =>
         val stats = countStats.keySet
 
-        val totalCount = stats.filter(_.startsWith("count")).foldLeft(0L){case(total, k) => total + countStats(k)}
-        val totalUnique = stats.filter(_.startsWith("unique")).foldLeft(0L){case(total, k) => total + countStats(k)}
+        val totalCount  = stats.filter(_.startsWith("count")).foldLeft(0L) { case (total, k)  => total + countStats(k) }
+        val totalUnique = stats.filter(_.startsWith("unique")).foldLeft(0L) { case (total, k) => total + countStats(k) }
 
         DailyViewCounts(seenPaths, countStats ++ Map("count-total" -> totalCount, "unique-total" -> totalUnique))
-      }
       case None =>
         DailyViewCounts(seenPaths = Set(), countStats = Map("count-total" -> 0L, "unique-total" -> 0L))
     }

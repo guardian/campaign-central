@@ -7,11 +7,11 @@ import services.Dynamo
 
 import scala.collection.JavaConversions._
 
-object CampaignReferralRepository {
+class CampaignReferralRepository(dynamo: Dynamo) {
 
   def getCampaignReferrals(campaignId: String): Seq[CampaignReferral] = {
 
-    val rows = Dynamo.campaignReferralTable
+    val rows = dynamo.campaignReferralTable
       .query("campaignId", campaignId)
       .flatMap(CampaignReferralRow.fromItem)
       .toList

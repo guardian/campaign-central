@@ -5,7 +5,7 @@ machine:
   node:
     version: 5.2.0
   environment:
-    SBT_VERSION: 0.13.15
+    SBT_VERSION: 0.13.16
     NODE_ENV: production
 
 # Collect build artifacts
