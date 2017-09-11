@@ -49,7 +49,7 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaff
       s"-J-Xloggc:/var/log/${packageName.value}/gc.log"
     ),
     debianPackageDependencies := Seq("openjdk-8-jre-headless"),
-    maintainer := "Editorial Tools Developers <digitalcms.dev@theguardian.com>",
+    maintainer := "Commercial Dev Team <commercial.dev@theguardian.com>",
     packageSummary := description.value,
     packageDescription := description.value,
     playDefaultPort := 2267,
