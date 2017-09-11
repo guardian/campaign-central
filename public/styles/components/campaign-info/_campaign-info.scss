@@ -48,8 +48,14 @@
 }
 
 .popover-key {
+  text-transform: lowercase !important;
   margin-right: 0.5em;
   font-weight: bold;
+}
+
+.popover-value {
+  text-transform: lowercase !important;
+  color: #37c7ba;
 }
 
 .hover {
