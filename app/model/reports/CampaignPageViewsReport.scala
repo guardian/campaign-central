@@ -8,12 +8,12 @@ import play.api.libs.json.Format
 import repositories.GoogleAnalytics.DailyViewCounts
 import repositories._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 
 case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], pageCountStats: List[Map[String, Long]]) {
-  def refresh = {
-    val refreshed = for (
+  def refresh(): Unit = {
+    val refreshed: Unit = for (
       campaign <- CampaignRepository.getCampaign(campaignId);
       lastData <- pageCountStats.lastOption;
       lastSeenDate <- lastData.get("date")
@@ -92,31 +92,28 @@ case class CampaignPageViewsReport(campaignId: String, seenPaths: Set[String], p
 
 object CampaignPageViewsReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
+  implicit val ec: ExecutionContextExecutor = AnalyticsDataCache.analyticsExecutionContext
 
   implicit val campaignPageViewsReportFormat: Format[CampaignPageViewsReport] = Jsonx.formatCaseClass[CampaignPageViewsReport]
 
   def getCampaignPageViewsReport(campaignId: String): Option[CampaignPageViewsReport] = {
 
     AnalyticsDataCache.getCampaignPageViewsReport(campaignId) match {
-      case Hit(report) => {
+      case Hit(report) =>
         Logger.debug(s"getting page view report for campaign $campaignId - cache hit")
         Some(report)
-      }
-      case Stale(report) => {
+      case Stale(report) =>
         Logger.debug(s"getting page view report for campaign $campaignId - cache stale spawning async refresh")
 
         Future{
           Logger.debug(s"async refresh of page view report for campaign $campaignId")
-          report.refresh
+          report.refresh()
         } // serve stale but spawn refresh future
         Some(report)
-      }
-      case Miss => {
+      case Miss =>
         Logger.debug(s"getting page view report for campaign $campaignId - cache miss fetching sync")
 
         generateReport(campaignId)
-      }
     }
   }
 
@@ -141,7 +138,7 @@ object CampaignPageViewsReport {
     }
   }
 
-  def loadCampaignPageViewsForDay(campaign: Campaign, date: DateTime) = {
+  def loadCampaignPageViewsForDay(campaign: Campaign, date: DateTime): (DateTime, DailyViewCounts) = {
     val dailyCounts = if (campaign.`type` == "hosted") {
       campaign.gaFilterExpression.flatMap(GoogleAnalytics.loadPageViewsForDay(_, date))
     } else {
@@ -153,14 +150,13 @@ object CampaignPageViewsReport {
 
   private def calculateDailyTotals(dailyViewCounts: Option[DailyViewCounts]): DailyViewCounts = {
     dailyViewCounts match {
-      case Some(DailyViewCounts(seenPaths, countStats)) => {
+      case Some(DailyViewCounts(seenPaths, countStats)) =>
         val stats = countStats.keySet
 
         val totalCount = stats.filter(_.startsWith("count")).foldLeft(0L){case(total, k) => total + countStats(k)}
         val totalUnique = stats.filter(_.startsWith("unique")).foldLeft(0L){case(total, k) => total + countStats(k)}
 
         DailyViewCounts(seenPaths, countStats ++ Map("count-total" -> totalCount, "unique-total" -> totalUnique))
-      }
       case None =>
         DailyViewCounts(seenPaths = Set(), countStats = Map("count-total" -> 0L, "unique-total" -> 0L))
     }
