@@ -22,10 +22,11 @@ object TrafficDriverRejectRepository {
 
   def putRejectedDriverId(campaignId: String, lineItemId: Long): Unit = {
     try {
-      val item = Item.fromMap(Map[String, AnyRef](
-        "campaignId" -> campaignId,
-        "lineItemId" -> long2Long(lineItemId)
-      ).asJava)
+      val item = Item.fromMap(
+        Map[String, AnyRef](
+          "campaignId" -> campaignId,
+          "lineItemId" -> long2Long(lineItemId)
+        ).asJava)
       Dynamo.trafficDriverRejectTable.putItem(item)
     } catch {
       case NonFatal(e) =>

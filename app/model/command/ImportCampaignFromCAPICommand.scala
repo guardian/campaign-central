@@ -23,7 +23,9 @@ trait CAPIImportCommand extends Command {
   override type T = Campaign
 
   def deriveHostedTagFromContent(content: List[ApiContent]): Option[Tag] = {
-    content.flatMap(_.tags).find{t => t.`type` == TagType.PaidContent}
+    content.flatMap(_.tags).find { t =>
+      t.`type` == TagType.PaidContent
+    }
   }
 
   def deriveContentType(apiContent: ApiContent) = {
@@ -35,23 +37,29 @@ trait CAPIImportCommand extends Command {
   }
 
   def buildAtomList(apiContent: ApiContent): List[Atom] = {
-    apiContent.atoms.map{ atoms =>
-      val mediaAtoms = atoms.media.map{ mediaAtoms => mediaAtoms.map{ma =>
-        Atom(ma.id, "media", Option(ma.data.asInstanceOf[AtomData.Media].media.title))}
-      }.getOrElse(Nil)
+    apiContent.atoms
+      .map { atoms =>
+        val mediaAtoms = atoms.media
+          .map { mediaAtoms =>
+            mediaAtoms.map { ma =>
+              Atom(ma.id, "media", Option(ma.data.asInstanceOf[AtomData.Media].media.title))
+            }
+          }
+          .getOrElse(Nil)
 
-      // other content atom types would go here
+        // other content atom types would go here
 
-      mediaAtoms.toList
-    }.getOrElse(Nil)
+        mediaAtoms.toList
+      }
+      .getOrElse(Nil)
   }
 
   def cleanHeadline(headline: String) = headline match {
     case "" => "untitled"
-    case h => h
+    case h  => h
   }
 
-  def buildContentItems(apiContent: List[ApiContent], campaignId: String): List[ContentItem] = apiContent.map{ apic =>
+  def buildContentItems(apiContent: List[ApiContent], campaignId: String): List[ContentItem] = apiContent.map { apic =>
     ContentItem(
       campaignId = campaignId,
       id = apic.fields.flatMap(_.internalComposerCode).getOrElse(UUID.randomUUID().toString),
@@ -64,28 +72,31 @@ trait CAPIImportCommand extends Command {
     )
   }
 
-  def updateCampaignAndContent(apiContent: List[ApiContent], campaign: Campaign, sponsorship: Option[Sponsorship]): Option[Campaign] = {
+  def updateCampaignAndContent(apiContent: List[ApiContent],
+                               campaign: Campaign,
+                               sponsorship: Option[Sponsorship]): Option[Campaign] = {
     val contentItems = buildContentItems(apiContent, campaign.id)
 
-    contentItems.foreach( CampaignContentRepository.putContent )
+    contentItems.foreach(CampaignContentRepository.putContent)
 
     val startDate = apiContent.flatMap(_.fields.flatMap(_.firstPublicationDate)).sortBy(_.dateTime).headOption
-    val endDate = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1)))
+    val endDate   = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1)))
 
     val status = (startDate, endDate) match {
       case (_, Some(ed)) if ed.isBeforeNow => "dead"
-      case (Some(_), _) => "live"
-      case _ => "production"
+      case (Some(_), _)                    => "live"
+      case _                               => "production"
     }
 
     val ctaAtoms = apiContent.flatMap(_.atoms.flatMap(_.cta)).flatten
 
-
     val updatedCampaign = campaign.copy(
-      startDate = startDate.map{cdt => new DateTime(cdt.dateTime).withTimeAtStartOfDay()},
+      startDate = startDate.map { cdt =>
+        new DateTime(cdt.dateTime).withTimeAtStartOfDay()
+      },
       endDate = endDate,
       status = status,
-      callToActions = ctaAtoms.map{ atomData =>
+      callToActions = ctaAtoms.map { atomData =>
         val ctaAtom = atomData.data.asInstanceOf[AtomData.Cta]
         ctaAtom.cta.trackingCode
         CallToAction(Some(atomData.id), ctaAtom.cta.trackingCode)
@@ -105,13 +116,11 @@ object ImportTag {
 }
 
 case class ImportCampaignFromCAPICommand(
-                                        tag: ImportTag,
-                                        campaignValue: Long,
-                                        uniquesTarget: Long,
-                                        pageviewTarget: Option[Long]
-                                        ) extends CAPIImportCommand {
-
-
+  tag: ImportTag,
+  campaignValue: Long,
+  uniquesTarget: Long,
+  pageviewTarget: Option[Long]
+) extends CAPIImportCommand {
 
   def findOrCreateClient(sponsorship: Option[Sponsorship]): Client = {
     val sponsorName = sponsorship.map(_.sponsorName) getOrElse SponsorNameNotFound
@@ -130,19 +139,18 @@ case class ImportCampaignFromCAPICommand(
     Logger.info(s"importing campaign from tag ${tag.externalName}")
 
     val userOrDefault = user getOrElse User("CAPI", "importer", "labs.beta@guardian.co.uk")
-    val now = DateTime.now
+    val now           = DateTime.now
 
     val apiContent = ContentApi.loadAllContentInSection(tag.section.pathPrefix)
     deriveHostedTagFromContent(apiContent).toRight(CampaignTagNotFound).right map { hostedTag =>
-
       val sponsorship = TagManagerApi.getSponsorshipForTag(tag.id)
 
       val campaignType = hostedTag.paidContentType match {
         case Some("HostedContent") => "hosted"
-        case Some(_) => "paidContent"
-        case None => InvalidCampaignTagType
+        case Some(_)               => "paidContent"
+        case None                  => InvalidCampaignTagType
       }
-      
+
       val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
         Campaign(
           id = UUID.randomUUID().toString,
@@ -156,8 +164,8 @@ case class ImportCampaignFromCAPICommand(
           createdBy = userOrDefault,
           lastModified = now,
           lastModifiedBy = userOrDefault,
-          nominalValue = None,                        // default targets and values
-          actualValue = Some(campaignValue),          // these will be set in the UI manually
+          nominalValue = None, // default targets and values
+          actualValue = Some(campaignValue), // these will be set in the UI manually
           targets = (Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _)).toMap
         )
       }
@@ -167,9 +175,9 @@ case class ImportCampaignFromCAPICommand(
   }
 }
 
-
 object ImportCampaignFromCAPICommand {
-  implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignFromCAPICommand] = Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
+  implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignFromCAPICommand] =
+    Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
 }
 
 case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand {
@@ -188,6 +196,6 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
 }
 
 object RefreshCampaignFromCAPICommand {
-  implicit val refreshCampaignFromCAPICommandFormat: Format[RefreshCampaignFromCAPICommand] = Jsonx.formatCaseClass[RefreshCampaignFromCAPICommand]
+  implicit val refreshCampaignFromCAPICommandFormat: Format[RefreshCampaignFromCAPICommand] =
+    Jsonx.formatCaseClass[RefreshCampaignFromCAPICommand]
 }
-

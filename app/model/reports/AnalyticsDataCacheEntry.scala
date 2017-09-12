@@ -11,16 +11,18 @@ import scala.util.control.NonFatal
 case class AnalyticsDataCacheEntrySummary(key: String, dataType: String, expires: Option[Long], written: Long)
 
 object AnalyticsDataCacheEntrySummary {
-  implicit val analyticsDataCacheEntrySummaryFormat: Format[AnalyticsDataCacheEntrySummary] = Jsonx.formatCaseClass[AnalyticsDataCacheEntrySummary]
+  implicit val analyticsDataCacheEntrySummaryFormat: Format[AnalyticsDataCacheEntrySummary] =
+    Jsonx.formatCaseClass[AnalyticsDataCacheEntrySummary]
 
-  def fromItem(item: Item) = try {
-    Json.parse(item.toJSON).as[AnalyticsDataCacheEntrySummary]
-  } catch {
-    case NonFatal(e) => {
-      Logger.error(s"failed to parse analytics data cache item summary ${item.toJSON}", e)
-      throw e
+  def fromItem(item: Item) =
+    try {
+      Json.parse(item.toJSON).as[AnalyticsDataCacheEntrySummary]
+    } catch {
+      case NonFatal(e) => {
+        Logger.error(s"failed to parse analytics data cache item summary ${item.toJSON}", e)
+        throw e
+      }
     }
-  }
 }
 
 case class AnalyticsDataCacheEntry(key: String, dataType: String, data: String, expires: Option[Long], written: Long) {
@@ -41,24 +43,26 @@ case class AnalyticsDataCacheEntry(key: String, dataType: String, data: String, 
 }
 
 object AnalyticsDataCacheEntry {
-  implicit val analyticsDataCacheEntryFormat: Format[AnalyticsDataCacheEntry] = Jsonx.formatCaseClass[AnalyticsDataCacheEntry]
+  implicit val analyticsDataCacheEntryFormat: Format[AnalyticsDataCacheEntry] =
+    Jsonx.formatCaseClass[AnalyticsDataCacheEntry]
 
-  def fromItem(item: Item) = try {
-    if (item.isPresent("compressedData")) {
-      AnalyticsDataCacheEntry(
-        key = item.getString("key"),
-        dataType = item.getString("dataType"),
-        data = Compression.decompress(item.getBinary("compressedData")),
-        expires = if(item.isPresent("expires")) Some(item.getLong("expires")) else None,
-        written = item.getLong("written")
-      )
-    } else {
-      Json.parse(item.toJSON).as[AnalyticsDataCacheEntry]
+  def fromItem(item: Item) =
+    try {
+      if (item.isPresent("compressedData")) {
+        AnalyticsDataCacheEntry(
+          key = item.getString("key"),
+          dataType = item.getString("dataType"),
+          data = Compression.decompress(item.getBinary("compressedData")),
+          expires = if (item.isPresent("expires")) Some(item.getLong("expires")) else None,
+          written = item.getLong("written")
+        )
+      } else {
+        Json.parse(item.toJSON).as[AnalyticsDataCacheEntry]
+      }
+    } catch {
+      case NonFatal(e) => {
+        Logger.error(s"failed to parse analytics data cache item ${item.toJSON}", e)
+        throw e
+      }
     }
-  } catch {
-    case NonFatal(e) => {
-      Logger.error(s"failed to parse analytics data cache item ${item.toJSON}", e)
-      throw e
-    }
-  }
 }

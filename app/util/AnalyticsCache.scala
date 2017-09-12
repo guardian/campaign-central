@@ -1,6 +1,5 @@
 package util
 
-
 import org.joda.time.DateTime
 
 case class ValueWithExpiry[A](expires: Long, value: A)
@@ -12,8 +11,8 @@ class AnalyticsCache[A, B] {
   def millisAtEndOfDay = DateTime.now().withTimeAtStartOfDay().plusDays(1).getMillis
 
   def get(key: A): Option[B] = {
-    internalMap.get(key).flatMap{ valueWithExpiry =>
-      if( valueWithExpiry.expires < System.currentTimeMillis ) None else Some(valueWithExpiry.value)
+    internalMap.get(key).flatMap { valueWithExpiry =>
+      if (valueWithExpiry.expires < System.currentTimeMillis) None else Some(valueWithExpiry.value)
     }
   }
 

@@ -8,8 +8,6 @@ import play.api.Logger
 import play.api.libs.json.Json
 import services.Config
 
-
-
 object TagManagerApi {
 
   val httpClient = new OkHttpClient.Builder()
@@ -20,7 +18,7 @@ object TagManagerApi {
 
     Logger.info(s"connecting to ${Config().tagManagerApiUrl}/hyper/tags/$id/sponsorships")
 
-    val req = new Request.Builder().url(s"${Config().tagManagerApiUrl}/hyper/tags/$id/sponsorships").build
+    val req  = new Request.Builder().url(s"${Config().tagManagerApiUrl}/hyper/tags/$id/sponsorships").build
     val resp = httpClient.newCall(req).execute
 
     resp.code match {
