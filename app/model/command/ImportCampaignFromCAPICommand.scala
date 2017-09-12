@@ -142,9 +142,7 @@ case class ImportCampaignFromCAPICommand(
         case Some(_) => "paidContent"
         case None => InvalidCampaignTagType
       }
-
-      Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _).toMap
-
+      
       val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
         Campaign(
           id = UUID.randomUUID().toString,
