@@ -12,7 +12,6 @@ object Config extends AwsInstanceTags {
 
   lazy val conf = readTag("Stage") match {
     case Some("PROD") => new ProdConfig
-    case Some("CODE") => new CodeConfig
     case _            => new DevConfig
   }
 
@@ -24,10 +23,6 @@ object Config extends AwsInstanceTags {
 sealed trait Config {
 
   def stage: String
-
-  def pandaDomain: String
-  def pandaAuthCallback: String
-  lazy val pandaHMACSecret = getRequiredRemoteStringProperty("panda.hmac.secret")
 
   def googleAuthClientId     = getRequiredRemoteStringProperty("googleauth.client.id")
   def googleAuthClientSecret = getRequiredRemoteStringProperty("googleauth.client.secret")
@@ -130,14 +125,9 @@ object StagingDfpProperties {
 }
 
 class DevConfig extends Config {
-
   override def stage = "DEV"
 
   override def logShippingStreamName = Some("elk-CODE-KinesisStream-M03ERGK5PVD9")
-
-  override def pandaDomain: String       = "local.dev-gutools.co.uk"
-  override def pandaAuthCallback: String = "https://campaign-central.local.dev-gutools.co.uk/oauthCallback"
-
   override def tagManagerApiUrl  = "https://tagmanager.code.dev-gutools.co.uk"
   override def composerUrl       = "https://composer.local.dev-gutools.co.uk"
   override def liveUrl           = "https://www.theguardian.com"
@@ -151,35 +141,10 @@ class DevConfig extends Config {
   override val dfpCampaignFieldId       = StagingDfpProperties.dfpCampaignFieldId
 }
 
-class CodeConfig extends Config {
-  override def stage = "CODE"
-
-  override def logShippingStreamName = Some("elk-PROD-KinesisStream-1PYU4KS1UEQA")
-
-  override def pandaDomain: String       = "code.dev-gutools.co.uk"
-  override def pandaAuthCallback: String = "https://campaign-central.code.dev-gutools.co.uk/oauthCallback"
-
-  override def tagManagerApiUrl  = "https://tagmanager.code.dev-gutools.co.uk"
-  override def composerUrl       = "https://composer.code.dev-gutools.co.uk"
-  override def liveUrl           = "http://m.code.dev-theguardian.com"
-  override def previewUrl        = "https://viewer.code.dev-gutools.co.uk/preview"
-  override def mediaAtomMakerUrl = "https://video.code.dev-gutools.co.uk"
-  override def ctaAtomMakerUrl   = "https://cta-atom-maker.code.dev-gutools.co.uk"
-
-  override val dfpNetworkCode           = StagingDfpProperties.dfpNetworkCode
-  override val dfpNativeCardOrderIds    = StagingDfpProperties.dfpNativeCardOrderIds
-  override val dfpMerchandisingOrderIds = StagingDfpProperties.dfpMerchandisingOrderIds
-  override val dfpCampaignFieldId       = StagingDfpProperties.dfpCampaignFieldId
-}
-
 class ProdConfig extends Config {
   override def stage = "PROD"
 
   override def logShippingStreamName = Some("elk-PROD-KinesisStream-1PYU4KS1UEQA")
-
-  override def pandaDomain: String       = "gutools.co.uk"
-  override def pandaAuthCallback: String = "https://campaign-central.gutools.co.uk/oauthCallback"
-
   override def tagManagerApiUrl  = "https://tagmanager.gutools.co.uk"
   override def composerUrl       = "https://composer.gutools.co.uk"
   override def liveUrl           = "https://www.theguardian.com"

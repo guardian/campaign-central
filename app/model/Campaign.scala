@@ -15,7 +15,6 @@ case class Campaign(
                    name: String,
                    `type`: String,
                    status: String,
-                   clientId: String,
                    created: DateTime,
                    createdBy: User,
                    lastModified: DateTime,

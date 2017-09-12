@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import R from 'ramda';
 import EditableNumber from '../utils/EditableNumber';
 import EditableText from '../utils/EditableText';
 
@@ -57,7 +56,7 @@ class AddTargetControl extends React.Component {
     </div>
     );
   }
-  
+
   render () {
 
     const availbleTargets = defaultTargets.filter(t => !this.props.existingTargets.includes(t.value) );
