@@ -35,11 +35,6 @@ POST /api/campaigns/:id/notes               controllers.CampaignApi.addCampaignN
 PUT /api/campaigns/:id/note/:date           controllers.CampaignApi.updateCampaignNote(id: String, date: String)
 POST /api/campaigns/import                  controllers.CampaignApi.importFromTag()
 POST /api/campaigns/:id/refreshFromCAPI     controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
-GET /api/campaigns/:id/drivers              controllers.CampaignApi.getCampaignTrafficDrivers(id: String)
-GET /api/campaigns/:id/suggest-drivers      controllers.CampaignApi.getSuggestedCampaignTrafficDrivers(id: String)
-PUT /api/campaigns/:id/driver/:driverId     controllers.CampaignApi.acceptSuggestedCampaignTrafficDriver(id: String, driverId: Long)
-PUT /api/campaigns/:id/not-driver/:driverId controllers.CampaignApi.rejectSuggestedCampaignTrafficDriver(id: String, driverId: Long)
-GET /api/campaigns/:id/driverstats          controllers.CampaignApi.getCampaignTrafficDriverStats(id: String)
 GET /api/campaigns/:id/ctastats             controllers.CampaignApi.getCampaignCtaStats(id: String)
 GET /api/v2/campaigns/:id/referrals         controllers.CampaignApi.getCampaignReferrals(id: String)
 

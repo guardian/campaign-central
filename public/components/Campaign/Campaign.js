@@ -4,7 +4,6 @@ import CampaignEdit from '../CampaignInformationEdit/CampaignEdit';
 import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
 import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
 import CampaignReferrals from '../CampaignAnalytics/Analytics/CampaignReferrals';
-import CampaignTrafficDriversAndSuggestions from '../CampaignInformationEdit/CampaignTrafficDriversAndSuggestions';
 
 class Campaign extends React.Component {
 
@@ -59,7 +58,6 @@ class Campaign extends React.Component {
                           getCampaign={this.props.campaignActions.getCampaign}
                           getCampaignContent={this.props.campaignActions.getCampaignContent} />
           <CampaignReferrals campaign={campaign} />
-          <CampaignTrafficDriversAndSuggestions campaign={campaign} />
         </div>
       </div>
     );

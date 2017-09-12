@@ -165,33 +165,6 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     }
   }
 
-  def getCampaignTrafficDrivers(campaignId: String) = authAction { _ =>
-    Logger.info(s"Loading traffic drivers for campaign $campaignId")
-    Ok(toJson(TrafficDriverGroup.forCampaign(campaignId)))
-  }
-
-  def getSuggestedCampaignTrafficDrivers(campaignId: String) = authAction { _ =>
-    Logger.info(s"Loading suggested traffic drivers for campaign $campaignId")
-    Ok(toJson(LineItemSummary.suggestedTrafficDriversForCampaign(campaignId)))
-  }
-
-  def acceptSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = authAction { _ =>
-    Logger.info(s"Accepting traffic driver $lineItemId for campaign $campaignId")
-    LineItemSummary.acceptSuggestedTrafficDriver(campaignId, lineItemId)
-    NoContent
-  }
-
-  def rejectSuggestedCampaignTrafficDriver(campaignId: String, lineItemId: Long) = authAction { _ =>
-    Logger.info(s"Rejecting traffic driver $lineItemId for campaign $campaignId")
-    LineItemSummary.rejectSuggestedTrafficDriver(campaignId, lineItemId)
-    NoContent
-  }
-
-  def getCampaignTrafficDriverStats(campaignId: String) = authAction { _ =>
-    Logger.info(s"Loading traffic driver stats for campaign $campaignId")
-    Ok(toJson(TrafficDriverGroupStats.forCampaign(campaignId)))
-  }
-
   def getCampaignCtaStats(campaignId: String) = authAction { _ =>
     Ok(toJson(CtaClicksReport.getCtaClicksForCampaign(campaignId)))
   }
