@@ -9,6 +9,8 @@ import play.filters.HttpFiltersComponents
 import services.{AWS, Config, LogShipping}
 import router.Routes
 
+import scala.util.Try
+
 class AppLoader extends ApplicationLoader {
   def load(context: Context): Application = {
     new AppComponents(context).application
@@ -26,7 +28,7 @@ class AppComponents(context: Context)
     super.httpFilters.filterNot(filter => filter == csrfFilter || filter == allowedHostsFilter)
 
   Logger.info("bootstrapping AWS")
-  AWS.init(configuration.get[String]("aws.profile"))
+  AWS.init(Try(configuration.get[String]("aws.profile")).toOption)
 
   Logger.info("bootstrapping log shipping")
   LogShipping.init()

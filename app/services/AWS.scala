@@ -1,6 +1,6 @@
 package services
 
-import com.amazonaws.auth.AWSCredentialsProvider
+import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Table}
@@ -20,10 +20,13 @@ object AWS {
 
   var creds: AWSCredentialsProvider = _
 
-  def init(profile: String): Unit = {
-    creds = {
-      Logger.info(s"using local aws profile $profile")
-      new ProfileCredentialsProvider(profile)
+  def init(profile: Option[String]): Unit = {
+    creds = profile map { p =>
+      Logger.info(s"using local aws profile $p")
+      new ProfileCredentialsProvider(p)
+    } getOrElse {
+      Logger.info("using default AWS profile")
+      new DefaultAWSCredentialsProviderChain()
     }
   }
 
