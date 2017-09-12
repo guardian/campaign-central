@@ -20,7 +20,6 @@ export default class Sidebar extends React.Component {
           <div className="sidebar__filter-group">
             <div className="sidebar__filter-group__header">State:</div>
             {this.filterLink({state: 'all'}, 'All')}
-            {this.filterLink({state: 'prospect'}, 'Prospects')}
             {this.filterLink({state: 'production'}, 'In Production')}
             {this.filterLink({state: undefined}, 'Live')}
             {this.filterLink({state: 'dead'}, 'Dead')}
@@ -31,10 +30,6 @@ export default class Sidebar extends React.Component {
             {this.filterLink({type: 'hosted'}, 'Hosted')}
             {this.filterLink({type: 'paidContent'}, 'Paid Content')}
           </div>
-        </div>
-        <div className="sidebar__link-group">
-          <div className="sidebar__link-group__header">Clients</div>
-          <SidebarLink to="/clients">All Clients</SidebarLink>
         </div>
         <div className="sidebar__link-group">
           <div className="sidebar__link-group__header">Tools</div>

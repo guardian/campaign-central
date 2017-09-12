@@ -49,7 +49,6 @@ class AppComponents(context: Context)
 
   val appController           = new App(controllerComponents, authAction)
   val campaignApiController   = new CampaignApi(controllerComponents, authAction)
-  val clientApiController     = new ClientApi(controllerComponents, authAction)
   val managementApiController = new ManagementApi(controllerComponents, authAction)
   val managementController    = new Management(controllerComponents)
   val assetsController        = new Assets(httpErrorHandler, assetsMetadata)
@@ -60,7 +59,6 @@ class AppComponents(context: Context)
     appController,
     logInController,
     campaignApiController,
-    clientApiController,
     managementApiController,
     assetsController,
     managementController

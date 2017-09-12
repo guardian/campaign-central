@@ -208,7 +208,6 @@ object LineItemSummary {
   def suggestedTrafficDriversForCampaign(campaignId: String): Map[String, Seq[LineItemSummary]] = {
     val lineItems = for {
       campaign <- CampaignRepository.getCampaign(campaignId)
-      client <- ClientRepository.getClient(campaign.clientId)
       nativeCardOrderIds <- dfpNativeCardOrderIds.get(campaign.`type`)
       merchandisingCardOrderIds <- dfpMerchandisingOrderIds.get(campaign.`type`)
     } yield {
@@ -216,7 +215,7 @@ object LineItemSummary {
       def fetch(orderIds: Seq[Long]): Seq[LineItemSummary] =
         Dfp.fetchSuggestedLineItems(
           campaignName = campaign.name,
-          clientName = client.name,
+          clientName = "",
           service = dfpLineItemService,
           orderIds,
           lineItemIdsToIgnore = TrafficDriverRejectRepository.getRejectedDriverIds(campaignId)
