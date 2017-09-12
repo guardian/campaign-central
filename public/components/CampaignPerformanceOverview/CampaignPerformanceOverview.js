@@ -6,8 +6,27 @@ class AttentionTimePerPlatform extends React.Component {
     const items = Object.keys(this.props.medianAttentionTimeSeconds).sort().map((deviceType) => {
       return (
         <div key={deviceType}>
-          <label className="popover-key">{deviceType}</label>
-          <span className="popover-value">{this.props.medianAttentionTimeSeconds[deviceType]} SECONDS</span>
+          <label className="popover-key">{deviceType} :</label>
+          <span className="popover-value">{this.props.medianAttentionTimeSeconds[deviceType]} seconds</span>
+        </div>
+      );
+    });
+
+    return (
+      <div className="hover-popover">
+        {items}
+      </div>
+    );
+  }
+}
+
+class AverageDwellTimePerPath extends React.Component {
+  render() {
+    const items = Object.keys(this.props.averageDwellTimePerPathSeconds).sort().map((path) => {
+      return (
+        <div key={path}>
+          <label className="popover-key">{path} :</label>
+          <span className="popover-value">{this.props.averageDwellTimePerPathSeconds[path]} seconds</span>
         </div>
       );
     });
@@ -46,6 +65,9 @@ export default class CampaignPerformanceOverview extends React.Component {
 
     const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
     const medianPerDevice = this.props.latestAnalyticsForCampaign.medianAttentionTimeByDevice || {};
+    
+    const weightedAverageDwellTime = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
+    const averageDwellTimePerPathSeconds = this.props.latestAnalyticsForCampaign.averageDwellTimePerPathSeconds || {};
 
     return (
       <div className="campaign-info campaign-box-section">
@@ -69,7 +91,15 @@ export default class CampaignPerformanceOverview extends React.Component {
               </div>
             </label>
             <span className="campaign-info__field__value">{ medianAttentionTime ? `${medianAttentionTime} seconds` : "not available" }</span>
-
+          </div>
+          <div className="campaign-info__field">
+            <label className={ R.isEmpty(averageDwellTimePerPathSeconds) ? "" : "hover" }>
+              Weighted average dwell time
+              <div className="hover-content">
+                <AverageDwellTimePerPath averageDwellTimePerPathSeconds={ averageDwellTimePerPathSeconds } />
+              </div>
+            </label>
+            <span className="campaign-info__field__value">{weightedAverageDwellTime ? `${weightedAverageDwellTime} seconds` : "none available"} </span>
           </div>
         </div>
       </div>

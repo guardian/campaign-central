@@ -10,4 +10,8 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.1")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
 
-addSbtPlugin("com.gu" % "sbt-riffraff-artifact" % "0.9.1")
+addSbtPlugin("com.gu" % "sbt-riffraff-artifact" % "0.9.7")
+
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC10")
+
+libraryDependencies += "org.vafer" % "jdeb" % "1.3" artifacts (Artifact("jdeb", "jar", "jar"))

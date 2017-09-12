@@ -30,19 +30,14 @@ Parameters:
     Type: List<AWS::EC2::Subnet::Id>
     Default: subnet-c2620fa7,subnet-2a37bd5d,subnet-2967c870
 
-  MachineImagesAMI:
-    Description: AMI id from the machine-images repo
+  AMI:
+    Description: AMIgo AMI id
     Type: AWS::EC2::Image::Id
 
   GuardianIP:
     Description: Ip range for the office
     Type: String
     Default: 77.91.248.0/21
-
-  GithubTeamName:
-    Description: Github team name, used for giving ssh access to members of the team.
-    Type: String
-    Default: Editorial-Tools-SSHAccess
 
   LogsKinesisStreamName:
     Description: The kinesis stream to send logs to
@@ -156,11 +151,11 @@ Resources:
           Action:
           - s3:GetObject
           Resource:
-          - arn:aws:s3:::github-team-keys/*
+          - arn:aws:s3:::github-public-keys/*
         - Effect: Allow
           Action:
           - s3:ListBucket
-          Resource: arn:aws:s3:::github-team-keys
+          Resource: arn:aws:s3:::github-public-keys
       Roles:
       - Ref: CampaignCentralRole
 
@@ -362,7 +357,7 @@ Resources:
       KeyName:
         Ref: KeyName
       ImageId:
-        Ref: MachineImagesAMI
+        Ref: AMI
       SecurityGroups:
       - Ref: AppServerSecurityGroup
       - Ref: SSHSecurityGroup
@@ -375,14 +370,7 @@ Resources:
         Ref: CampaignCentralInstanceProfile
       UserData:
         Fn::Base64:
-          Fn::Join:
-          - ''
-          - - "#!/bin/bash -ev\n"
-            - "/opt/features/gnm-ca/install.sh\n"
-            - Fn::Join:
-              - ''
-              - - "/opt/features/ssh-keys/initialise-keys-and-cron-job.sh -b github-team-keys
-                  -t "
-                - Ref: GithubTeamName
-                - " -l || true\n"
-            - "/opt/features/native-packager/install.sh -b composer-dist -t tgz -s\n"
+          Fn::Sub: |
+            #!/bin/bash -ev
+            aws s3 cp s3://composer-dist/flexible/${Stage}/campaign-central/campaign-central_1.0_all.deb /tmp/campaign-central.deb
+            dpkg -i /tmp/campaign-central.deb

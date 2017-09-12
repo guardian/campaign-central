@@ -34,14 +34,28 @@ lazy val dependencies = Seq(
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaffArtifact)
+lazy val root = (project in file(".")).enablePlugins(PlayScala, SbtWeb, RiffRaffArtifact, JDebPackaging, SystemdPlugin)
   .settings(Defaults.coreDefaultSettings: _*)
   .settings(
+    javaOptions in Universal ++= Seq(
+      "-Dpidfile.path=/dev/null",
+      "-J-XX:MaxRAMFraction=2",
+      "-J-XX:InitialRAMFraction=2",
+      "-J-XX:MaxMetaspaceSize=500m",
+      "-J-XX:+UseConcMarkSweepGC",
+      "-J-XX:+PrintGCDetails",
+      "-J-XX:+PrintGCDateStamps",
+      s"-J-Xloggc:/var/log/${packageName.value}/gc.log"
+    ),
+    debianPackageDependencies := Seq("openjdk-8-jre-headless"),
+    maintainer := "Commercial Dev Team <commercial.dev@theguardian.com>",
+    packageSummary := description.value,
+    packageDescription := description.value,
     playDefaultPort := 2267,
     packageName in Universal := normalizedName.value,
     name in Universal := normalizedName.value,
     topLevelDirectory in Universal := Some(normalizedName.value),
-    riffRaffPackageType := (packageZipTarball in config("universal")).value,
+    riffRaffPackageType := (packageBin in Debian).value,
     riffRaffBuildIdentifier := Option(System.getenv("CIRCLE_BUILD_NUM")).getOrElse("DEV"),
     riffRaffUploadArtifactBucket := Option("riffraff-artifact"),
     riffRaffUploadManifestBucket := Option("riffraff-builds"),
