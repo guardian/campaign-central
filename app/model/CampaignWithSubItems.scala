@@ -6,8 +6,7 @@ import play.api.libs.json.Format
 
 case class CampaignWithSubItems(
                                  campaign: Campaign,
-                                 content: List[ContentItem] = Nil,
-                                 notes: List[Note] = Nil
+                                 content: List[ContentItem] = Nil
                                )
 
 object CampaignWithSubItems {

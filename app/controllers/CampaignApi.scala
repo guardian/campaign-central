@@ -5,7 +5,6 @@ import model._
 import model.command.CommandError._
 import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import model.reports._
-import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json._
 import play.api.libs.json._
@@ -44,7 +43,6 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   def deleteCampaign(id: String) = authAction { _ =>
-    CampaignNotesRepository.deleteNotesForCampaign(id)
     CampaignContentRepository.deleteContentForCampaign(id)
     CampaignRepository.deleteCampaign(id)
     NoContent
@@ -86,59 +84,6 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
 
   def getCampaignContent(id: String) = authAction { _ =>
     Ok(Json.toJson(CampaignContentRepository.getContentForCampaign(id)))
-  }
-
-  def getCampaignNotes(id: String) = authAction { _ =>
-    Ok(Json.toJson(CampaignNotesRepository.getNotesForCampaign(id)))
-  }
-
-  def addCampaignNote(id: String) = authAction { req =>
-    val content = (req.body.asJson.get \ "content").as[String]
-
-    if (content.isEmpty)
-      BadRequest("Cannot add a note with no content")
-    else {
-      val created        = DateTime.now()
-      val lastModified   = created
-      val createdBy      = User(req.user)
-      val lastModifiedBy = createdBy
-
-      val newNote = Note(
-        campaignId = id,
-        created = created,
-        createdBy = createdBy,
-        lastModified = lastModified,
-        lastModifiedBy = lastModifiedBy,
-        content = content
-      )
-
-      CampaignNotesRepository.putNote(newNote)
-      Ok(Json.toJson(newNote))
-    }
-  }
-
-  def updateCampaignNote(id: String, date: String): Action[AnyContent] = {
-
-    authAction { req =>
-      val dateCreated = new DateTime(date.toLong)
-
-      CampaignNotesRepository.getNote(id, dateCreated) match {
-        case None => NotFound
-        case Some(note) =>
-          val lastModified = DateTime.now()
-          val modifiedBy   = User(req.user)
-          val content      = (req.body.asJson.get \ "content").as[String]
-
-          val updatedNote = note.copy(
-            lastModified = lastModified,
-            lastModifiedBy = modifiedBy,
-            content = content
-          )
-
-          CampaignNotesRepository.putNote(updatedNote)
-          Ok(Json.toJson(updatedNote))
-      }
-    }
   }
 
   def importFromTag() = authAction { req =>

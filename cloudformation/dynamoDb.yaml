@@ -8,7 +8,6 @@ Parameters:
     Type: String
     AllowedValues:
     - PROD
-    - CODE
     - DEV
 
 Resources:

@@ -10,13 +10,12 @@ import scala.collection.JavaConversions._
 
 object Config extends AwsInstanceTags {
 
-  lazy val conf: Config = readTag("Stage") match {
+  lazy val conf = readTag("Stage") match {
     case Some("PROD") => new ProdConfig
-    case Some("CODE") => new CodeConfig
     case _            => new DevConfig
   }
 
-  def apply(): Config = {
+  def apply() = {
     conf
   }
 }
@@ -25,10 +24,10 @@ sealed trait Config {
 
   def stage: String
 
-  def googleAuthClientId: String     = getRequiredRemoteStringProperty("googleauth.client.id")
-  def googleAuthClientSecret: String = getRequiredRemoteStringProperty("googleauth.client.secret")
-  def googleAuthRedirectUrl: String  = getRequiredRemoteStringProperty("googleauth.redirect.url")
-  def googleAuthDomain: String       = getRequiredRemoteStringProperty("googleauth.domain")
+  def googleAuthClientId     = getRequiredRemoteStringProperty("googleauth.client.id")
+  def googleAuthClientSecret = getRequiredRemoteStringProperty("googleauth.client.secret")
+  def googleAuthRedirectUrl  = getRequiredRemoteStringProperty("googleauth.redirect.url")
+  def googleAuthDomain       = getRequiredRemoteStringProperty("googleauth.domain")
 
   def logShippingStreamName: Option[String] = None
 
@@ -57,17 +56,17 @@ sealed trait Config {
 
   private lazy val stack              = readTag("Stack") getOrElse "flexible"
   private lazy val app                = readTag("App") getOrElse "campaign-central"
-  private lazy val remoteConfigBucket = s"guconf-$stack"
+  private lazy val remoteConfigBucket = s"guconf-${stack}"
 
   private val remoteConfiguration: Map[String, String] = loadRemoteConfiguration
 
-  lazy val googleAnalyticsViewId: String      = getRequiredRemoteStringProperty("googleAnalytivsViewId")
-  lazy val googleAnalyticsGlabsViewId: String = getRequiredRemoteStringProperty("googleAnalytivsGlabsViewId")
+  lazy val googleAnalyticsViewId      = getRequiredRemoteStringProperty("googleAnalytivsViewId")
+  lazy val googleAnalyticsGlabsViewId = getRequiredRemoteStringProperty("googleAnalytivsGlabsViewId")
 
-  lazy val capiKey: String             = getRequiredRemoteStringProperty("capi.key")
-  lazy val capiPreviewUrl: String      = getRequiredRemoteStringProperty("capi.preview.url")
-  lazy val capiPreviewUser: String     = getRequiredRemoteStringProperty("capi.preview.username")
-  lazy val capiPreviewPassword: String = getRequiredRemoteStringProperty("capi.preview.password")
+  lazy val capiKey             = getRequiredRemoteStringProperty("capi.key")
+  lazy val capiPreviewUrl      = getRequiredRemoteStringProperty("capi.preview.url")
+  lazy val capiPreviewUser     = getRequiredRemoteStringProperty("capi.preview.username")
+  lazy val capiPreviewPassword = getRequiredRemoteStringProperty("capi.preview.password")
 
   def googleServiceAccountJsonInputStream: InputStream = {
     val jsonLocation    = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
@@ -103,11 +102,9 @@ sealed trait Config {
 }
 
 class DevConfig extends Config {
-
   override def stage = "DEV"
 
   override def logShippingStreamName = Some("elk-CODE-KinesisStream-M03ERGK5PVD9")
-
   override def tagManagerApiUrl  = "https://tagmanager.code.dev-gutools.co.uk"
   override def composerUrl       = "https://composer.local.dev-gutools.co.uk"
   override def liveUrl           = "https://www.theguardian.com"
@@ -116,24 +113,10 @@ class DevConfig extends Config {
   override def ctaAtomMakerUrl   = "https://cta-atom-maker.local.dev-gutools.co.uk"
 }
 
-class CodeConfig extends Config {
-  override def stage = "CODE"
-
-  override def logShippingStreamName = Some("elk-PROD-KinesisStream-1PYU4KS1UEQA")
-
-  override def tagManagerApiUrl  = "https://tagmanager.code.dev-gutools.co.uk"
-  override def composerUrl       = "https://composer.code.dev-gutools.co.uk"
-  override def liveUrl           = "http://m.code.dev-theguardian.com"
-  override def previewUrl        = "https://viewer.code.dev-gutools.co.uk/preview"
-  override def mediaAtomMakerUrl = "https://video.code.dev-gutools.co.uk"
-  override def ctaAtomMakerUrl   = "https://cta-atom-maker.code.dev-gutools.co.uk"
-}
-
 class ProdConfig extends Config {
   override def stage = "PROD"
 
   override def logShippingStreamName = Some("elk-PROD-KinesisStream-1PYU4KS1UEQA")
-
   override def tagManagerApiUrl  = "https://tagmanager.gutools.co.uk"
   override def composerUrl       = "https://composer.gutools.co.uk"
   override def liveUrl           = "https://www.theguardian.com"
