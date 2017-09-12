@@ -7,7 +7,7 @@ class CapiImport extends Component {
 
   static contextTypes = {
     router: React.PropTypes.object.isRequired
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -51,28 +51,19 @@ class CapiImport extends Component {
 
     const isCampaignValueSet = this.state.campaignValue && this.state.campaignValue > 0;
     const isUniquesTargetSet = this.state.uniquesTarget && this.state.uniquesTarget > 0;
-    const isPageviewsTargetSet = this.state.pageviewsTarget && this.state.pageviewsTarget > 0;
     const selectedTag = this.state.selectedTag;
 
+    const payload = {
+      tag: this.state.selectedTag,
+      campaignValue: this.state.campaignValue,
+      uniquesTarget: this.state.uniquesTarget,
+      pageviewTarget: this.state.pageviewsTarget
+    };
 
     if (isCampaignValueSet && isUniquesTargetSet && selectedTag) {
       this.setState({importing: true});
 
-      importCampaignFromTag(selectedTag).then((campaign) => {
-
-        let updatedTargets = undefined;
-
-        if (isPageviewsTargetSet) {
-          updatedTargets = Object.assign({}, campaign.targets, { ['uniques']: this.state.uniquesTarget, ['pageviews']: this.state.pageviewsTarget });
-        } else {
-          updatedTargets = Object.assign({}, campaign.targets, { ['uniques']: this.state.uniquesTarget });
-        }
-
-        this.props.updateCampaign(Object.assign({}, campaign, {
-          actualValue: this.state.campaignValue,
-          targets: updatedTargets
-        }));
-
+      importCampaignFromTag(payload).then((campaign) => {
         this.setState({importing: false});
         this.context.router.push('/campaign/' + campaign.id);
       }).catch((error) => {
@@ -87,42 +78,34 @@ class CapiImport extends Component {
     }
   };
 
-  validateNumericInput = (value, errorState, successState) => {
-    const numValue = parseInt(value);
+  validateState = () => {
+    const errors = ['campaignValue', 'uniquesTarget', 'pageviewsTarget'].reduce((errorsAccum, dataToCheck) => {
+      const value = this.state[dataToCheck];
+      if (value !== undefined && isNaN(value)) {
+        errorsAccum.push(`${dataToCheck} value has to be a number!`);
+      }
 
-    if (!value) {
-      this.setState({error: ''});
-    } else if (isNaN(numValue) || numValue != value) {
-      this.setState(errorState);
+      return errorsAccum;
+    }, []);
+
+    if (errors.length > 0) {
+      this.setState({error: errors[0]});
     } else {
-      this.setState(successState);
+      this.setState({error: ''});
     }
-
   };
 
-  onCampaignValueChange = (e) => {
-    const campaignValue = e.target.value;
-    const successState = { error: '', campaignValue: campaignValue };
-    const errorState = { error: 'Campaign value has to be a number!' };
+  onInputChange = (keyName, event) => {
+    const newValue = event.target.value;
 
-    this.validateNumericInput(campaignValue, errorState, successState);
+    if (newValue === '' || newValue === undefined) {
+      this.setState({[keyName]: undefined}, this.validateState);
+    } else if (newValue) {
+      const valueAsInt = Number(newValue);
+      this.setState({[keyName]: valueAsInt}, this.validateState);
+    }
   };
 
-  onPageviewsTargetChange = (e) => {
-    const pageviewsTarget = e.target.value;
-    const successState = { error: '', pageviewsTarget: pageviewsTarget };
-    const errorState = { error: 'Pageviews target value has to be a number!' };
-
-    this.validateNumericInput(pageviewsTarget, errorState, successState);
-  };
-
-  onUniquesTargetChange = (e) => {
-    const uniquesTarget = e.target.value;
-    const successState = { error: '', uniquesTarget: uniquesTarget };
-    const errorState = { error: 'Uniques target value has to be a number!' };
-
-    this.validateNumericInput(uniquesTarget, errorState, successState);
-  };
 
   performSearch(searchTerm) {
     const searchParams = {query: searchTerm || this.state.searchTerm};
@@ -157,7 +140,7 @@ class CapiImport extends Component {
       return(<ProgressSpinner />);
     }
     return;
-  }
+  };
 
   render() {
 
@@ -168,19 +151,19 @@ class CapiImport extends Component {
           <fieldset>
             <div className="pure-control-group">
               <label htmlFor="name">Campaign Value (£)</label>
-              <input id="name" type="text" placeholder="" onChange={this.onCampaignValueChange} />
+              <input id="name" type="text" autoComplete="off" placeholder="" onChange={this.onInputChange.bind(this, 'campaignValue')} />
                 <span className="pure-form-message-inline">required</span>
             </div>
 
             <div className="pure-control-group">
               <label htmlFor="name">Uniques Target</label>
-              <input id="name" type="text" placeholder="" onChange={this.onUniquesTargetChange} />
+              <input id="name" type="text" autoComplete="off" placeholder="" onChange={this.onInputChange.bind(this, 'uniquesTarget')} />
               <span className="pure-form-message-inline">required</span>
             </div>
 
             <div className="pure-control-group">
               <label htmlFor="name">Pageviews Target</label>
-              <input id="name" type="text" placeholder="" onChange={this.onPageviewsTargetChange}/>
+              <input id="name" type="text" autoComplete="off" placeholder="" onChange={this.onInputChange.bind(this, 'pageviewsTarget')}/>
               <span className="pure-form-message-inline">optional</span>
             </div>
 

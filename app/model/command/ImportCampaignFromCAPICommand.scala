@@ -98,10 +98,17 @@ trait CAPIImportCommand extends Command {
 
 }
 
+case class ImportTag(id: Long, externalName: String, section: Section)
+
+object ImportTag {
+  implicit val importTagFormat: Format[ImportTag] = Jsonx.formatCaseClass[ImportTag]
+}
+
 case class ImportCampaignFromCAPICommand(
-                                        id: Long,
-                                        externalName: String,
-                                        section: Section
+                                        tag: ImportTag,
+                                        campaignValue: Long,
+                                        uniquesTarget: Long,
+                                        pageviewTarget: Option[Long]
                                         ) extends CAPIImportCommand {
 
 
@@ -120,38 +127,38 @@ case class ImportCampaignFromCAPICommand(
   }
 
   override def process()(implicit user: Option[User]): Either[CommandError, Option[Campaign]] = {
-    Logger.info(s"importing campaign from tag $externalName")
+    Logger.info(s"importing campaign from tag ${tag.externalName}")
 
     val userOrDefault = user getOrElse User("CAPI", "importer", "labs.beta@guardian.co.uk")
     val now = DateTime.now
 
-    val apiContent = ContentApi.loadAllContentInSection(section.pathPrefix)
+    val apiContent = ContentApi.loadAllContentInSection(tag.section.pathPrefix)
     deriveHostedTagFromContent(apiContent).toRight(CampaignTagNotFound).right map { hostedTag =>
 
-      val sponsorship = TagManagerApi.getSponsorshipForTag(id)
+      val sponsorship = TagManagerApi.getSponsorshipForTag(tag.id)
 
       val campaignType = hostedTag.paidContentType match {
         case Some("HostedContent") => "hosted"
         case Some(_) => "paidContent"
         case None => InvalidCampaignTagType
       }
-
-      val campaign = CampaignRepository.getCampaignByTag(id) getOrElse {
+      
+      val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
         Campaign(
           id = UUID.randomUUID().toString,
-          name = externalName,
+          name = tag.externalName,
           `type` = campaignType,
           status = "pending",
-          tagId = Some(id),
-          pathPrefix = Some(section.pathPrefix),
+          tagId = Some(tag.id),
+          pathPrefix = Some(tag.section.pathPrefix),
           clientId = findOrCreateClient(sponsorship).id,
           created = now,
           createdBy = userOrDefault,
           lastModified = now,
           lastModifiedBy = userOrDefault,
-          nominalValue = Some(10000),         // default targets and values
-          actualValue = Some(10000),          // these will be set in the UI manually
-          targets = Map("uniques" -> 10000L)
+          nominalValue = None,                        // default targets and values
+          actualValue = Some(campaignValue),          // these will be set in the UI manually
+          targets = (Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _)).toMap
         )
       }
 
