@@ -9,7 +9,7 @@ import play.api.libs.json.JodaReads._
 import play.api.libs.json.JodaWrites._
 import repositories._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContextExecutor, Future}
 
 case class DailyUniqueUserEntry(date: DateTime, uniqueUsers: Long, cumulativeUniqueUsers: Long)
 
@@ -18,8 +18,8 @@ object DailyUniqueUserEntry{
 }
 
 case class DailyUniqueUsersReport(campaignId: String, dailyUniqueUsers: List[DailyUniqueUserEntry]) {
-  def refresh = {
-    val refreshed = for (
+  def refresh(): Unit = {
+    val refreshed: Unit = for (
       campaign <- CampaignRepository.getCampaign(campaignId);
       lastData <- dailyUniqueUsers.lastOption
     ) {
@@ -41,45 +41,40 @@ case class DailyUniqueUsersReport(campaignId: String, dailyUniqueUsers: List[Dai
   def addDayCounts(date: DateTime, dailyUniqueCount: Long): DailyUniqueUsersReport = {
 
     dailyUniqueUsers.lastOption match{
-      case Some(latest) => {
+      case Some(latest) =>
         val newData = DailyUniqueUserEntry(date, dailyUniqueCount, latest.cumulativeUniqueUsers + dailyUniqueCount)
         DailyUniqueUsersReport(campaignId, dailyUniqueUsers :+ newData)
-      }
-      case None => {
+      case None =>
         val newData = DailyUniqueUserEntry(date, dailyUniqueCount, dailyUniqueCount)
         DailyUniqueUsersReport(campaignId, List(newData))
-      }
     }
   }
 }
 
 object DailyUniqueUsersReport {
 
-  implicit val ec = AnalyticsDataCache.analyticsExecutionContext
+  implicit val ec: ExecutionContextExecutor = AnalyticsDataCache.analyticsExecutionContext
 
   implicit val dailyUniqueUsersReportFormat: Format[DailyUniqueUsersReport] = Jsonx.formatCaseClass[DailyUniqueUsersReport]
 
   def getDailyUniqueUsersReport(campaignId: String): Option[DailyUniqueUsersReport] = {
 
     AnalyticsDataCache.getDailyUniqueUsersReport(campaignId) match {
-      case Hit(report) => {
+      case Hit(report) =>
         Logger.debug(s"getting daily unique users report for campaign $campaignId - cache hit")
         Some(report)
-      }
-      case Stale(report) => {
+      case Stale(report) =>
         Logger.debug(s"getting daily unique users report for campaign $campaignId - cache stale spawning async refresh")
 
         Future{
           Logger.debug(s"async refresh of daily unique users report for campaign $campaignId")
-          report.refresh
+          report.refresh()
         } // serve stale but spawn refresh future
         Some(report)
-      }
-      case Miss => {
+      case Miss =>
         Logger.debug(s"getting daily unique users report for campaign $campaignId - cache miss fetching sync")
 
         generateReport(campaignId)
-      }
     }
   }
 
@@ -105,11 +100,11 @@ object DailyUniqueUsersReport {
     }
   }
 
-  def loadCampaignDailyUniquesForDay(campaign: Campaign, date: DateTime) = {
+  def loadCampaignDailyUniquesForDay(campaign: Campaign, date: DateTime): (DateTime, Long) = {
     val dailyCount = if (campaign.`type` == "hosted") {
       campaign.gaFilterExpression.map(GoogleAnalytics.loadUniqueUsersDay(_, date))
     } else {
-      campaign.pathPrefix.map{ section => GoogleAnalytics.loadUniqueUsersDay(s"ga:dimension4==${section}", date)}
+      campaign.pathPrefix.map{ section => GoogleAnalytics.loadUniqueUsersDay(s"ga:dimension4==$section", date)}
     }
 
     date -> dailyCount.getOrElse(0L)
