@@ -39,8 +39,8 @@ object CampaignService {
         latest.pageviews,
         latest.medianAttentionTimeSeconds,
         latest.medianAttentionTimeByDevice.map(normaliseDeviceData),
-        latest.weightedAverageDwellTimeForCampaign.to2Dp,
-        latest.averageDwellTimePerPathSeconds.mapValues(_.to2Dp)
+        latest.weightedAverageDwellTimeForCampaign.map(_.to2Dp),
+        latest.averageDwellTimePerPathSeconds.map(_.mapValues(_.to2Dp))
       )
 
     }
@@ -68,8 +68,8 @@ object CampaignService {
             uniquesTarget, latest.pageviews,
             latest.medianAttentionTimeSeconds,
             latest.medianAttentionTimeByDevice.map(normaliseDeviceData),
-            latest.weightedAverageDwellTimeForCampaign.to2Dp,
-            latest.averageDwellTimePerPathSeconds.mapValues(_.to2Dp)
+            latest.weightedAverageDwellTimeForCampaign.map(_.to2Dp),
+            latest.averageDwellTimePerPathSeconds.map(_.mapValues(_.to2Dp))
           )
       }
     }
