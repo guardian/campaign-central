@@ -7,7 +7,7 @@ class CapiImport extends Component {
 
   static contextTypes = {
     router: React.PropTypes.object.isRequired
-  }
+  };
 
   constructor(props) {
     super(props);
