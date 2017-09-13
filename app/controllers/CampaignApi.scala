@@ -1,10 +1,9 @@
 package controllers
 
 import model._
-import model.command.CommandError._
-import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
+import model.command.{CampaignNotFound, ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand, RefreshCampaignSuccess}
 import model.reports._
-import org.joda.time.{DateTime, _}
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json._
 import play.api.libs.json._
@@ -139,10 +138,10 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
     implicit val user = Option(User(req.user))
     req.body.asJson map { json =>
       json.as[ImportCampaignFromCAPICommand].process() match {
-        case Left(e) =>
-          commandErrorAsResult(e)
+        case Left(_) =>
+          InternalServerError
         case Right(campaign) =>
-          campaign map (t => Ok(Json.toJson(t))) getOrElse NotFound
+          Ok(Json.toJson(campaign))
       }
     } getOrElse {
       BadRequest("Expecting Json data")
@@ -150,12 +149,10 @@ class CampaignApi(override val wsClient: WSClient, components: ControllerCompone
   }
 
   def refreshCampaignFromCAPI(campaignId: String) = APIAuthAction { req =>
-    implicit val user = Option(User(req.user))
     RefreshCampaignFromCAPICommand(campaignId).process() match {
-      case Left(e) =>
-        commandErrorAsResult(e)
-      case Right(campaign) =>
-        campaign map (t => Ok(Json.toJson(t))) getOrElse NotFound
+      case Right(RefreshCampaignSuccess(campaign)) => Ok(Json.toJson(campaign))
+      case Left(CampaignNotFound(message)) => NotFound(message)
+      case Left(_) => InternalServerError
     }
   }
 

@@ -1,15 +1,21 @@
 package model.command
 
-import model.Client
+import model.{Campaign, Client, ContentItem}
 import play.api.mvc.{Result, Results}
+
+sealed trait CampaignCentralApiError
+case class CampaignNotFound(message: String) extends CampaignCentralApiError
+case class ContentItemFailedToPersist(contentItem: ContentItem, exception: Throwable) extends CampaignCentralApiError
+case class CampaignDeletionFailed(campaignId: String, exception: Throwable) extends CampaignCentralApiError
+case class CampaignItemDeletionFailed(campaignId: String, exception: Throwable) extends CampaignCentralApiError
+case class CampaignPutError(campaign: Campaign, exception: Throwable) extends CampaignCentralApiError
+case class CampaignTagNotFound(id: Long, externalName: String) extends CampaignCentralApiError
 
 case class CommandError(message: String, responseCode: Int) extends RuntimeException(message)
 
 object CommandError extends Results {
 
-  def CampaignTagNotFound = new CommandError("campaign tag not found", 400)
   def InvalidCampaignTagType = throw new CommandError("campaign tag was not expected type", 400)
-  def CampaignNotFound = throw new CommandError("campaign not found", 404)
   def CampaignMissingData(field: String) = throw new CommandError(s"campaign missing required field $field", 400)
   def SponsorNameNotFound = throw new CommandError("unable to find a sponsor name", 400)
   def UnableToDetermineContentType = throw new CommandError("unable to find a determine content's type", 400)

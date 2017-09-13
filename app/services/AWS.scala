@@ -3,7 +3,7 @@ package services
 import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient
+import com.amazonaws.services.dynamodbv2._
 import com.amazonaws.services.dynamodbv2.document.DynamoDB
 import com.amazonaws.services.ec2.AmazonEC2Client
 import com.amazonaws.services.ec2.model.{DescribeTagsRequest, Filter}
@@ -34,7 +34,13 @@ object AWS {
   def credentialsProvider = creds
 
   lazy val EC2Client = region.createClient(classOf[AmazonEC2Client], creds, null)
-  lazy val DynamoClient = AWS.region.createClient(classOf[AmazonDynamoDBClient], creds, null)
+
+  lazy val DynamoClient: AmazonDynamoDB = AmazonDynamoDBClientBuilder
+    .standard()
+    .withRegion(Regions.EU_WEST_1)
+    .withCredentials(creds)
+    .build()
+
   lazy val S3Client  = region.createClient(classOf[AmazonS3Client], creds, null)
 
 }
