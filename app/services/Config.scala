@@ -105,22 +105,22 @@ class DevConfig extends Config {
   override def stage = "DEV"
 
   override def logShippingStreamName = Some("elk-CODE-KinesisStream-M03ERGK5PVD9")
-  override def tagManagerApiUrl  = "https://tagmanager.code.dev-gutools.co.uk"
-  override def composerUrl       = "https://composer.local.dev-gutools.co.uk"
-  override def liveUrl           = "https://www.theguardian.com"
-  override def previewUrl        = "https://viewer.gutools.co.uk/preview"
-  override def mediaAtomMakerUrl = "https://video.local.dev-gutools.co.uk"
-  override def ctaAtomMakerUrl   = "https://cta-atom-maker.local.dev-gutools.co.uk"
+  override def tagManagerApiUrl      = "https://tagmanager.code.dev-gutools.co.uk"
+  override def composerUrl           = "https://composer.local.dev-gutools.co.uk"
+  override def liveUrl               = "https://www.theguardian.com"
+  override def previewUrl            = "https://viewer.gutools.co.uk/preview"
+  override def mediaAtomMakerUrl     = "https://video.local.dev-gutools.co.uk"
+  override def ctaAtomMakerUrl       = "https://cta-atom-maker.local.dev-gutools.co.uk"
 }
 
 class ProdConfig extends Config {
   override def stage = "PROD"
 
   override def logShippingStreamName = Some("elk-PROD-KinesisStream-1PYU4KS1UEQA")
-  override def tagManagerApiUrl  = "https://tagmanager.gutools.co.uk"
-  override def composerUrl       = "https://composer.gutools.co.uk"
-  override def liveUrl           = "https://www.theguardian.com"
-  override def previewUrl        = "https://viewer.gutools.co.uk/preview"
-  override def mediaAtomMakerUrl = "https://video.gutools.co.uk"
-  override def ctaAtomMakerUrl   = "https://cta-atom-maker.gutools.co.uk"
+  override def tagManagerApiUrl      = "https://tagmanager.gutools.co.uk"
+  override def composerUrl           = "https://composer.gutools.co.uk"
+  override def liveUrl               = "https://www.theguardian.com"
+  override def previewUrl            = "https://viewer.gutools.co.uk/preview"
+  override def mediaAtomMakerUrl     = "https://video.gutools.co.uk"
+  override def ctaAtomMakerUrl       = "https://cta-atom-maker.gutools.co.uk"
 }

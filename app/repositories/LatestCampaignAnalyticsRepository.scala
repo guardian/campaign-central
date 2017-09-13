@@ -11,7 +11,11 @@ object LatestCampaignAnalyticsRepository {
   }
 
   def getLatestCampaignAnalytics(campaignId: String): Option[LatestCampaignAnalyticsItem] = {
-    Dynamo.latestCampaignAnalyticsTable.query("campaignId", campaignId).asScala.headOption.map(LatestCampaignAnalyticsItem.fromItem)
+    Dynamo.latestCampaignAnalyticsTable
+      .query("campaignId", campaignId)
+      .asScala
+      .headOption
+      .map(LatestCampaignAnalyticsItem.fromItem)
   }
 
 }

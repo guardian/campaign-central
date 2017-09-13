@@ -5,7 +5,6 @@ import java.util.zip.{GZIPInputStream, GZIPOutputStream}
 
 import org.apache.commons.io.IOUtils
 
-
 object Compression {
 
   def compress(data: String): Array[Byte] = {
@@ -19,8 +18,8 @@ object Compression {
   }
 
   def decompress(compressed: Array[Byte]): String = {
-    val bis = new ByteArrayInputStream(compressed);
-    val gis = new GZIPInputStream(bis);
+    val bis   = new ByteArrayInputStream(compressed);
+    val gis   = new GZIPInputStream(bis);
     val bytes = IOUtils.toByteArray(gis);
     return new String(bytes, "UTF-8");
   }

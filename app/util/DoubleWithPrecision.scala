@@ -5,4 +5,3 @@ object DoubleUtils {
     def to2Dp: Double = BigDecimal(value).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 }
-

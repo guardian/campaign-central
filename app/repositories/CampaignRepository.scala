@@ -10,19 +10,19 @@ import scala.collection.JavaConversions._
 object CampaignRepository {
 
   def getCampaign(campaignId: String) = {
-    Option(Dynamo.campaignTable.getItem("id", campaignId)).map{ Campaign.fromItem }
+    Option(Dynamo.campaignTable.getItem("id", campaignId)).map { Campaign.fromItem }
   }
 
   def getCampaignByTag(tagId: Long) = {
-    Dynamo.campaignTable.scan(new ScanFilter("tagId").eq(tagId)).headOption.map( Campaign.fromItem )
+    Dynamo.campaignTable.scan(new ScanFilter("tagId").eq(tagId)).headOption.map(Campaign.fromItem)
   }
 
   def getAllCampaigns() = {
-    Dynamo.campaignTable.scan().map{ Campaign.fromItem }.toList
+    Dynamo.campaignTable.scan().map { Campaign.fromItem }.toList
   }
 
   def getCampaignWithSubItems(campaignId: String) = {
-    val campaign = Option(Dynamo.campaignTable.getItem("id", campaignId)).map{ Campaign.fromItem }
+    val campaign = Option(Dynamo.campaignTable.getItem("id", campaignId)).map { Campaign.fromItem }
 
     campaign map { c =>
       CampaignWithSubItems(
