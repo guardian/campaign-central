@@ -3,9 +3,9 @@ package controllers
 import java.util.concurrent.Executors
 
 import com.gu.googleauth.AuthAction
+import model.User
 import model.command.RefreshCampaignFromCAPICommand
 import model.reports._
-import model.{TrafficDriverGroupStats, User}
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc.{AbstractController, AnyContent, ControllerComponents}
@@ -58,9 +58,6 @@ class ManagementApi(components: ControllerComponents, authAction: AuthAction[Any
       case "CampaignPageViewsReport" =>
         Logger.info(s"manually clearing CampaignPageViewsReport analytics for $key")
         Future { CampaignPageViewsReport.getCampaignPageViewsReport(key) }
-      case "TrafficDriverGroupStats" =>
-        Logger.info(s"manually clearing Traffic driver stats for $key")
-        Future { TrafficDriverGroupStats.forCampaign(key) }
       case "QualifiedPercentagesReport" =>
         Logger.info(s"manually clearing Qualified stats for $key")
         Future { QualifiedPercentagesReport.getQualifiedPercentagesReportForCampaign(key) }

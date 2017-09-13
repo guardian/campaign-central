@@ -1,8 +1,7 @@
 package repositories
 
 import com.amazonaws.services.dynamodbv2.document.ScanFilter
-import model.{Campaign, CampaignWithSubItems, Note}
-import org.joda.time.DateTime
+import model.{Campaign, CampaignWithSubItems}
 import play.api.Logger
 import services.Dynamo
 
@@ -28,8 +27,7 @@ object CampaignRepository {
     campaign map { c =>
       CampaignWithSubItems(
         campaign = c,
-        content = CampaignContentRepository.getContentForCampaign(c.id),
-        notes = CampaignNotesRepository.getNotesForCampaign(c.id)
+        content = CampaignContentRepository.getContentForCampaign(c.id)
       )
     }
   }

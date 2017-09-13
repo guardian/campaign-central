@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import CampaignInformationEdit from './CampaignInformationEdit';
 import CampaignTargetsEdit from './CampaignTargetsEdit';
-import CampaignNotes from '../CampaignNotes/CampaignNotes';
 import CampaignPerformanceOverview from '../CampaignPerformanceOverview/CampaignPerformanceOverview';
 
 class CampaignEdit extends React.Component {
@@ -56,8 +55,6 @@ class CampaignEdit extends React.Component {
           </div>
           <div className="campaign__column">
             <CampaignTargetsEdit campaign={this.props.campaign} updateCampaign={this.triggerUpdate} />
-            <br/>
-            <CampaignNotes campaign={this.props.campaign} />
           </div>
         </div>
         {this.renderSaveButtons()}

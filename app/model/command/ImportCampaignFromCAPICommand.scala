@@ -112,20 +112,6 @@ case class ImportCampaignFromCAPICommand(
                                         ) extends CAPIImportCommand {
 
 
-
-  def findOrCreateClient(sponsorship: Option[Sponsorship]): Client = {
-    val sponsorName = sponsorship.map(_.sponsorName) getOrElse SponsorNameNotFound
-    ClientRepository.getClientByName(sponsorName) getOrElse {
-      val client = Client(
-        id = UUID.randomUUID().toString,
-        name = sponsorName,
-        country = "UK", // default country and agency, these can be manually
-        agency = None // updated later
-      )
-      ClientRepository.putClient(client) getOrElse FailedToSaveClient(client)
-    }
-  }
-
   override def process()(implicit user: Option[User]): Either[CommandError, Option[Campaign]] = {
     Logger.info(s"importing campaign from tag ${tag.externalName}")
 
@@ -142,7 +128,7 @@ case class ImportCampaignFromCAPICommand(
         case Some(_) => "paidContent"
         case None => InvalidCampaignTagType
       }
-      
+
       val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
         Campaign(
           id = UUID.randomUUID().toString,
@@ -151,7 +137,6 @@ case class ImportCampaignFromCAPICommand(
           status = "pending",
           tagId = Some(tag.id),
           pathPrefix = Some(tag.section.pathPrefix),
-          clientId = findOrCreateClient(sponsorship).id,
           created = now,
           createdBy = userOrDefault,
           lastModified = now,
