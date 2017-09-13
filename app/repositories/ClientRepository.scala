@@ -11,15 +11,15 @@ import scala.util.Random
 object ClientRepository {
 
   def getClient(clientId: String) = {
-    Option(Dynamo.clientTable.getItem("id", clientId)).map { Client.fromItem }
+    Option(Dynamo.clientTable.getItem("id", clientId)).map{ Client.fromItem }
   }
 
   def getClientByName(clientName: String): Option[Client] = {
-    Dynamo.clientTable.scan(new ScanFilter("name").eq(clientName)).headOption.map { Client.fromItem }
+    Dynamo.clientTable.scan(new ScanFilter("name").eq(clientName)).headOption.map{ Client.fromItem }
   }
 
   def getAllClients() = {
-    Dynamo.clientTable.scan().map { Client.fromItem }.toList
+    Dynamo.clientTable.scan().map{ Client.fromItem }.toList
   }
 
   def putClient(client: Client) = {

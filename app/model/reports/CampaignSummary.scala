@@ -9,7 +9,7 @@ import repositories.{AnalyticsDataCache, Hit, Miss, Stale}
 
 case class CampaignSummary(totalUniques: Long, targetToDate: Long)
 
-object CampaignSummary {
+object CampaignSummary{
 
   implicit val campaignSummaryFormat: Format[CampaignSummary] = Jsonx.formatCaseClass[CampaignSummary]
 
@@ -31,25 +31,25 @@ object CampaignSummary {
   }
 
   def storeLatestUniquesForCampaign(campaign: Campaign, latestUniquesOption: Option[DailyUniqueUserEntry]) = {
-    latestUniquesOption.foreach { latestUniques =>
+    latestUniquesOption.foreach{ latestUniques =>
       val targetToDate = calculateTargetToDate(campaign, latestUniques.date)
-      val summary      = CampaignSummary(latestUniques.cumulativeUniqueUsers, targetToDate)
+      val summary = CampaignSummary(latestUniques.cumulativeUniqueUsers, targetToDate)
 
-      AnalyticsDataCache.putCampaignSummary(campaign.id,
-                                            summary,
-                                            AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
+      AnalyticsDataCache.putCampaignSummary(campaign.id, summary, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
 
       OverallSummaryReport.storeLatestUniquesForCampaign(campaign.id, summary)
     }
   }
 
   def calculateTargetToDate(campaign: Campaign, date: DateTime): Long = {
-    val targetToDate = for (startDate <- campaign.startDate;
-                            endDate      <- campaign.endDate;
-                            uniqueTarget <- campaign.targets.get("uniques")) yield {
+    val targetToDate = for (
+      startDate <- campaign.startDate;
+      endDate <- campaign.endDate;
+      uniqueTarget <- campaign.targets.get("uniques")
+    ) yield {
 
       val campaignLength = new Duration(startDate, endDate).getStandardDays
-      val daysIn         = new Duration(startDate, date).getStandardDays
+      val daysIn = new Duration(startDate, date).getStandardDays
 
       val dailyRunRate = uniqueTarget.toDouble / campaignLength
 

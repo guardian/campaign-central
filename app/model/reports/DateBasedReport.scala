@@ -8,10 +8,10 @@ object DateBasedReport {
 
   def calculateDatesToFetch(startDate: DateTime, campaignEndDate: Option[DateTime]): List[DateTime] = {
 
-    val sd      = if (startDate.isBefore(GA_SWITCH_ON_DATE)) GA_SWITCH_ON_DATE else startDate
-    val endDate = campaignEndDate.map(_.plusDays(1)).find(_.isBeforeNow) getOrElse (DateTime.now)
+    val sd = if(startDate.isBefore(GA_SWITCH_ON_DATE)) GA_SWITCH_ON_DATE else startDate
+    val endDate = campaignEndDate.map(_.plusDays(1)).find(_.isBeforeNow) getOrElse(DateTime.now)
 
-    var date   = sd.withTimeAtStartOfDay()
+    var date = sd.withTimeAtStartOfDay()
     val endDay = endDate.withTimeAtStartOfDay()
 
     var daysInRange: List[DateTime] = Nil

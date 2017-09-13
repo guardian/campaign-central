@@ -5,6 +5,7 @@ import play.api.Logger
 import play.api.libs.json.Format
 import repositories.{AnalyticsDataCache, Hit, Miss, Stale}
 
+
 case class OverallSummaryReport(summaries: Map[String, CampaignSummary]) {
   def storeLatestUniquesForCampaign(campaignId: String, summary: CampaignSummary) = {
     OverallSummaryReport(summaries + (campaignId -> summary))
@@ -32,7 +33,7 @@ object OverallSummaryReport {
   }
 
   def storeLatestUniquesForCampaign(campaignId: String, summary: CampaignSummary) = {
-    val report  = getOverallSummaryReport.getOrElse(OverallSummaryReport(Map()))
+    val report = getOverallSummaryReport.getOrElse(OverallSummaryReport(Map()))
     val updated = report.storeLatestUniquesForCampaign(campaignId: String, summary: CampaignSummary)
 
     AnalyticsDataCache.putOverallSummary(updated)

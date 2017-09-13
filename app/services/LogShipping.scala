@@ -12,10 +12,12 @@ object LogShipping extends AwsInstanceTags {
 
   def init(): Unit = {
     rootLogger.info("bootstrapping kinesis appender if configured correctly")
-    for (stack      <- readTag("Stack");
-         app        <- readTag("App");
-         stage      <- readTag("Stage");
-         streamName <- Config().logShippingStreamName) {
+    for (
+      stack <- readTag("Stack");
+      app <- readTag("App");
+      stage <- readTag("Stage");
+      streamName <- Config().logShippingStreamName
+    ) {
 
       Logger.info(s"bootstrapping kinesis appender with $stack -> $app -> $stage")
       val context = rootLogger.getLoggerContext
