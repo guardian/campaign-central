@@ -8,7 +8,6 @@ Parameters:
     Type: String
     AllowedValues:
     - PROD
-    - CODE
     - DEV
 
 Resources:
@@ -122,30 +121,6 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - analytics
-    DeletionPolicy: Retain
-
-  TrafficDriverRejectDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: campaignId
-        AttributeType: S
-      - AttributeName: lineItemId
-        AttributeType: N
-      KeySchema:
-      - AttributeName: campaignId
-        KeyType: HASH
-      - AttributeName: lineItemId
-        KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: '5'
-        WriteCapacityUnits: '5'
-      TableName:
-        Fn::Join:
-        - "-"
-        - - campaign-central
-          - Ref: Stage
-          - drivers-rejected
     DeletionPolicy: Retain
 
   CampaignUniquesDBTable:

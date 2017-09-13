@@ -18,10 +18,10 @@ object CampaignContentRepository {
     Dynamo.campaignContentTable.query("campaignId", campaignId).toList
 
   def getContentForCampaign(campaignId: String): List[ContentItem] =
-    getItemsForCampaignId(campaignId).map{ ContentItem.fromItem }
+    getItemsForCampaignId(campaignId).map { ContentItem.fromItem }
 
   def getContent(campaignId: String, id: String): Option[ContentItem] =
-    Option(Dynamo.campaignContentTable.getItem("campaignId", campaignId, "id", id)).map{ ContentItem.fromItem }
+    Option(Dynamo.campaignContentTable.getItem("campaignId", campaignId, "id", id)).map { ContentItem.fromItem }
 
   def deleteContentForCampaign(campaignId: String): Either[CampaignCentralApiError, DeleteCampaignContentResult] = {
     Try[List[DeleteItemOutcome]] {
