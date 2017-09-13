@@ -39,7 +39,6 @@ sealed trait Config {
 
   def analyticsDataCacheTableName = s"campaign-central-$stage-analytics"
 
-  def trafficDriverRejectTableName     = s"campaign-central-$stage-drivers-rejected"
   def campaignPageviewsTableName       = s"campaign-central-$stage-campaign-page-views"
   def campaignUniquesTableName         = s"campaign-central-$stage-campaign-uniques"
   def latestCampaignAnalyticsTableName = s"campaign-central-$stage-analytics-latest"
@@ -68,15 +67,6 @@ sealed trait Config {
   lazy val capiPreviewUrl      = getRequiredRemoteStringProperty("capi.preview.url")
   lazy val capiPreviewUser     = getRequiredRemoteStringProperty("capi.preview.username")
   lazy val capiPreviewPassword = getRequiredRemoteStringProperty("capi.preview.password")
-
-  val dfpAppName           = "Campaign Central"
-  lazy val dfpClientId     = getRequiredRemoteStringProperty("dfp.client.id")
-  lazy val dfpClientSecret = getRequiredRemoteStringProperty("dfp.client.secret")
-  lazy val dfpRefreshToken = getRequiredRemoteStringProperty("dfp.refresh.token")
-  def dfpNetworkCode: String
-  def dfpNativeCardOrderIds: Map[String, Seq[Long]]
-  def dfpMerchandisingOrderIds: Map[String, Seq[Long]]
-  def dfpCampaignFieldId: Long
 
   def googleServiceAccountJsonInputStream: InputStream = {
     val jsonLocation    = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
@@ -111,19 +101,6 @@ sealed trait Config {
   }
 }
 
-object StagingDfpProperties {
-  val dfpNetworkCode = "158186692"
-  val dfpNativeCardOrderIds = Map(
-    "hosted"      -> Seq(550773372L),
-    "paidContent" -> Seq(550773372L)
-  )
-  val dfpMerchandisingOrderIds = Map(
-    "hosted"      -> Seq(550774092L),
-    "paidContent" -> Seq(550774092L)
-  )
-  val dfpCampaignFieldId: Long = 26412
-}
-
 class DevConfig extends Config {
   override def stage = "DEV"
 
@@ -134,11 +111,6 @@ class DevConfig extends Config {
   override def previewUrl        = "https://viewer.gutools.co.uk/preview"
   override def mediaAtomMakerUrl = "https://video.local.dev-gutools.co.uk"
   override def ctaAtomMakerUrl   = "https://cta-atom-maker.local.dev-gutools.co.uk"
-
-  override val dfpNetworkCode           = StagingDfpProperties.dfpNetworkCode
-  override val dfpNativeCardOrderIds    = StagingDfpProperties.dfpNativeCardOrderIds
-  override val dfpMerchandisingOrderIds = StagingDfpProperties.dfpMerchandisingOrderIds
-  override val dfpCampaignFieldId       = StagingDfpProperties.dfpCampaignFieldId
 }
 
 class ProdConfig extends Config {
@@ -151,25 +123,4 @@ class ProdConfig extends Config {
   override def previewUrl        = "https://viewer.gutools.co.uk/preview"
   override def mediaAtomMakerUrl = "https://video.gutools.co.uk"
   override def ctaAtomMakerUrl   = "https://cta-atom-maker.gutools.co.uk"
-
-  override val dfpNetworkCode = "59666047"
-  override val dfpNativeCardOrderIds = {
-    val hosted = 353494647L
-    val paid   = 347621127L
-    Map(
-      "hosted"      -> Seq(hosted),
-      "paidContent" -> Seq(paid)
-    )
-  }
-  override val dfpMerchandisingOrderIds = {
-    val hosted = 345535767L
-    val paid   = 211298847L
-    val paidUs = 211064247L
-    val paidAu = 211090047L
-    Map(
-      "hosted"      -> Seq(hosted),
-      "paidContent" -> Seq(paid, paidUs, paidAu)
-    )
-  }
-  override val dfpCampaignFieldId: Long = 9927
 }

@@ -65,7 +65,6 @@ object Dynamo {
   lazy val campaignContentTable: Table         = dynamoDb.getTable(Config().campaignContentTableName)
   lazy val clientTable: Table                  = dynamoDb.getTable(Config().clientTableName)
   lazy val analyticsDataCacheTable: Table      = dynamoDb.getTable(Config().analyticsDataCacheTableName)
-  lazy val trafficDriverRejectTable: Table     = dynamoDb.getTable(Config().trafficDriverRejectTableName)
   lazy val campaignPageviewsTable: Table       = dynamoDb.getTable(Config().campaignPageviewsTableName)
   lazy val campaignUniquesTable: Table         = dynamoDb.getTable(Config().campaignUniquesTableName)
   lazy val latestCampaignAnalyticsTable: Table = dynamoDb.getTable(Config().latestCampaignAnalyticsTableName)

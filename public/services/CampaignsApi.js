@@ -80,45 +80,6 @@ export function fetchCampaignContent(id) {
   });
 }
 
-export function fetchCampaignTrafficDrivers(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/drivers',
-    method: 'get'
-  });
-}
-
-export function fetchCampaignTrafficDriverSuggestions(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/suggest-drivers',
-    method: 'get'
-  });
-}
-
-export function acceptSuggestedCampaignTrafficDriver(campaignId, trafficDriverId) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + campaignId + '/driver/' + trafficDriverId,
-    contentType: 'application/json',
-    data: {},
-    method: 'put'
-  });
-}
-
-export function rejectSuggestedCampaignTrafficDriver(campaignId, trafficDriverId) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + campaignId + '/not-driver/' + trafficDriverId,
-    contentType: 'application/json',
-    data: {},
-    method: 'put'
-  });
-}
-
-export function fetchCampaignTrafficDriverStats(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/driverstats',
-    method: 'get'
-  });
-}
-
 export function fetchCampaignReferrals(id) {
   return AuthedReqwest({
     url: '/api/v2/campaigns/' + id + '/referrals',

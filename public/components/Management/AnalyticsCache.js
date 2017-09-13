@@ -101,7 +101,6 @@ class AnalyticsCache extends Component {
           <li onClick={() => refreshDataType('CampaignPageViewsReport')}><i className="i-refresh-black" />CampaignPageViewsReport</li>
           <li onClick={() => refreshDataType('DailyUniqueUsersReport')}><i className="i-refresh-black" />DailyUniqueUsersReport</li>
           <li onClick={() => refreshDataType('CtaClicksReport')}><i className="i-refresh-black" />CtaClicksReport</li>
-          <li onClick={() => refreshDataType('TrafficDriverGroupStats')}><i className="i-refresh-black" />TrafficDriverGroupStats</li>
         </ul>
       </div>
     );

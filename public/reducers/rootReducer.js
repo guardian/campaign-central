@@ -10,11 +10,6 @@ import campaignQualifiedReport from './campaignQualifiedReportReducer';
 import campaignCtaStats from './campaignCtaStatsReducer';
 import campaignContent from './campaignContentReducer';
 import campaignReferrals from './campaignReferralReducer';
-import campaignTrafficDrivers from './campaignTrafficDriverReducer';
-import campaignTrafficDriversDirty from './campaignTrafficDriversDirtyReducer';
-import campaignTrafficDriverSuggestions from './campaignTrafficDriverSuggestionsReducer';
-import campaignTrafficDriverSuggestionsDirty from './campaignTrafficDriverSuggestionsDirtyReducer';
-import campaignTrafficDriverStats from './campaignTrafficDriverStatsReducer';
 import campaignSort from './campaignSortReducer';
 import latestAnalytics from './latestAnalyticsReducer';
 import latestAnalyticsForCampaign from './latestAnalyticsForCampaignReducer';
@@ -31,11 +26,6 @@ export default combineReducers({
   campaignCtaStats,
   campaignContent,
   campaignReferrals,
-  campaignTrafficDrivers,
-  campaignTrafficDriversDirty,
-  campaignTrafficDriverSuggestions,
-  campaignTrafficDriverSuggestionsDirty,
-  campaignTrafficDriverStats,
   campaignSort,
   latestAnalytics,
   latestAnalyticsForCampaign

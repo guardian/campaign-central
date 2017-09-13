@@ -10,7 +10,6 @@ resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-to
 
 val slf4jVersion = "1.7.25"
 val playJsonVersion = "2.6.2"
-val dfpClientVersion = "3.5.0"
 
 lazy val dependencies = Seq(
   "com.typesafe.play" %% "play-json" % playJsonVersion,
@@ -28,9 +27,6 @@ lazy val dependencies = Seq(
   "com.gu" % "kinesis-logback-appender" % "1.4.0",
   "org.slf4j" % "slf4j-api" % slf4jVersion,
   "org.slf4j" % "jcl-over-slf4j" % slf4jVersion,
-  "com.google.api-ads" % "ads-lib" % dfpClientVersion,
-  "com.google.api-ads" % "dfp-axis" % dfpClientVersion,
-  "com.google.guava" % "guava" % "20.0",
   "org.scalatest" %% "scalatest" % "3.0.3" % Test
 )
 
