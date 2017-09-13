@@ -20,6 +20,8 @@ object Section {
 
 trait CAPIImportCommand {
 
+  val defaultUser: User = User("CAPI", "importer", "labs.beta@guardian.co.uk")
+
   def deriveHostedTagFromContent(content: List[ApiContent]): Option[Tag] = {
     content.flatMap(_.tags).find { t =>
       t.`type` == TagType.PaidContent
@@ -73,13 +75,10 @@ trait CAPIImportCommand {
     )
   }
 
-  case class UpdateCampaignSuccess(updatedCampaign: Campaign)
-
-  def updateCampaignAndContent(
-    apiContent: List[ApiContent],
-    campaign: Campaign,
-    sponsorship: Option[Sponsorship],
-    user: User): Either[CampaignCentralApiError, UpdateCampaignSuccess] = {
+  def updateCampaignAndContent(apiContent: List[ApiContent],
+                               campaign: Campaign,
+                               sponsorship: Option[Sponsorship],
+                               user: User): Either[CampaignCentralApiError, Campaign] = {
     val contentItems: List[ContentItem] = buildContentItems(apiContent, campaign.id)
 
     val putContentResults: List[Either[CampaignCentralApiError, PutContentItemResult]] = for {
@@ -126,7 +125,7 @@ trait CAPIImportCommand {
         CampaignRepository
           .putCampaign(updatedCampaign)
           .right
-          .map(Function.const(UpdateCampaignSuccess(updatedCampaign)))
+          .map(Function.const(updatedCampaign))
     }
   }
 }
@@ -149,7 +148,7 @@ case class ImportCampaignFromCAPICommand(
   def process()(implicit user: Option[User]): Either[CampaignCentralApiError, Campaign] = {
     Logger.info(s"importing campaign from tag ${tag.externalName}")
 
-    val userOrDefault = user getOrElse User("CAPI", "importer", "labs.beta@guardian.co.uk")
+    val userOrDefault = user getOrElse defaultUser
     val now           = DateTime.now
 
     val apiContent: List[ApiContent] = ContentApi.loadAllContentInSection(tag.section.pathPrefix)
@@ -181,7 +180,7 @@ case class ImportCampaignFromCAPICommand(
           )
         }
 
-        updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault).right.map(_.updatedCampaign)
+        updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault)
     }
   }
 }
@@ -195,7 +194,8 @@ case class RefreshCampaignSuccess(campaign: Campaign)
 
 case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand {
 
-  def process(): Either[CampaignCentralApiError, RefreshCampaignSuccess] = {
+  def process()(implicit user: Option[User]): Either[CampaignCentralApiError, Campaign] = {
+    val userOrDefault = user getOrElse defaultUser
     CampaignRepository.getCampaign(id) match {
       case Some(campaign) =>
         Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
@@ -205,8 +205,7 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
         val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag)
 
         // TODO: Pass along user for lastModified
-        updateCampaignAndContent(apiContent, campaign, sponsorship).right.map(updateCampaignSuccess =>
-          RefreshCampaignSuccess(updateCampaignSuccess.updatedCampaign))
+        updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault)
 
       case None => Left(CampaignNotFound(s"Campaign ID $id not found"))
     }

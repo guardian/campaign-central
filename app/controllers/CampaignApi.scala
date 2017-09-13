@@ -106,10 +106,11 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   def refreshCampaignFromCAPI(campaignId: String) = authAction { req =>
+    implicit val user: Option[User] = Option(User(req.user))
     RefreshCampaignFromCAPICommand(campaignId).process() match {
-      case Right(RefreshCampaignSuccess(campaign)) => Ok(Json.toJson(campaign))
-      case Left(CampaignNotFound(message))         => NotFound(message)
-      case Left(_)                                 => InternalServerError
+      case Right(campaign)                 => Ok(Json.toJson(campaign))
+      case Left(CampaignNotFound(message)) => NotFound(message)
+      case Left(_)                         => InternalServerError
     }
   }
 

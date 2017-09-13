@@ -75,7 +75,7 @@ class ManagementApi(components: ControllerComponents, authAction: AuthAction[Any
 
     expiringCampaigns foreach { c =>
       Logger.info(s"campaign ${c.name} is due to expire, refreshing from CAPI")
-      RefreshCampaignFromCAPICommand(c.id).process()
+      RefreshCampaignFromCAPICommand(c.id).process()(Some(user))
     }
 
     NoContent
