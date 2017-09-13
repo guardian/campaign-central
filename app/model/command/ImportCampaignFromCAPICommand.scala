@@ -78,7 +78,8 @@ trait CAPIImportCommand {
   def updateCampaignAndContent(
     apiContent: List[ApiContent],
     campaign: Campaign,
-    sponsorship: Option[Sponsorship]): Either[CampaignCentralApiError, UpdateCampaignSuccess] = {
+    sponsorship: Option[Sponsorship],
+    user: User): Either[CampaignCentralApiError, UpdateCampaignSuccess] = {
     val contentItems: List[ContentItem] = buildContentItems(apiContent, campaign.id)
 
     val putContentResults: List[Either[CampaignCentralApiError, PutContentItemResult]] = for {
@@ -117,7 +118,9 @@ trait CAPIImportCommand {
             ctaAtom.cta.trackingCode
             CallToAction(Some(atomData.id), ctaAtom.cta.trackingCode)
           }.distinct,
-          campaignLogo = deriveSponsorshipLogo(sponsorship) orElse campaign.campaignLogo
+          campaignLogo = deriveSponsorshipLogo(sponsorship) orElse campaign.campaignLogo,
+          lastModified = DateTime.now,
+          lastModifiedBy = user
         )
 
         CampaignRepository
@@ -178,7 +181,7 @@ case class ImportCampaignFromCAPICommand(
           )
         }
 
-        updateCampaignAndContent(apiContent, campaign, sponsorship).right.map(_.updatedCampaign)
+        updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault).right.map(_.updatedCampaign)
     }
   }
 }
