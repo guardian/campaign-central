@@ -5,8 +5,7 @@ import model._
 import model.command.{
   CampaignNotFound,
   ImportCampaignFromCAPICommand,
-  RefreshCampaignFromCAPICommand,
-  RefreshCampaignSuccess
+  RefreshCampaignFromCAPICommand
 }
 import model.reports._
 import org.joda.time.DateTime

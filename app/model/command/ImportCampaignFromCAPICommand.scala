@@ -190,8 +190,6 @@ object ImportCampaignFromCAPICommand {
     Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
 }
 
-case class RefreshCampaignSuccess(campaign: Campaign)
-
 case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand {
 
   def process()(implicit user: Option[User]): Either[CampaignCentralApiError, Campaign] = {
