@@ -18,7 +18,6 @@ object CommandError extends Results {
   def InvalidCampaignTagType = throw new CommandError("campaign tag was not expected type", 400)
   def CampaignMissingData(field: String) = throw new CommandError(s"campaign missing required field $field", 400)
   def SponsorNameNotFound = throw new CommandError("unable to find a sponsor name", 400)
-  def UnableToDetermineContentType = throw new CommandError("unable to find a determine content's type", 400)
   def FailedToSaveClient(client: Client) = throw new CommandError(s"failed to save client ${client.name}", 503)
 
 
