@@ -29,7 +29,7 @@ object CtaClicksReport {
       case Stale(report) => {
         Logger.debug(s"getting CTA clicks for campaign $campaignId - cache stale spawning async refresh")
 
-        Future{
+        Future {
           Logger.debug(s"async refresh of CTA clicks for campaign $campaignId")
           report.refresh
         } // serve stale but spawn refresh future
@@ -45,25 +45,23 @@ object CtaClicksReport {
 
   def generateReport(campaignId: String): Option[CtaClicksReport] = {
     CampaignRepository.getCampaign(campaignId) map { campaign =>
-      val ctaReportLines = for (
-        cta <- campaign.callToActions;
-        startDate <- campaign.startDate;
-        builderId <- cta.builderId;
-        trackingCode <- cta.trackingCode
-      ) yield {
+      val ctaReportLines = for (cta <- campaign.callToActions;
+                                startDate    <- campaign.startDate;
+                                builderId    <- cta.builderId;
+                                trackingCode <- cta.trackingCode) yield {
         builderId -> GoogleAnalytics.loadCtaClicks(trackingCode, startDate, campaign.endDate)
       }
 
-      val logoReportLines = for (
-        startDate <- campaign.startDate;
-        sectionId <- campaign.pathPrefix
-      ) yield {
+      val logoReportLines = for (startDate <- campaign.startDate;
+                                 sectionId <- campaign.pathPrefix) yield {
         "logo" -> GoogleAnalytics.loadSponsorLogoClicks(sectionId, startDate, campaign.endDate)
       }
 
       val report = CtaClicksReport(campaignId, (logoReportLines.toList ::: ctaReportLines).toMap)
 
-      AnalyticsDataCache.putCampaignCtaClicksReport(campaignId, report, AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
+      AnalyticsDataCache.putCampaignCtaClicksReport(campaignId,
+                                                    report,
+                                                    AnalyticsDataCache.calculateValidToDateForDailyStats(campaign))
 
       report
     }
