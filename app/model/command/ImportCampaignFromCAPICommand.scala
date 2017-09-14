@@ -145,11 +145,10 @@ case class ImportCampaignFromCAPICommand(
 
   sealed trait ImportCampaignResult
 
-  def process()(implicit user: Option[User]): Either[CampaignCentralApiError, Campaign] = {
+  def process()(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
     Logger.info(s"importing campaign from tag ${tag.externalName}")
 
-    val userOrDefault = user getOrElse defaultUser
-    val now           = DateTime.now
+    val now: DateTime = DateTime.now
 
     val apiContent: List[ApiContent] = ContentApi.loadAllContentInSection(tag.section.pathPrefix)
     deriveHostedTagFromContent(apiContent).toRight(CampaignTagNotFound(tag.id, tag.externalName)).right.flatMap {
@@ -172,16 +171,16 @@ case class ImportCampaignFromCAPICommand(
               tagId = Some(tag.id),
               pathPrefix = Some(tag.section.pathPrefix),
               created = now,
-              createdBy = userOrDefault,
+              createdBy = user,
               lastModified = now,
-              lastModifiedBy = userOrDefault,
+              lastModifiedBy = user,
               nominalValue = None, // default targets and values
               actualValue = Some(campaignValue), // these will be set in the UI manually
               targets = (Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _)).toMap
             )
           }
 
-          updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault)
+          updateCampaignAndContent(apiContent, campaign, sponsorship, user)
         }
     }
   }
@@ -194,8 +193,7 @@ object ImportCampaignFromCAPICommand {
 
 case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand {
 
-  def process()(implicit user: Option[User]): Either[CampaignCentralApiError, Campaign] = {
-    val userOrDefault = user getOrElse defaultUser
+  def process()(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
     CampaignRepository.getCampaign(id) match {
       case Some(campaign) =>
         campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
@@ -203,7 +201,7 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
             val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag)
 
             Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
-            updateCampaignAndContent(content, campaign, sponsorship, userOrDefault)
+            updateCampaignAndContent(content, campaign, sponsorship, user)
           case None =>
             Logger.error(s"Campaign ${campaign.id} (${campaign.name}) is missing pathPrefix")
             Left(CampaignMissingPathPrefix(campaign))

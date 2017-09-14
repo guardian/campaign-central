@@ -4,7 +4,6 @@ import com.gu.googleauth.AuthAction
 import model._
 import model.command.{CampaignNotFound, ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import model.reports._
-import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Json._
 import play.api.libs.json._
@@ -87,7 +86,7 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   def importFromTag() = authAction { req =>
-    implicit val user: Option[User] = Option(User(req.user))
+    implicit val user: User = User(req.user)
     req.body.asJson map { json =>
       json.as[ImportCampaignFromCAPICommand].process() match {
         case Left(_) =>
@@ -101,7 +100,7 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   def refreshCampaignFromCAPI(campaignId: String) = authAction { req =>
-    implicit val user: Option[User] = Option(User(req.user))
+    implicit val user: User = User(req.user)
     RefreshCampaignFromCAPICommand(campaignId).process() match {
       case Right(campaign)                 => Ok(Json.toJson(campaign))
       case Left(CampaignNotFound(message)) => NotFound(message)
