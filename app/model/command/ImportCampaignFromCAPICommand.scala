@@ -202,7 +202,6 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
           ContentApi.loadAllContentInSection(campaign.pathPrefix getOrElse CampaignMissingData("pathPrefix"))
         val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag)
 
-        // TODO: Pass along user for lastModified
         updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault)
 
       case None => Left(CampaignNotFound(s"Campaign ID $id not found"))
