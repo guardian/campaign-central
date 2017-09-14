@@ -27,6 +27,7 @@ lazy val dependencies = Seq(
   "com.gu"               % "kinesis-logback-appender" % "1.4.0",
   "org.slf4j"            % "slf4j-api"                % slf4jVersion,
   "org.slf4j"            % "jcl-over-slf4j"           % slf4jVersion,
+  "com.gu"               %% "scanamo"                 % "0.9.5",
   "org.scalatest"        %% "scalatest"               % "3.0.3" % Test
 )
 
@@ -65,7 +66,5 @@ lazy val root = (project in file("."))
     scalaVersion := "2.11.8",
     scalaVersion in ThisBuild := "2.11.8",
     libraryDependencies ++= dependencies,
-    // this can be removed when it's no longer a transitive dependency
-    excludeDependencies += "com.gu" %% "pan-domain-auth-play_2-5",
     scalafmtOnCompile := true
   )
