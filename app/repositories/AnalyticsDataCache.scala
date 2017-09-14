@@ -2,14 +2,17 @@ package repositories
 
 import java.util.concurrent.Executors
 
-import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import model.Campaign
 import model.reports._
 import org.joda.time.DateTime
+import play.api.Logger
 import play.api.libs.json.{Json, Reads}
-import services.Dynamo
+import services.AWS.DynamoClient
+import services.Config
+import util.DynamoResults.{getResult, getResults}
 
-import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 sealed trait CacheResult[+A] extends Product {
@@ -42,77 +45,100 @@ object AnalyticsDataCache {
   implicit val analyticsExecutionContext: ExecutionContextExecutor =
     ExecutionContext.fromExecutor(Executors.newFixedThreadPool(50))
 
-  def deleteCacheEntry(key: String, dataType: String): Unit = {
-    Dynamo.analyticsDataCacheTable.deleteItem("key", key, "dataType", dataType)
-  }
+  private implicit val logger: Logger = Logger(getClass)
 
-  def putCampaignPageViewsReport(campaignId: String,
-                                 data: CampaignPageViewsReport,
-                                 validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId,
-                                        "CampaignPageViewsReport",
-                                        Json.toJson(data).toString(),
-                                        validToTimestamp,
-                                        System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
+  private val tableName = Config().analyticsDataCacheTableName
 
-  def putDailyUniqueUsersReport(campaignId: String,
-                                data: DailyUniqueUsersReport,
-                                validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId,
-                                        "DailyUniqueUsersReport",
-                                        Json.toJson(data).toString(),
-                                        validToTimestamp,
-                                        System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
+  def deleteCacheEntry(key: String, dataType: String): Unit =
+    Scanamo.delete(DynamoClient)(tableName)('key -> key and 'dataType -> dataType)
 
-  def putCampaignSummary(campaignId: String, data: CampaignSummary, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId,
-                                        "CampaignSummary",
-                                        Json.toJson(data).toString(),
-                                        validToTimestamp,
-                                        System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
+  private def putEntry(entry: AnalyticsDataCacheEntry): Unit = Scanamo.put(DynamoClient)(tableName)(entry)
 
-  def putOverallSummary(data: OverallSummaryReport): Unit = {
-    val entry = AnalyticsDataCacheEntry("overall",
-                                        "CampaignSummary",
-                                        Json.toJson(data).toString(),
-                                        None,
-                                        System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
+  def putCampaignPageViewsReport(
+    campaignId: String,
+    data: CampaignPageViewsReport,
+    validToTimestamp: Option[Long]
+  ): Unit =
+    putEntry(
+      AnalyticsDataCacheEntry(
+        campaignId,
+        "CampaignPageViewsReport",
+        Json.toJson(data).toString(),
+        validToTimestamp,
+        System.currentTimeMillis()
+      )
+    )
 
-  def putCampaignCtaClicksReport(campaignId: String, data: CtaClicksReport, validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId,
-                                        "CtaClicksReport",
-                                        Json.toJson(data).toString(),
-                                        validToTimestamp,
-                                        System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
+  def putDailyUniqueUsersReport(
+    campaignId: String,
+    data: DailyUniqueUsersReport,
+    validToTimestamp: Option[Long]
+  ): Unit =
+    putEntry(
+      AnalyticsDataCacheEntry(
+        campaignId,
+        "DailyUniqueUsersReport",
+        Json.toJson(data).toString(),
+        validToTimestamp,
+        System.currentTimeMillis()
+      )
+    )
 
-  def putQualifiedPercentagesReport(campaignId: String,
-                                    data: QualifiedPercentagesReport,
-                                    validToTimestamp: Option[Long]): Unit = {
-    val entry = AnalyticsDataCacheEntry(campaignId,
-                                        "QualifiedPercentagesReport",
-                                        Json.toJson(data).toString(),
-                                        validToTimestamp,
-                                        System.currentTimeMillis())
-    Dynamo.analyticsDataCacheTable.putItem(entry.toItem)
-  }
+  def putCampaignSummary(campaignId: String, data: CampaignSummary, validToTimestamp: Option[Long]): Unit =
+    putEntry(
+      AnalyticsDataCacheEntry(
+        campaignId,
+        "CampaignSummary",
+        Json.toJson(data).toString(),
+        validToTimestamp,
+        System.currentTimeMillis()
+      )
+    )
+
+  def putOverallSummary(data: OverallSummaryReport): Unit =
+    putEntry(
+      AnalyticsDataCacheEntry(
+        "overall",
+        "CampaignSummary",
+        Json.toJson(data).toString(),
+        None,
+        System.currentTimeMillis()
+      )
+    )
+
+  def putCampaignCtaClicksReport(campaignId: String, data: CtaClicksReport, validToTimestamp: Option[Long]): Unit =
+    putEntry(
+      AnalyticsDataCacheEntry(
+        campaignId,
+        "CtaClicksReport",
+        Json.toJson(data).toString(),
+        validToTimestamp,
+        System.currentTimeMillis()
+      )
+    )
+
+  def putQualifiedPercentagesReport(
+    campaignId: String,
+    data: QualifiedPercentagesReport,
+    validToTimestamp: Option[Long]
+  ): Unit =
+    putEntry(
+      AnalyticsDataCacheEntry(
+        campaignId,
+        "QualifiedPercentagesReport",
+        Json.toJson(data).toString(),
+        validToTimestamp,
+        System.currentTimeMillis()
+      )
+    )
 
   private def getEntry[T](key: String, dataType: String)(implicit fjs: Reads[T]): CacheResult[T] = {
-    val item = Option(Dynamo.analyticsDataCacheTable.getItem("key", key, "dataType", dataType))
+    val item = Scanamo
+      .get[AnalyticsDataCacheEntry](DynamoClient)(tableName)('key -> key and 'dataType -> dataType)
+      .flatMap(getResult(_))
     item
-      .map { i =>
-        val entry  = AnalyticsDataCacheEntry.fromItem(i)
+      .map { entry =>
         val report = Json.parse(entry.data).as[T]
-
         entry.expires match {
           case Some(ts) if ts < System.currentTimeMillis() => Stale(report)
           case _                                           => Hit(report)
@@ -145,15 +171,17 @@ object AnalyticsDataCache {
     getEntry[QualifiedPercentagesReport](campaignId, "QualifiedPercentagesReport")
   }
 
-  def summariseContents: List[AnalyticsDataCacheEntrySummary] = {
-    Dynamo.analyticsDataCacheTable
-      .scan(
-        new ScanSpec().withAttributesToGet("key", "dataType", "expires", "written")
-      )
-      .map(AnalyticsDataCacheEntrySummary.fromItem)
-      .toList
+  def summariseContents: List[AnalyticsDataCacheEntrySummary] =
+    getResults(Scanamo.scan[AnalyticsDataCacheEntry](DynamoClient)(tableName))
+      .map { entry =>
+        AnalyticsDataCacheEntrySummary(
+          key = entry.key,
+          dataType = entry.dataType,
+          expires = entry.expires,
+          written = entry.written
+        )
+      }
       .sortBy(_.key)
-  }
 
   def calculateValidToDateForDailyStats(campaign: Campaign): Option[Long] = {
     val campaignFinished = for (d <- campaign.endDate) yield { d.isBeforeNow }

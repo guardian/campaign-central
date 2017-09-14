@@ -102,7 +102,8 @@ sealed trait Config {
 }
 
 class DevConfig extends Config {
-  override def stage = "DEV"
+  // override def stage = "DEV"
+  override def stage = "PROD"
 
   override def logShippingStreamName = Some("elk-CODE-KinesisStream-M03ERGK5PVD9")
   override def tagManagerApiUrl      = "https://tagmanager.code.dev-gutools.co.uk"

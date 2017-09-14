@@ -1,21 +1,24 @@
 package repositories
 
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import model.LatestCampaignAnalyticsItem
-import services.Dynamo
-import scala.collection.JavaConverters._
+import play.api.Logger
+import services.AWS.DynamoClient
+import services.Config
+import util.DynamoResults.getResults
 
 object LatestCampaignAnalyticsRepository {
 
-  def getLatestCampaignAnalytics(): Seq[LatestCampaignAnalyticsItem] = {
-    Dynamo.latestCampaignAnalyticsTable.scan().asScala.toList.map(LatestCampaignAnalyticsItem.fromItem)
-  }
+  private implicit val logger: Logger = Logger(getClass)
+
+  private val tableName = Config().latestCampaignAnalyticsTableName
+
+  def getLatestCampaignAnalytics(): Seq[LatestCampaignAnalyticsItem] =
+    getResults(Scanamo.scan[LatestCampaignAnalyticsItem](DynamoClient)(tableName))
 
   def getLatestCampaignAnalytics(campaignId: String): Option[LatestCampaignAnalyticsItem] = {
-    Dynamo.latestCampaignAnalyticsTable
-      .query("campaignId", campaignId)
-      .asScala
-      .headOption
-      .map(LatestCampaignAnalyticsItem.fromItem)
+    val query = 'campaignId -> campaignId
+    getResults(Scanamo.query[LatestCampaignAnalyticsItem](DynamoClient)(tableName)(query)).headOption
   }
-
 }

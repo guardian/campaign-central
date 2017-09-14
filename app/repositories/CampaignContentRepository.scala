@@ -1,44 +1,26 @@
 package repositories
 
+import com.gu.scanamo.Scanamo
+import com.gu.scanamo.syntax._
 import model.ContentItem
 import play.api.Logger
-import services.Dynamo
-
-import scala.collection.JavaConversions._
+import services.AWS.DynamoClient
+import services.Config
+import util.DynamoResults.getResults
 
 object CampaignContentRepository {
 
-  def getContentForCampaign(campaignId: String) = {
-    Dynamo.campaignContentTable.query("campaignId", campaignId).map { ContentItem.fromItem }.toList
-  }
+  private implicit val logger: Logger = Logger(getClass)
 
-  def getContent(campaignId: String, id: String) = {
-    Option(Dynamo.campaignContentTable.getItem("campaignId", campaignId, "id", id)).map { ContentItem.fromItem }
-  }
+  private val tableName = Config().campaignContentTableName
 
-  def deleteContentForCampaign(campaignId: String) = {
-    try {
-      for (content <- Dynamo.campaignContentTable.query("campaignId", campaignId)) {
-        Dynamo.campaignContentTable.deleteItem("campaignId", campaignId, "id", content.getString("id"))
-      }
-    } catch {
-      case e: Error => {
-        Logger.error(s"failed to delete content for campaign $campaignId", e)
-        None
-      }
+  def getContentForCampaign(campaignId: String): List[ContentItem] =
+    getResults(Scanamo.query[ContentItem](DynamoClient)(tableName)('campaignId -> campaignId))
+
+  def deleteContentForCampaign(campaignId: String): Unit =
+    getResults(Scanamo.query[ContentItem](DynamoClient)(tableName)('campaignId -> campaignId)) foreach { content =>
+      Scanamo.delete(DynamoClient)(tableName)('campaignId -> campaignId and 'id -> content.id)
     }
-  }
 
-  def putContent(content: ContentItem) = {
-    try {
-      Dynamo.campaignContentTable.putItem(content.toItem)
-      Some(content)
-    } catch {
-      case e: Error => {
-        Logger.error(s"failed to persist content $content", e)
-        None
-      }
-    }
-  }
-
+  def putContent(content: ContentItem): Unit = Scanamo.put(DynamoClient)(tableName)(content)
 }

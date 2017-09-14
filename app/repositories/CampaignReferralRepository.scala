@@ -2,19 +2,24 @@ package repositories
 
 import java.time.LocalDate
 
+import com.gu.scanamo._
+import com.gu.scanamo.syntax._
 import model.{CampaignReferral, CampaignReferralRow, Component}
-import services.Dynamo
-
-import scala.collection.JavaConversions._
+import play.api.Logger
+import services.AWS.DynamoClient
+import services.Config
+import util.DynamoResults.getResults
 
 object CampaignReferralRepository {
 
+  private implicit val logger: Logger = Logger(getClass)
+
   def getCampaignReferrals(campaignId: String): Seq[CampaignReferral] = {
 
-    val rows = Dynamo.campaignReferralTable
-      .query("campaignId", campaignId)
-      .flatMap(CampaignReferralRow.fromItem)
-      .toList
+    val rows = {
+      val query = 'campaignId -> campaignId
+      getResults(Scanamo.query[CampaignReferralRow](DynamoClient)(Config().campaignReferralTableName)(query))
+    }
 
     val groupedRows = rows.groupBy(row => (row.platform, row.edition, row.path, row.containerIndex, row.cardIndex))
 
