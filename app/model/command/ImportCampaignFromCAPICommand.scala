@@ -32,7 +32,7 @@ trait CAPIImportCommand {
     apiContent.tags
       .find(_.`type` == TagType.Type)
       .map(_.webTitle)
-      .getOrElse(throw new RuntimeException(s"Unable to derive content type from ${apiContent.id}"))
+      .getOrElse(UnableToDetermineContentType)
   }
 
   def deriveSponsorshipLogo(sponsorship: Option[Sponsorship]): Option[String] = {

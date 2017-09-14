@@ -19,6 +19,7 @@ object CommandError extends Results {
   def CampaignMissingData(field: String) = throw new CommandError(s"campaign missing required field $field", 400)
   def SponsorNameNotFound                = throw new CommandError("unable to find a sponsor name", 400)
   def FailedToSaveClient(client: Client) = throw new CommandError(s"failed to save client ${client.name}", 503)
+  def UnableToDetermineContentType       = throw new CommandError("unable to find a determine content's type", 400)
 
   def commandErrorAsResult: PartialFunction[Throwable, Result] = {
     case CommandError(msg, 400) => BadRequest(msg)
