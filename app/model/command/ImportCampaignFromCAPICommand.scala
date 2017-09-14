@@ -27,20 +27,24 @@ case class ImportCampaignFromCAPICommand(
   campaignValue: Long,
   uniquesTarget: Long,
   pageviewTarget: Option[Long]
-) {
-  
-  def process()(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
-    Logger.info(s"importing campaign from tag ${tag.externalName}")
+)
+
+object ImportCampaignFromCAPICommand {
+  implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignFromCAPICommand] =
+    Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
+
+  def process(importCommand: ImportCampaignFromCAPICommand)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
+    Logger.info(s"importing campaign from tag ${importCommand.tag.externalName}")
 
     val now: DateTime = DateTime.now
 
-    val apiContent: List[ApiContent] = ContentApi.loadAllContentInSection(tag.section.pathPrefix)
+    val apiContent: List[ApiContent] = ContentApi.loadAllContentInSection(importCommand.tag.section.pathPrefix)
     CommandUtils
       .deriveHostedTagFromContent(apiContent)
-      .toRight(CampaignTagNotFound(tag.id, tag.externalName))
+      .toRight(CampaignTagNotFound(importCommand.tag.id, importCommand.tag.externalName))
       .right
       .flatMap { hostedTag =>
-        val sponsorship: Option[Sponsorship] = TagManagerApi.getSponsorshipForTag(tag.id)
+        val sponsorship: Option[Sponsorship] = TagManagerApi.getSponsorshipForTag(importCommand.tag.id)
 
         val campaignType: Either[CampaignCentralApiError, String] = hostedTag.paidContentType match {
           case Some("HostedContent") => Right("hosted")
@@ -49,21 +53,21 @@ case class ImportCampaignFromCAPICommand(
         }
 
         campaignType.right.flatMap { campaignType =>
-          val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
+          val campaign = CampaignRepository.getCampaignByTag(importCommand.tag.id) getOrElse {
             Campaign(
               id = UUID.randomUUID().toString,
-              name = tag.externalName,
+              name = importCommand.tag.externalName,
               `type` = campaignType,
               status = "pending",
-              tagId = Some(tag.id),
-              pathPrefix = Some(tag.section.pathPrefix),
+              tagId = Some(importCommand.tag.id),
+              pathPrefix = Some(importCommand.tag.section.pathPrefix),
               created = now,
               createdBy = user,
               lastModified = now,
               lastModifiedBy = user,
               nominalValue = None, // default targets and values
-              actualValue = Some(campaignValue), // these will be set in the UI manually
-              targets = (Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _)).toMap
+              actualValue = Some(importCommand.campaignValue), // these will be set in the UI manually
+              targets = (Some("uniques" -> importCommand.uniquesTarget) ++ importCommand.pageviewTarget.map("pageviews" -> _)).toMap
             )
           }
 
@@ -73,15 +77,15 @@ case class ImportCampaignFromCAPICommand(
   }
 }
 
-object ImportCampaignFromCAPICommand {
-  implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignFromCAPICommand] =
-    Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
-}
+case class RefreshCampaignFromCAPICommand(id: String)
 
-case class RefreshCampaignFromCAPICommand(id: String) {
 
-  def process()(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
-    CampaignRepository.getCampaign(id) match {
+object RefreshCampaignFromCAPICommand {
+  implicit val refreshCampaignFromCAPICommandFormat: Format[RefreshCampaignFromCAPICommand] =
+    Jsonx.formatCaseClass[RefreshCampaignFromCAPICommand]
+
+  def process(refreshCommand: RefreshCampaignFromCAPICommand)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
+    CampaignRepository.getCampaign(refreshCommand.id) match {
       case Some(campaign) =>
         campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
           case Some(content) =>
@@ -94,12 +98,7 @@ case class RefreshCampaignFromCAPICommand(id: String) {
             Left(CampaignMissingPathPrefix(campaign))
         }
 
-      case None => Left(CampaignNotFound(s"Campaign ID $id not found"))
+      case None => Left(CampaignNotFound(s"Campaign ID ${refreshCommand.id} not found"))
     }
   }
-}
-
-object RefreshCampaignFromCAPICommand {
-  implicit val refreshCampaignFromCAPICommandFormat: Format[RefreshCampaignFromCAPICommand] =
-    Jsonx.formatCaseClass[RefreshCampaignFromCAPICommand]
 }
