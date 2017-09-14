@@ -28,9 +28,7 @@ case class ImportCampaignFromCAPICommand(
   uniquesTarget: Long,
   pageviewTarget: Option[Long]
 ) {
-
-  sealed trait ImportCampaignResult
-
+  
   def process()(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
     Logger.info(s"importing campaign from tag ${tag.externalName}")
 
