@@ -19,8 +19,6 @@ object Section {
 
 trait CAPIImportCommand {
 
-  val defaultUser: User = User("CAPI", "importer", "labs.beta@guardian.co.uk")
-
   def deriveHostedTagFromContent(content: List[ApiContent]): Option[Tag] = {
     content.flatMap(_.tags).find { t =>
       t.`type` == TagType.PaidContent
