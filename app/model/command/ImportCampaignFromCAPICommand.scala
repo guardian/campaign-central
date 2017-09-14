@@ -77,15 +77,10 @@ object ImportCampaignFromCAPICommand {
   }
 }
 
-case class RefreshCampaignFromCAPICommand(id: String)
-
 
 object RefreshCampaignFromCAPICommand {
-  implicit val refreshCampaignFromCAPICommandFormat: Format[RefreshCampaignFromCAPICommand] =
-    Jsonx.formatCaseClass[RefreshCampaignFromCAPICommand]
-
-  def process(refreshCommand: RefreshCampaignFromCAPICommand)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
-    CampaignRepository.getCampaign(refreshCommand.id) match {
+  def process(campaignId: String)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
+    CampaignRepository.getCampaign(campaignId) match {
       case Some(campaign) =>
         campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
           case Some(content) =>
@@ -98,7 +93,7 @@ object RefreshCampaignFromCAPICommand {
             Left(CampaignMissingPathPrefix(campaign))
         }
 
-      case None => Left(CampaignNotFound(s"Campaign ID ${refreshCommand.id} not found"))
+      case None => Left(CampaignNotFound(s"Campaign ID $campaignId not found"))
     }
   }
 }

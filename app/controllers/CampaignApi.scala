@@ -88,7 +88,8 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   def importFromTag() = authAction { req =>
     implicit val user: User = User(req.user)
     req.body.asJson map { json =>
-      json.as[ImportCampaignFromCAPICommand].process() match {
+      val importCommand: ImportCampaignFromCAPICommand = json.as[ImportCampaignFromCAPICommand]
+      ImportCampaignFromCAPICommand.process(importCommand) match {
         case Left(_) =>
           InternalServerError
         case Right(campaign) =>
@@ -101,7 +102,7 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
 
   def refreshCampaignFromCAPI(campaignId: String) = authAction { req =>
     implicit val user: User = User(req.user)
-    RefreshCampaignFromCAPICommand(campaignId).process() match {
+    RefreshCampaignFromCAPICommand.process(campaignId) match {
       case Right(campaign)                 => Ok(Json.toJson(campaign))
       case Left(CampaignNotFound(message)) => NotFound(message)
       case Left(_)                         => InternalServerError
