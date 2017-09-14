@@ -2,11 +2,7 @@ package controllers
 
 import com.gu.googleauth.AuthAction
 import model._
-import model.command.{
-  CampaignNotFound,
-  ImportCampaignFromCAPICommand,
-  RefreshCampaignFromCAPICommand
-}
+import model.command.{CampaignNotFound, ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
 import model.reports._
 import org.joda.time.DateTime
 import play.api.Logger

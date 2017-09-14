@@ -5,7 +5,6 @@ import ai.x.play.json.Jsonx
 import com.gu.contentapi.client.model.v1.{Tag, TagType, Content => ApiContent}
 import com.gu.contentatom.thrift.AtomData
 import model._
-import model.command.CommandError._
 import model.external.Sponsorship
 import org.joda.time.DateTime
 import play.api.Logger
@@ -28,12 +27,10 @@ trait CAPIImportCommand {
     }
   }
 
-  def deriveContentType(apiContent: ApiContent) = {
+  def deriveContentType(apiContent: ApiContent): Option[String] =
     apiContent.tags
       .find(_.`type` == TagType.Type)
       .map(_.webTitle)
-      .getOrElse(UnableToDetermineContentType)
-  }
 
   def deriveSponsorshipLogo(sponsorship: Option[Sponsorship]): Option[String] = {
     sponsorship.flatMap(_.sponsorLogo.assets.headOption.map(_.imageUrl))
@@ -62,17 +59,20 @@ trait CAPIImportCommand {
     case h  => h
   }
 
-  def buildContentItems(apiContent: List[ApiContent], campaignId: String): List[ContentItem] = apiContent.map { apic =>
-    ContentItem(
-      campaignId = campaignId,
-      id = apic.fields.flatMap(_.internalComposerCode).getOrElse(UUID.randomUUID().toString),
-      `type` = deriveContentType(apic),
-      composerId = apic.fields.flatMap(_.internalComposerCode),
-      path = Option(apic.id),
-      title = cleanHeadline(apic.webTitle),
-      isLive = apic.fields.flatMap(_.isLive).getOrElse(false),
-      atoms = buildAtomList(apic)
-    )
+  def buildContentItems(apiContent: List[ApiContent], campaignId: String): List[ContentItem] = apiContent.flatMap {
+    apic =>
+      deriveContentType(apic).map { contentType =>
+        ContentItem(
+          campaignId = campaignId,
+          id = apic.fields.flatMap(_.internalComposerCode).getOrElse(UUID.randomUUID().toString),
+          `type` = contentType,
+          composerId = apic.fields.flatMap(_.internalComposerCode),
+          path = Option(apic.id),
+          title = cleanHeadline(apic.webTitle),
+          isLive = apic.fields.flatMap(_.isLive).getOrElse(false),
+          atoms = buildAtomList(apic)
+        )
+      }
   }
 
   def updateCampaignAndContent(apiContent: List[ApiContent],
@@ -154,33 +154,35 @@ case class ImportCampaignFromCAPICommand(
     val apiContent: List[ApiContent] = ContentApi.loadAllContentInSection(tag.section.pathPrefix)
     deriveHostedTagFromContent(apiContent).toRight(CampaignTagNotFound(tag.id, tag.externalName)).right.flatMap {
       hostedTag =>
-        val sponsorship = TagManagerApi.getSponsorshipForTag(tag.id)
+        val sponsorship: Option[Sponsorship] = TagManagerApi.getSponsorshipForTag(tag.id)
 
-        val campaignType = hostedTag.paidContentType match {
-          case Some("HostedContent") => "hosted"
-          case Some(_)               => "paidContent"
-          case None                  => InvalidCampaignTagType
+        val campaignType: Either[CampaignCentralApiError, String] = hostedTag.paidContentType match {
+          case Some("HostedContent") => Right("hosted")
+          case Some(_)               => Right("paidContent")
+          case None                  => Left(InvalidCampaignTagType)
         }
 
-        val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
-          Campaign(
-            id = UUID.randomUUID().toString,
-            name = tag.externalName,
-            `type` = campaignType,
-            status = "pending",
-            tagId = Some(tag.id),
-            pathPrefix = Some(tag.section.pathPrefix),
-            created = now,
-            createdBy = userOrDefault,
-            lastModified = now,
-            lastModifiedBy = userOrDefault,
-            nominalValue = None, // default targets and values
-            actualValue = Some(campaignValue), // these will be set in the UI manually
-            targets = (Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _)).toMap
-          )
-        }
+        campaignType.right.flatMap { campaignType =>
+          val campaign = CampaignRepository.getCampaignByTag(tag.id) getOrElse {
+            Campaign(
+              id = UUID.randomUUID().toString,
+              name = tag.externalName,
+              `type` = campaignType,
+              status = "pending",
+              tagId = Some(tag.id),
+              pathPrefix = Some(tag.section.pathPrefix),
+              created = now,
+              createdBy = userOrDefault,
+              lastModified = now,
+              lastModifiedBy = userOrDefault,
+              nominalValue = None, // default targets and values
+              actualValue = Some(campaignValue), // these will be set in the UI manually
+              targets = (Some("uniques" -> uniquesTarget) ++ pageviewTarget.map("pageviews" -> _)).toMap
+            )
+          }
 
-        updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault)
+          updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault)
+        }
     }
   }
 }
@@ -196,13 +198,16 @@ case class RefreshCampaignFromCAPICommand(id: String) extends CAPIImportCommand 
     val userOrDefault = user getOrElse defaultUser
     CampaignRepository.getCampaign(id) match {
       case Some(campaign) =>
-        Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
+        campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
+          case Some(content) =>
+            val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag)
 
-        val apiContent: List[ApiContent] =
-          ContentApi.loadAllContentInSection(campaign.pathPrefix getOrElse CampaignMissingData("pathPrefix"))
-        val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag)
-
-        updateCampaignAndContent(apiContent, campaign, sponsorship, userOrDefault)
+            Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
+            updateCampaignAndContent(content, campaign, sponsorship, userOrDefault)
+          case None =>
+            Logger.error(s"Campaign ${campaign.id} (${campaign.name}) is missing pathPrefix")
+            Left(CampaignMissingPathPrefix(campaign))
+        }
 
       case None => Left(CampaignNotFound(s"Campaign ID $id not found"))
     }
