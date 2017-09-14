@@ -4,7 +4,7 @@ import java.util.concurrent.Executors
 
 import com.gu.googleauth.AuthAction
 import model.User
-import model.command.RefreshCampaignFromCAPICommand
+import model.command.Commands
 import model.reports._
 import play.api.Logger
 import play.api.libs.json._
@@ -75,7 +75,7 @@ class ManagementApi(components: ControllerComponents, authAction: AuthAction[Any
 
     expiringCampaigns foreach { c =>
       Logger.info(s"campaign ${c.name} is due to expire, refreshing from CAPI")
-      RefreshCampaignFromCAPICommand(c.id).process()(user)
+      Commands.refreshCampaignById(c.id)(user)
     }
 
     NoContent

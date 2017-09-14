@@ -22,18 +22,22 @@ object ImportTag {
   implicit val importTagFormat: Format[ImportTag] = Jsonx.formatCaseClass[ImportTag]
 }
 
-case class ImportCampaignFromCAPICommand(
+case class ImportCampaignCommand(
   tag: ImportTag,
   campaignValue: Long,
   uniquesTarget: Long,
   pageviewTarget: Option[Long]
 )
 
-object ImportCampaignFromCAPICommand {
-  implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignFromCAPICommand] =
-    Jsonx.formatCaseClass[ImportCampaignFromCAPICommand]
+object ImportCampaignCommand {
+  implicit val importCampaignFromCAPICommandFormat: Format[ImportCampaignCommand] =
+    Jsonx.formatCaseClass[ImportCampaignCommand]
+}
 
-  def process(importCommand: ImportCampaignFromCAPICommand)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
+object Commands {
+
+  def importCampaign(importCommand: ImportCampaignCommand)(
+    implicit user: User): Either[CampaignCentralApiError, Campaign] = {
     Logger.info(s"importing campaign from tag ${importCommand.tag.externalName}")
 
     val now: DateTime = DateTime.now
@@ -67,7 +71,8 @@ object ImportCampaignFromCAPICommand {
               lastModifiedBy = user,
               nominalValue = None, // default targets and values
               actualValue = Some(importCommand.campaignValue), // these will be set in the UI manually
-              targets = (Some("uniques" -> importCommand.uniquesTarget) ++ importCommand.pageviewTarget.map("pageviews" -> _)).toMap
+              targets = (Some("uniques" -> importCommand.uniquesTarget) ++ importCommand.pageviewTarget.map(
+                "pageviews"             -> _)).toMap
             )
           }
 
@@ -75,11 +80,8 @@ object ImportCampaignFromCAPICommand {
         }
       }
   }
-}
 
-
-object RefreshCampaignFromCAPICommand {
-  def process(campaignId: String)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
+  def refreshCampaignById(campaignId: String)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
     CampaignRepository.getCampaign(campaignId) match {
       case Some(campaign) =>
         campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
