@@ -2,93 +2,90 @@ package controllers
 
 import com.gu.googleauth.AuthAction
 import model._
-import model.command._
-import model.reports._
 import play.api.Logger
-import play.api.libs.json.Json._
-import play.api.libs.json._
 import play.api.mvc._
 import repositories._
 import services.CampaignService
+import cats.syntax.either._
+import model.command._
+import play.api.libs.json.Json
 
 class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyContent])
   extends AbstractController(components) {
 
   def getCampaign(id: String) = authAction {
-    CampaignRepository.getCampaign(id) map { c =>
-      Ok(Json.toJson(c))
+    CampaignRepository.getCampaign(id) map { campaign =>
+      Ok(Json.toJson(campaign))
     } getOrElse NotFound
   }
 
   def getAllCampaigns() = authAction {
-    Ok(Json.toJson(CampaignRepository.getAllCampaigns()))
+    CampaignRepository.getAllCampaigns() match {
+      case Left(_)          => InternalServerError
+      case Right(campaigns) => Ok(Json.toJson(campaigns))
+    }
   }
 
   def getLatestCampaignAnalytics() = authAction {
-    Ok(Json.toJson(CampaignService.getLatestCampaignAnalytics()))
+    CampaignService.getLatestCampaignAnalytics() match {
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(_)                       => InternalServerError
+      case Right(analytics)              => Ok(Json.toJson(analytics))
+    }
   }
 
   def getLatestAnalyticsForCampaign(campaignId: String) = authAction {
-    Ok(Json.toJson(CampaignService.getLatestAnalyticsForCampaign(campaignId)))
+    CampaignService.getLatestAnalyticsForCampaign(campaignId) match {
+      case Left(LatestCampaignAnalyticsItemNotFound(error)) => NotFound(error)
+      case Left(CampaignNotFound(error))                    => NotFound(error)
+      case Left(JsonParsingError(error))                    => InternalServerError(error)
+      case Left(_)                                          => InternalServerError
+      case Right(analytics)                                 => Ok(Json.toJson(analytics))
+    }
   }
 
   def updateCampaign(id: String) = authAction { req =>
     req.body.asJson.flatMap(_.asOpt[Campaign]) match {
       case None => BadRequest("Could not convert json to campaign")
       case Some(campaign) =>
-        CampaignRepository.putCampaign(campaign)
-        Ok(Json.toJson(campaign))
+        CampaignRepository.putCampaign(campaign) match {
+          case Left(_)  => InternalServerError
+          case Right(_) => Ok(Json.toJson(campaign))
+        }
     }
   }
 
   def deleteCampaign(id: String) = authAction { _ =>
-    CampaignContentRepository.deleteContentForCampaign(id)
-    CampaignRepository.deleteCampaign(id)
-    NoContent
-  }
+    val result = for {
+      _ <- CampaignContentRepository.deleteContentForCampaign(id)
+      _ <- CampaignRepository.deleteCampaign(id)
+    } yield NoContent
 
-  def getCampaignPageViews(id: String) = authAction { _ =>
-    CampaignPageViewsReport.getCampaignPageViewsReport(id).map { c =>
-      Ok(Json.toJson(c))
-    } getOrElse NotFound
+    result getOrElse InternalServerError
   }
 
   def getCampaignPageViewsFromDatalake(id: String) = authAction { _ =>
-    val pageViews = CampaignService.getPageViews(id)
-    Ok(Json.toJson(pageViews))
+    CampaignService.getPageViews(id) match {
+      case Left(_)          => InternalServerError
+      case Right(pageViews) => Ok(Json.toJson(pageViews))
+    }
   }
 
+  // TODO - fix return types
   def getCampaignUniquesFromDatalake(id: String) = authAction { _ =>
     CampaignService.getUniquesDataForGraph(id).map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound
   }
 
-  def getCampaignDailyUniqueUsers(id: String) = authAction { _ =>
-    DailyUniqueUsersReport.getDailyUniqueUsersReport(id).map { c =>
-      Ok(Json.toJson(c))
-    } getOrElse NotFound
-  }
-
-  def getCampaignQualifiedPercentagesReport(id: String) = authAction { _ =>
-    QualifiedPercentagesReport.getQualifiedPercentagesReportForCampaign(id).map { c =>
-      Ok(Json.toJson(c))
-    } getOrElse NotFound
-  }
-
-  def getCampaignTargetsReport(id: String) = authAction { _ =>
-    Ok(
-      Json.toJson(
-        CampaignTargetsReport.getCampaignTargetsReport(id).getOrElse(CampaignTargetsReport(Map()))
-      ))
-  }
-
   def getCampaignContent(id: String) = authAction { _ =>
-    Ok(Json.toJson(CampaignContentRepository.getContentForCampaign(id)))
+    CampaignContentRepository.getContentForCampaign(id) match {
+      case Left(_)        => InternalServerError
+      case Right(content) => Ok(Json.toJson(content))
+    }
   }
 
   def importFromTag() = authAction { req =>
     implicit val user: User = User(req.user)
-    req.body.asJson map { json =>
-      val importCommand: ImportCampaignCommand = json.as[ImportCampaignCommand]
+    req.body.asJson.flatMap(_.asOpt[ImportCampaignCommand]) map { importCommand =>
       Commands.importCampaign(importCommand) match {
         case Left(_) =>
           InternalServerError
@@ -109,12 +106,11 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     }
   }
 
-  def getCampaignCtaStats(campaignId: String) = authAction { _ =>
-    Ok(toJson(CtaClicksReport.getCtaClicksForCampaign(campaignId)))
-  }
-
   def getCampaignReferrals(campaignId: String) = authAction { _ =>
     Logger.info(s"Loading on-platform referrals for campaign $campaignId")
-    Ok(toJson(CampaignReferral.forCampaign(campaignId)))
+    CampaignReferralRepository.getCampaignReferrals(campaignId) match {
+      case Left(_)          => InternalServerError
+      case Right(referrals) => Ok(Json.toJson(referrals))
+    }
   }
 }

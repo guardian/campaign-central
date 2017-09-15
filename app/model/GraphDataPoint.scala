@@ -2,26 +2,21 @@ package model
 
 import ai.x.play.json.Jsonx
 import com.amazonaws.services.dynamodbv2.document.Item
-import play.api.Logger
+import cats.syntax.either._
+import model.command.{CampaignCentralApiError, JsonParsingError}
 import play.api.libs.json.{Format, JsValue, Json}
 
-import scala.util.control.NonFatal
-
 case class GraphDataPoint(name: String, dataPoint: Long, target: Long) {
-  def toItem = Item.fromJSON(Json.toJson(this).toString())
+  def toItem: Either[CampaignCentralApiError, Item] =
+    Option(Item.fromJSON(Json.toJson(this).toString())).map(Right(_)) getOrElse Left(JsonParsingError(""))
+
 }
 
 object GraphDataPoint {
   implicit val GraphDataPointFormat: Format[GraphDataPoint] = Jsonx.formatCaseClass[GraphDataPoint]
-  def fromJson(json: JsValue)                               = json.as[GraphDataPoint]
 
-  def fromItem(item: Item) =
-    try {
-      Json.parse(item.toJSON).as[GraphDataPoint]
-    } catch {
-      case NonFatal(e) => {
-        Logger.error(s"failed to load GraphDataPoint ${item.toJSON}", e)
-        throw e
-      }
-    }
+  def fromJson(json: JsValue): Either[CampaignCentralApiError, GraphDataPoint] =
+    json.asOpt[GraphDataPoint].map(Right(_)) getOrElse Left(JsonParsingError(""))
+  def fromItem(item: Item): Either[CampaignCentralApiError, GraphDataPoint] =
+    Either.catchNonFatal(Json.parse(item.toJSON).as[GraphDataPoint]).leftMap(e => JsonParsingError(e.getMessage))
 }

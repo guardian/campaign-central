@@ -1,10 +1,11 @@
 package repositories
 
 import com.amazonaws.services.dynamodbv2.document.ScanFilter
-import model.command.{CampaignCentralApiError, CampaignDeletionFailed, CampaignPutError}
+import model.command._
 import model.{Campaign, CampaignWithSubItems}
 import play.api.Logger
 import services.Dynamo
+import cats.implicits._
 
 import scala.collection.JavaConversions._
 import scala.util.{Failure, Success, Try}
@@ -14,26 +15,40 @@ case class CampaignRepositoryDeleteResult(campaignId: String)
 
 object CampaignRepository {
 
-  def getCampaign(campaignId: String): Option[Campaign] = {
-    Option(Dynamo.campaignTable.getItem("id", campaignId)).map { Campaign.fromItem }
+  def getCampaign(campaignId: String): Either[CampaignCentralApiError, Campaign] = {
+    val maybeCampaignOrError: Either[CampaignCentralApiError, Option[Campaign]] = {
+      val result = Option(Dynamo.campaignTable.getItem("id", campaignId)).map { Campaign.fromItem }
+      result.sequence
+    }
+
+    maybeCampaignOrError.flatMap { maybeCampaign =>
+      maybeCampaign.map(Right(_)) getOrElse Left(CampaignNotFound(s"Campaign with id $campaignId could not be found."))
+    }
   }
 
-  def getCampaignByTag(tagId: Long): Option[Campaign] = {
-    Dynamo.campaignTable.scan(new ScanFilter("tagId").eq(tagId)).headOption.map(Campaign.fromItem)
+  def getCampaignByTag(tagId: Long): Either[CampaignCentralApiError, Campaign] = {
+    val campaignOrError: Either[CampaignCentralApiError, Option[Campaign]] = {
+      val result: Option[Either[CampaignCentralApiError, Campaign]] =
+        Dynamo.campaignTable.scan(new ScanFilter("tagId").eq(tagId)).headOption.map(Campaign.fromItem)
+      result.sequence
+    }
+
+    campaignOrError.flatMap(maybeCampaign =>
+      maybeCampaign.map(Right(_)) getOrElse Left(CampaignNotFound(s"Campaign could not be found by tag id $tagId")))
   }
 
-  def getAllCampaigns(): List[Campaign] = {
-    Dynamo.campaignTable.scan().map { Campaign.fromItem }.toList
+  def getAllCampaigns(): Either[CampaignCentralApiError, List[Campaign]] = {
+    val result: List[Either[CampaignCentralApiError, Campaign]] =
+      Dynamo.campaignTable.scan().map { Campaign.fromItem }.toList
+    result.sequence
   }
 
-  def getCampaignWithSubItems(campaignId: String): Option[CampaignWithSubItems] = {
-    val maybeCampaign: Option[Campaign] = getCampaign(campaignId)
-
-    maybeCampaign.map { campaign =>
-      CampaignWithSubItems(
-        campaign = campaign,
-        content = CampaignContentRepository.getContentForCampaign(campaign.id)
-      )
+  def getCampaignWithSubItems(campaignId: String): Either[CampaignCentralApiError, CampaignWithSubItems] = {
+    for {
+      campaign <- getCampaign(campaignId)
+      content  <- CampaignContentRepository.getContentForCampaign(campaign.id)
+    } yield {
+      CampaignWithSubItems(campaign, content)
     }
   }
 
@@ -49,14 +64,19 @@ object CampaignRepository {
   }
 
   def putCampaign(campaign: Campaign): Either[CampaignCentralApiError, CampaignRepositoryPutResult] = {
-    Try(Dynamo.campaignTable.putItem(campaign.toItem)) match {
-      case Success(result) =>
-        Logger.debug(result.toString)
-        Right(CampaignRepositoryPutResult(campaign))
-      case Failure(exception) =>
-        Logger.error(s"failed to persist campaign $campaign", exception)
-        Left(CampaignPutError(campaign, exception))
+
+    campaign.toItem match {
+      case Left(error) => Left(error)
+      case Right(item) =>
+        Try(Dynamo.campaignTable.putItem(item)) match {
+          case Success(result) =>
+            Logger.debug(result.toString)
+            Right(CampaignRepositoryPutResult(campaign))
+
+          case Failure(exception) =>
+            Logger.error(s"failed to persist campaign $campaign", exception)
+            Left(CampaignPutError(campaign, exception))
+        }
     }
   }
-
 }

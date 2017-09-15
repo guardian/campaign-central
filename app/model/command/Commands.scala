@@ -1,6 +1,6 @@
 package model.command
-import java.util.UUID
 
+import java.util.UUID
 import ai.x.play.json.Jsonx
 import com.gu.contentapi.client.model.v1.{Content => ApiContent}
 import model._
@@ -9,6 +9,7 @@ import org.joda.time.DateTime
 import play.api.Logger
 import play.api.libs.json.Format
 import repositories._
+import cats.syntax.either._
 
 case class Section(id: Long, pathPrefix: String)
 
@@ -48,7 +49,7 @@ object Commands {
       .toRight(CampaignTagNotFound(importCommand.tag.id, importCommand.tag.externalName))
       .right
       .flatMap { hostedTag =>
-        val sponsorship: Option[Sponsorship] = TagManagerApi.getSponsorshipForTag(importCommand.tag.id)
+        val sponsorship: Option[Sponsorship] = TagManagerApi.getSponsorshipForTag(importCommand.tag.id).toOption
 
         val campaignType: Either[CampaignCentralApiError, String] = hostedTag.paidContentType match {
           case Some("HostedContent") => Right("hosted")
@@ -83,10 +84,10 @@ object Commands {
 
   def refreshCampaignById(campaignId: String)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
     CampaignRepository.getCampaign(campaignId) match {
-      case Some(campaign) =>
+      case Right(campaign) =>
         campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
           case Some(content) =>
-            val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag)
+            val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag(_).toOption)
 
             Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
             CommandUtils.updateCampaignAndContent(content, campaign, sponsorship, user)
@@ -95,7 +96,7 @@ object Commands {
             Left(CampaignMissingPathPrefix(campaign))
         }
 
-      case None => Left(CampaignNotFound(s"Campaign ID $campaignId not found"))
+      case Left(_) => Left(CampaignNotFound(s"Campaign ID $campaignId not found"))
     }
   }
 }

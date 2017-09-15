@@ -27,24 +27,6 @@ object CommandUtils {
     sponsorship.flatMap(_.sponsorLogo.assets.headOption.map(_.imageUrl))
   }
 
-  def buildAtomList(apiContent: ApiContent): List[Atom] = {
-    apiContent.atoms
-      .map { atoms =>
-        val mediaAtoms = atoms.media
-          .map { mediaAtoms =>
-            mediaAtoms.map { ma =>
-              Atom(ma.id, "media", Option(ma.data.asInstanceOf[AtomData.Media].media.title))
-            }
-          }
-          .getOrElse(Nil)
-
-        // other content atom types would go here
-
-        mediaAtoms.toList
-      }
-      .getOrElse(Nil)
-  }
-
   def cleanHeadline(headline: String) = headline match {
     case "" => "untitled"
     case h  => h
@@ -60,8 +42,7 @@ object CommandUtils {
           composerId = apic.fields.flatMap(_.internalComposerCode),
           path = Option(apic.id),
           title = cleanHeadline(apic.webTitle),
-          isLive = apic.fields.flatMap(_.isLive).getOrElse(false),
-          atoms = buildAtomList(apic)
+          isLive = apic.fields.flatMap(_.isLive).getOrElse(false)
         )
       }
   }
@@ -96,19 +77,12 @@ object CommandUtils {
           case _                               => "production"
         }
 
-        val ctaAtoms = apiContent.flatMap(_.atoms.flatMap(_.cta)).flatten
-
         val updatedCampaign = campaign.copy(
           startDate = startDate.map { cdt =>
             new DateTime(cdt.dateTime).withTimeAtStartOfDay()
           },
           endDate = endDate,
           status = status,
-          callToActions = ctaAtoms.map { atomData =>
-            val ctaAtom = atomData.data.asInstanceOf[AtomData.Cta]
-            ctaAtom.cta.trackingCode
-            CallToAction(Some(atomData.id), ctaAtom.cta.trackingCode)
-          }.distinct,
           campaignLogo = deriveSponsorshipLogo(sponsorship) orElse campaign.campaignLogo,
           lastModified = DateTime.now,
           lastModifiedBy = user
