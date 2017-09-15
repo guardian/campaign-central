@@ -1,13 +1,11 @@
 package model
 
 import ai.x.play.json.Jsonx
-import com.amazonaws.services.dynamodbv2.document.Item
-import org.joda.time.DateTime
 import cats.syntax.either._
+import com.amazonaws.services.dynamodbv2.document.Item
 import model.command.{CampaignCentralApiError, JsonParsingError}
-import play.api.libs.json.{Format, JsValue, Json}
-import play.api.libs.json.JodaReads._
-import play.api.libs.json.JodaWrites._
+import org.joda.time.DateTime
+import play.api.libs.json._
 
 case class Campaign(
   id: String,
@@ -39,7 +37,9 @@ case class Campaign(
 }
 
 object Campaign {
-  implicit val campaignFormat: Format[Campaign] = Jsonx.formatCaseClass[Campaign]
+  implicit val campaignFormat: Format[Campaign]    = Jsonx.formatCaseClass[Campaign]
+  implicit val defaultJodaReads: Reads[DateTime]   = JodaReads.DefaultJodaDateTimeReads
+  implicit val defaultJodaWrites: Writes[DateTime] = JodaWrites.JodaDateTimeNumberWrites
 
   def fromJson(json: JsValue): Either[CampaignCentralApiError, Campaign] =
     json.asOpt[Campaign].map(Right(_)) getOrElse Left(JsonParsingError(""))
