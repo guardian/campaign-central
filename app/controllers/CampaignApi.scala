@@ -2,8 +2,7 @@ package controllers
 
 import com.gu.googleauth.AuthAction
 import model._
-import model.command.CommandError._
-import model.command.{ImportCampaignFromCAPICommand, RefreshCampaignFromCAPICommand}
+import model.command._
 import model.reports._
 import play.api.Logger
 import play.api.libs.json.Json._
@@ -87,13 +86,14 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   def importFromTag() = authAction { req =>
-    implicit val user: Option[User] = Option(User(req.user))
+    implicit val user: User = User(req.user)
     req.body.asJson map { json =>
-      json.as[ImportCampaignFromCAPICommand].process() match {
-        case Left(e) =>
-          commandErrorAsResult(e)
+      val importCommand: ImportCampaignCommand = json.as[ImportCampaignCommand]
+      Commands.importCampaign(importCommand) match {
+        case Left(_) =>
+          InternalServerError
         case Right(campaign) =>
-          campaign map (t => Ok(Json.toJson(t))) getOrElse NotFound
+          Ok(Json.toJson(campaign))
       }
     } getOrElse {
       BadRequest("Expecting Json data")
@@ -101,12 +101,11 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   def refreshCampaignFromCAPI(campaignId: String) = authAction { req =>
-    implicit val user: Option[User] = Option(User(req.user))
-    RefreshCampaignFromCAPICommand(campaignId).process() match {
-      case Left(e) =>
-        commandErrorAsResult(e)
-      case Right(campaign) =>
-        campaign map (t => Ok(Json.toJson(t))) getOrElse NotFound
+    implicit val user: User = User(req.user)
+    Commands.refreshCampaignById(campaignId) match {
+      case Right(campaign)                 => Ok(Json.toJson(campaign))
+      case Left(CampaignNotFound(message)) => NotFound(message)
+      case Left(_)                         => InternalServerError
     }
   }
 

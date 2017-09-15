@@ -1,26 +1,19 @@
 package repositories
 
-import com.amazonaws.services.dynamodbv2.model.DeleteItemResult
+import com.gu.scanamo._
 import com.gu.scanamo.Scanamo
-import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.query.UniqueKey
 import com.gu.scanamo.syntax._
+import model.command.{CampaignCentralApiError, CampaignDeletionFailed, CampaignPutError}
 import model.{Campaign, CampaignWithSubItems}
 import play.api.Logger
 import services.AWS.DynamoClient
 import services.Config
 import util.DynamoResults.{getResult, getResults}
 
-import scala.util.Try
-import com.amazonaws.services.dynamodbv2.model.PutItemResult
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.error.DynamoReadError
-import com.gu.scanamo.syntax._
-import model.ContentItem
-import play.api.Logger
-import services.AWS.DynamoClient
-import services.Config
-import util.DynamoResults.getResults
+import scala.util.{Failure, Success, Try}
+
+case class CampaignRepositoryPutResult(campaign: Campaign)
+case class CampaignRepositoryDeleteResult(campaignId: String)
 
 object CampaignRepository {
 
@@ -28,41 +21,43 @@ object CampaignRepository {
 
   private val tableName = Config().campaignTableName
 
-  private def getCampaignByKey(key: UniqueKey[_]): Option[Campaign] = {
-    val x: Option[Either[DynamoReadError, Campaign]] = Scanamo.get(DynamoClient)(tableName)(key)
-    val w                                            = x flatMap (h => getResult(h))
-    w
+  def getCampaign(campaignId: String): Option[Campaign] = {
+    val option = Scanamo.get[Campaign](DynamoClient)(tableName)('id -> campaignId)
+    option.flatMap(getResult(_))
   }
 
-  def getCampaign(campaignId: String): Option[Campaign] =
-    getCampaignByKey('campaignId -> campaignId)
-
-//  def getCampaignByTag(tagId: Long): Option[Campaign] = {
-  def getCampaignByTag(tagId: String): Option[Campaign] = {
-    val tuple: UniqueKey[_] = 'tagId -> tagId
-    val option: Option[Either[DynamoReadError, Campaign]] =
-      Scanamo.get[Campaign](DynamoClient)(tableName)(tuple)
-    val h = option.flatMap(o => getResult(o))
-    h
+  def getCampaignByTag(tagId: Long): Option[Campaign] = {
+    val list = Scanamo.query[Campaign](DynamoClient)(tableName)('tagId -> tagId)
+    list.headOption.flatMap(getResult(_))
   }
 
-  def getAllCampaigns(): Seq[Campaign] = getResults(Scanamo.scan[Campaign](DynamoClient)(tableName))
+  def getAllCampaigns(): List[Campaign] = getResults(Scanamo.scan[Campaign](DynamoClient)(tableName))
 
-  def getCampaignWithSubItems(campaignId: String): Option[CampaignWithSubItems] = {
-
-    val campaign = getCampaign(campaignId)
-
-    campaign map { c =>
+  def getCampaignWithSubItems(campaignId: String): Option[CampaignWithSubItems] =
+    getCampaign(campaignId).map { campaign =>
       CampaignWithSubItems(
-        campaign = c,
-        content = CampaignContentRepository.getContentForCampaign(c.id)
+        campaign = campaign,
+        content = CampaignContentRepository.getContentForCampaign(campaign.id)
       )
     }
-  }
 
-  def deleteCampaign(campaignId: String): DeleteItemResult =
-    Scanamo.delete(DynamoClient)(tableName)('campaignId -> campaignId)
+  def deleteCampaign(campaignId: String): Either[CampaignCentralApiError, CampaignRepositoryDeleteResult] =
+    Try(Scanamo.delete(DynamoClient)(tableName)('campaignId -> campaignId)) match {
+      case Success(result) =>
+        Logger.debug(result.toString)
+        Right(CampaignRepositoryDeleteResult(campaignId))
+      case Failure(exception) =>
+        Logger.error(s"failed to delete campaign $campaignId", exception)
+        Left(CampaignDeletionFailed(campaignId, exception))
+    }
 
-  def putCampaign(campaign: Campaign): Option[Campaign] =
-    Try(Scanamo.put[Campaign](DynamoClient)(tableName)(campaign)).toOption.map(_ => campaign)
+  def putCampaign(campaign: Campaign): Either[CampaignCentralApiError, CampaignRepositoryPutResult] =
+    Try(Scanamo.put[Campaign](DynamoClient)(tableName)(campaign)) match {
+      case Success(result) =>
+        Logger.debug(result.toString)
+        Right(CampaignRepositoryPutResult(campaign))
+      case Failure(exception) =>
+        Logger.error(s"failed to persist campaign $campaign", exception)
+        Left(CampaignPutError(campaign, exception))
+    }
 }
