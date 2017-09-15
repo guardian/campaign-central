@@ -83,20 +83,17 @@ object Commands {
   }
 
   def refreshCampaignById(campaignId: String)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
-    CampaignRepository.getCampaign(campaignId) match {
-      case Right(campaign) =>
-        campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
-          case Some(content) =>
-            val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag(_).toOption)
+    CampaignRepository.getCampaign(campaignId) flatMap { campaign =>
+      campaign.pathPrefix.map(ContentApi.loadAllContentInSection(_)) match {
+        case Some(content) =>
+          val sponsorship = campaign.tagId.flatMap(TagManagerApi.getSponsorshipForTag(_).toOption)
 
-            Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
-            CommandUtils.updateCampaignAndContent(content, campaign, sponsorship, user)
-          case None =>
-            Logger.error(s"Campaign ${campaign.id} (${campaign.name}) is missing pathPrefix")
-            Left(CampaignMissingPathPrefix(campaign))
-        }
-
-      case Left(_) => Left(CampaignNotFound(s"Campaign ID $campaignId not found"))
+          Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
+          CommandUtils.updateCampaignAndContent(content, campaign, sponsorship, user)
+        case None =>
+          Logger.error(s"Campaign ${campaign.id} (${campaign.name}) is missing pathPrefix")
+          Left(CampaignMissingPathPrefix(campaign))
+      }
     }
   }
 }

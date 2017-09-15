@@ -29,7 +29,7 @@ class ManagementApi(components: ControllerComponents, authAction: AuthAction[Any
 
     expiringCampaigns match {
       case Left(error: JsonParsingError) => BadRequest(error.message)
-      case Left(_)                       => BadRequest
+      case Left(_)                       => InternalServerError
       case Right(campaigns) =>
         campaigns foreach { c =>
           Logger.info(s"campaign ${c.name} is due to expire, refreshing from CAPI")
