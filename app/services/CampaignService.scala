@@ -1,7 +1,9 @@
 package services
 
+import model.command.CampaignCentralApiError
 import model.{CampaignPageViewsItem, CampaignUniquesItem, GraphDataPoint, LatestCampaignAnalytics}
 import org.joda.time.DateTime
+import cats.syntax.either._
 import repositories.{
   CampaignPageViewsRepository,
   CampaignRepository,
@@ -23,99 +25,78 @@ object CampaignService {
     val ExcludedDeviceTypes = Set("UNKNOWN", "OTHER")
   }
 
-  def getPageViews(campaignId: String): Seq[CampaignPageViewsItem] = {
+  def getPageViews(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignPageViewsItem]] = {
     CampaignPageViewsRepository.getCampaignPageViews(campaignId)
   }
 
-  def getUniques(campaignId: String): Seq[CampaignUniquesItem] = {
+  def getUniques(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignUniquesItem]] = {
     CampaignUniquesRepository.getCampaignUniques(campaignId)
   }
 
-  def getLatestAnalyticsForCampaign(campaignId: String): Option[LatestCampaignAnalytics] = {
-
-    import util.DoubleUtils._
-
+  def getLatestAnalyticsForCampaign(campaignId: String): Either[CampaignCentralApiError, LatestCampaignAnalytics] = {
     for {
       campaign <- CampaignRepository.getCampaign(campaignId)
       latest   <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(campaignId)
     } yield {
       val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
       val uniquesTarget: Long    = campaign.targets.getOrElse("uniques", 0)
-      LatestCampaignAnalytics(
-        latest.campaignId,
-        latest.uniques,
-        uniquesDeviceBreakdown.mobile,
-        uniquesDeviceBreakdown.desktop,
-        uniquesTarget,
-        latest.pageviews,
-        latest.medianAttentionTimeSeconds,
-        latest.medianAttentionTimeByDevice.map(normaliseDeviceData),
-        latest.weightedAverageDwellTimeForCampaign.map(_.to2Dp),
-        latest.averageDwellTimePerPathSeconds.map(_.mapValues(_.to2Dp))
-      )
-
+      LatestCampaignAnalytics(latest, uniquesDeviceBreakdown, uniquesTarget)
     }
   }
 
-  def getLatestCampaignAnalytics(): Map[String, LatestCampaignAnalytics] = {
+  def getLatestCampaignAnalytics(): Either[CampaignCentralApiError, Map[String, LatestCampaignAnalytics]] = {
 
-    import util.DoubleUtils._
-
-    val latestCampaignAnalytics = LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics()
-    val campaignsWeHaveUniquesFor =
-      CampaignRepository.getAllCampaigns().filter(c => latestCampaignAnalytics.map(_.campaignId).contains(c.id))
-
-    val results = campaignsWeHaveUniquesFor flatMap { campaign =>
-      for {
-        latest <- latestCampaignAnalytics.find(_.campaignId == campaign.id)
-      } yield {
-        val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
-        val uniquesTarget: Long    = campaign.targets.getOrElse("uniques", 0)
-        campaign.id ->
-          LatestCampaignAnalytics(
-            latest.campaignId,
-            latest.uniques,
-            uniquesDeviceBreakdown.mobile,
-            uniquesDeviceBreakdown.desktop,
-            uniquesTarget,
-            latest.pageviews,
-            latest.medianAttentionTimeSeconds,
-            latest.medianAttentionTimeByDevice.map(normaliseDeviceData),
-            latest.weightedAverageDwellTimeForCampaign.map(_.to2Dp),
-            latest.averageDwellTimePerPathSeconds.map(_.mapValues(_.to2Dp))
-          )
+    for {
+      latestCampaignAnalytics <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics()
+      campaignsWeHaveUniquesFor <- CampaignRepository
+        .getAllCampaigns()
+        .map(campaigns => campaigns.filter(c => latestCampaignAnalytics.map(_.campaignId).contains(c.id)))
+    } yield {
+      val results = campaignsWeHaveUniquesFor flatMap { campaign =>
+        for {
+          latest <- latestCampaignAnalytics.find(_.campaignId == campaign.id)
+        } yield {
+          val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
+          val uniquesTarget: Long    = campaign.targets.getOrElse("uniques", 0)
+          campaign.id -> LatestCampaignAnalytics(latest, uniquesDeviceBreakdown, uniquesTarget)
+        }
       }
-    }
 
-    results.toMap
+      results.toMap
+    }
   }
 
-  def getUniquesDataForGraph(campaignId: String): Option[Seq[GraphDataPoint]] = {
+  def getUniquesDataForGraph(campaignId: String): Either[CampaignCentralApiError, Option[Seq[GraphDataPoint]]] = {
 
-    val campaignUniques = CampaignUniquesRepository.getCampaignUniques(campaignId)
-    val initialDataPoint = campaignUniques.headOption.map { item =>
-      item.copy(reportExecutionTimestamp = new DateTime(item.reportExecutionTimestamp).minusDays(1).toString,
-                uniques = 0L)
-    }
-
-    val uniqueItems = initialDataPoint ++ campaignUniques
-    val maybeTarget = CampaignRepository.getCampaign(campaignId).flatMap(_.targets.get("uniques"))
-
-    maybeTarget map { target =>
-      val runRateStep = {
-        val numItems = uniqueItems.size.toLong
-        if (numItems == 0) 1
-        else target / numItems
+    for {
+      campaignUniques <- CampaignUniquesRepository.getCampaignUniques(campaignId)
+      campaign        <- CampaignRepository.getCampaign(campaignId)
+    } yield {
+      val initialDataPoint = campaignUniques.headOption.map { item =>
+        item.copy(reportExecutionTimestamp = new DateTime(item.reportExecutionTimestamp).minusDays(1).toString,
+                  uniques = 0L)
       }
-      val runRate = Seq.range[Long](0, target + runRateStep, runRateStep)
-      (uniqueItems zip runRate).map {
-        case (unique, rate) =>
-          GraphDataPoint(
-            name = unique.reportExecutionTimestamp,
-            dataPoint = unique.uniques,
-            target = rate
-          )
-      }.toSeq
+
+      val uniqueItems = initialDataPoint ++ campaignUniques
+      val maybeTarget = campaign.targets.get("uniques")
+
+      maybeTarget map { target =>
+        val runRateStep = {
+          val numItems = uniqueItems.size.toLong
+          if (numItems == 0) 1
+          else target / numItems
+        }
+
+        val runRate = Seq.range[Long](0, target + runRateStep, runRateStep)
+        (uniqueItems zip runRate).map {
+          case (unique, rate) =>
+            GraphDataPoint(
+              name = unique.reportExecutionTimestamp,
+              dataPoint = unique.uniques,
+              target = rate
+            )
+        }.toSeq
+      }
     }
   }
 
@@ -123,9 +104,12 @@ object CampaignService {
 
   private def breakdownUniquesByMobileAndDesktop(totalUniques: Long,
                                                  uniquesPerDevice: Map[String, Long]): DeviceBreakdown = {
+
     val uniquesFromOther: Long =
       uniquesPerDevice.filter { case (key, _) => DeviceTypes.ExcludedDeviceTypes.contains(key) }.values.sum
+
     val uniquesByDeviceWithoutExcludes = uniquesPerDevice -- DeviceTypes.ExcludedDeviceTypes
+
     val (mobile, _) = uniquesByDeviceWithoutExcludes.partition {
       case (key, _) => DeviceTypes.MobileDeviceTypes.contains(key)
     }
@@ -134,18 +118,5 @@ object CampaignService {
     val uniquesFromDesktop = totalUniques - uniquesFromMobile
 
     DeviceBreakdown(uniquesFromMobile, uniquesFromDesktop)
-  }
-
-  private def normaliseDeviceData(data: Map[String, Long]): Map[String, Long] = {
-    data.map {
-      case (deviceType, medianAttentionTime) =>
-        deviceType match {
-          case "GUARDIAN_IOS_NATIVE_APP"     => "IOS APP"     -> medianAttentionTime
-          case "GUARDIAN_ANDROID_NATIVE_APP" => "ANDROID APP" -> medianAttentionTime
-          case "PERSONAL_COMPUTER"           => "DESKTOP"     -> medianAttentionTime
-          case "SMARTPHONE"                  => "MOBILE"      -> medianAttentionTime
-          case other                         => other         -> medianAttentionTime
-        }
-    }
   }
 }

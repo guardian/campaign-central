@@ -1,9 +1,7 @@
 package model
 
 import java.time.LocalDate
-
-import play.api.libs.json._
-import repositories.CampaignReferralRepository
+import play.api.libs.json.{Json, Writes}
 
 case class Component(
   platform: String,
@@ -28,9 +26,5 @@ case class CampaignReferral(
 )
 
 object CampaignReferral {
-
   implicit val referralWrites: Writes[CampaignReferral] = Json.writes[CampaignReferral]
-
-  def forCampaign(campaignId: String): Seq[CampaignReferral] =
-    CampaignReferralRepository.getCampaignReferrals(campaignId)
 }

@@ -1,10 +1,9 @@
 package model
 
 import com.amazonaws.services.dynamodbv2.document.Item
-import play.api.Logger
+import model.command.{CampaignCentralApiError, JsonParsingError}
 import play.api.libs.json.{Json, Reads}
-
-import scala.util.control.NonFatal
+import cats.syntax.either._
 
 case class CampaignReferralRow(
   campaignId: String,
@@ -25,12 +24,6 @@ object CampaignReferralRow {
 
   implicit val itemReads: Reads[CampaignReferralRow] = Json.reads[CampaignReferralRow]
 
-  def fromItem(item: Item): Option[CampaignReferralRow] =
-    try {
-      Some(Json.parse(item.toJSON).as[CampaignReferralRow])
-    } catch {
-      case NonFatal(e) =>
-        Logger.error(s"failed to load referral ${item.toJSON}", e)
-        None
-    }
+  def fromItem(item: Item): Either[CampaignCentralApiError, CampaignReferralRow] =
+    Either.catchNonFatal(Json.parse(item.toJSON).as[CampaignReferralRow]).leftMap(e => JsonParsingError(e.getMessage))
 }

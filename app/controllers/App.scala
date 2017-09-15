@@ -17,14 +17,12 @@ class App(components: ControllerComponents, authAction: AuthAction[AnyContent])
     }
 
     val clientConf = Map(
-      "tagManagerUrl"     -> Config().tagManagerApiUrl,
-      "composerUrl"       -> Config().composerUrl,
-      "liveUrl"           -> Config().liveUrl,
-      "previewUrl"        -> Config().previewUrl,
-      "mediaAtomMakerUrl" -> Config().mediaAtomMakerUrl,
-      "ctaAtomMakerUrl"   -> Config().ctaAtomMakerUrl
+      "tagManagerUrl" -> Config().tagManagerApiUrl,
+      "composerUrl"   -> Config().composerUrl,
+      "liveUrl"       -> Config().liveUrl,
+      "previewUrl"    -> Config().previewUrl
     )
 
-    Ok(views.html.Application.app("Campaign Central", jsLocation, Json.toJson(clientConf).toString()))
+    Ok(views.html.Application.app("Campaign Central", jsLocation, Json.toJson(clientConf).toString))
   }
 }
