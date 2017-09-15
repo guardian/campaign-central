@@ -81,7 +81,7 @@ export default class CampaignPerformanceOverview extends React.Component {
           </div>
           <div className="campaign-info__field">
             <label>Uniques so far</label>
-            <span className="campaign-info__field__value">{uniquesSoFar ? uniquesSoFar : "none available"} {this.renderPercentageOfTarget(uniquesSoFar, uniquesTarget)} ({uniquesFromMobilePercentage}% on mobile, {uniquesFromDesktopPercentage}% on desktop)</span>
+            <span className="campaign-info__field__value">{uniquesSoFar ? uniquesSoFar : "none available"} {this.renderPercentageOfTarget(uniquesSoFar, uniquesTarget)} {uniquesFromMobilePercentage && uniquesFromDesktopPercentage ? '(' + uniquesFromMobilePercentage + '% on mobile,' + uniquesFromDesktopPercentage + '% on desktop)' : ''}</span>
           </div>
           <div className="campaign-info__field">
             <label className={ R.isEmpty(medianPerDevice) ? "" : "hover" }>
