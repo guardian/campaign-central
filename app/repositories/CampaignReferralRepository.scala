@@ -2,48 +2,24 @@ package repositories
 
 import java.time.LocalDate
 
-<<<<<<< HEAD
+import cats.implicits._
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
+import model.command.{CampaignCentralApiError, JsonParsingError}
 import model.{CampaignReferral, CampaignReferralRow, Component}
-import play.api.Logger
 import services.AWS.DynamoClient
 import services.Config
-import util.DynamoResults.getResults
-
-object CampaignReferralRepository {
-
-  private implicit val logger: Logger = Logger(getClass)
-
-  def getCampaignReferrals(campaignId: String): Seq[CampaignReferral] = {
-
-    val rows = {
-      val query = 'campaignId -> campaignId
-      getResults(Scanamo.query[CampaignReferralRow](DynamoClient)(Config().campaignReferralTableName)(query))
-    }
-
-    val groupedRows = rows.groupBy(row => (row.platform, row.edition, row.path, row.containerIndex, row.cardIndex))
-=======
-import model.command.{CampaignCentralApiError}
-import model.{CampaignReferral, CampaignReferralRow, Component}
-import services.Dynamo
-import cats.implicits._
-
-import scala.collection.JavaConversions._
+import util.DynamoResults.getResultsOrFirstFailure
 
 object CampaignReferralRepository {
 
   def getCampaignReferrals(campaignId: String): Either[CampaignCentralApiError, List[CampaignReferral]] = {
+    val query  = 'campaignId -> campaignId
+    val result = Scanamo.query[CampaignReferralRow](DynamoClient)(Config().campaignReferralTableName)(query)
+    getResultsOrFirstFailure(result) match {
 
-    val rowsOrError: Either[CampaignCentralApiError, List[CampaignReferralRow]] = {
-      val results: List[Either[CampaignCentralApiError, CampaignReferralRow]] =
-        Dynamo.campaignReferralTable.query("campaignId", campaignId).map(CampaignReferralRow.fromItem).toList
-      results.sequence
-    }
->>>>>>> master
+      case Left(e) => Left(JsonParsingError(e.show))
 
-    rowsOrError match {
-      case Left(error) => Left(error)
       case Right(rows) =>
         val groupedRows = rows.groupBy(row => (row.platform, row.edition, row.path, row.containerIndex, row.cardIndex))
 
@@ -81,5 +57,4 @@ object CampaignReferralRepository {
     case "WINDOWS_NATIVE_APP" => "Windows"
     case other                => other
   }
-
 }

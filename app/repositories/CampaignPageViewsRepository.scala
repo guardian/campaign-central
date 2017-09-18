@@ -1,19 +1,21 @@
 package repositories
 
+import cats.implicits._
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import model.CampaignPageViewsItem
-import play.api.Logger
+import model.command.{CampaignCentralApiError, JsonParsingError}
 import services.AWS.DynamoClient
 import services.Config
-import util.DynamoResults.getResults
+import util.DynamoResults.getResultsOrFirstFailure
 
 object CampaignPageViewsRepository {
 
-  private implicit val logger: Logger = Logger(getClass)
-
-  def getCampaignPageViews(campaignId: String): List[CampaignPageViewsItem] = {
+  def getCampaignPageViews(campaignId: String): Either[CampaignCentralApiError, List[CampaignPageViewsItem]] = {
     val tableName = Config().campaignPageviewsTableName
-    getResults(Scanamo.query[CampaignPageViewsItem](DynamoClient)(tableName)('campaignId -> campaignId))
+    val result    = Scanamo.query[CampaignPageViewsItem](DynamoClient)(tableName)('campaignId -> campaignId)
+    getResultsOrFirstFailure(result).left map { e =>
+      JsonParsingError(e.show)
+    }
   }
 }

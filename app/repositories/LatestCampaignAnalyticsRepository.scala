@@ -1,58 +1,28 @@
 package repositories
 
+import cats.implicits._
 import com.gu.scanamo.Scanamo
 import com.gu.scanamo.syntax._
 import model.LatestCampaignAnalyticsItem
-<<<<<<< HEAD
-import play.api.Logger
+import model.command.{CampaignCentralApiError, JsonParsingError, LatestCampaignAnalyticsItemNotFound}
 import services.AWS.DynamoClient
 import services.Config
-import util.DynamoResults.getResults
+import util.DynamoResults.getResultsOrFirstFailure
 
 object LatestCampaignAnalyticsRepository {
-
-  private implicit val logger: Logger = Logger(getClass)
 
   private val tableName = Config().latestCampaignAnalyticsTableName
 
-  def getLatestCampaignAnalytics(): Seq[LatestCampaignAnalyticsItem] =
-    getResults(Scanamo.scan[LatestCampaignAnalyticsItem](DynamoClient)(tableName))
-
-  def getLatestCampaignAnalytics(campaignId: String): Option[LatestCampaignAnalyticsItem] = {
-    val query = 'campaignId -> campaignId
-    getResults(Scanamo.query[LatestCampaignAnalyticsItem](DynamoClient)(tableName)(query)).headOption
-=======
-import model.command.{CampaignCentralApiError, LatestCampaignAnalyticsItemNotFound}
-import services.Dynamo
-import cats.implicits._
-
-import scala.collection.JavaConverters._
-
-object LatestCampaignAnalyticsRepository {
-
-  def getLatestCampaignAnalytics(): Either[CampaignCentralApiError, List[LatestCampaignAnalyticsItem]] = {
-    val results: List[Either[CampaignCentralApiError, LatestCampaignAnalyticsItem]] =
-      Dynamo.latestCampaignAnalyticsTable.scan().asScala.toList.map(LatestCampaignAnalyticsItem.fromItem)
-
-    results.sequence
-  }
-
-  def getLatestCampaignAnalytics(campaignId: String): Either[CampaignCentralApiError, LatestCampaignAnalyticsItem] = {
-    val maybeLatestItemOrError: Either[CampaignCentralApiError, Option[LatestCampaignAnalyticsItem]] = {
-      val result: Option[Either[CampaignCentralApiError, LatestCampaignAnalyticsItem]] =
-        Dynamo.latestCampaignAnalyticsTable
-          .query("campaignId", campaignId)
-          .asScala
-          .headOption
-          .map(LatestCampaignAnalyticsItem.fromItem)
-
-      result.sequence
+  def getLatestCampaignAnalytics(): Either[CampaignCentralApiError, List[LatestCampaignAnalyticsItem]] =
+    getResultsOrFirstFailure(Scanamo.scan[LatestCampaignAnalyticsItem](DynamoClient)(tableName)).left map { e =>
+      JsonParsingError(e.show)
     }
 
-    maybeLatestItemOrError.flatMap(
-      maybeLatestItem =>
-        maybeLatestItem.map(Right(_)) getOrElse Left(
-          LatestCampaignAnalyticsItemNotFound(s"Could not find latest analytics for campaign with id $campaignId")))
->>>>>>> master
+  def getLatestCampaignAnalytics(campaignId: String): Either[CampaignCentralApiError, LatestCampaignAnalyticsItem] = {
+    Scanamo.query[LatestCampaignAnalyticsItem](DynamoClient)(tableName)('campaignId -> campaignId).headOption map {
+      case Left(e)              => Left(JsonParsingError(e.show))
+      case Right(analyticsItem) => Right(analyticsItem)
+    } getOrElse
+      Left(LatestCampaignAnalyticsItemNotFound(s"Could not find latest analytics for campaign with id $campaignId"))
   }
 }

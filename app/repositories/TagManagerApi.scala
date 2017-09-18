@@ -23,7 +23,7 @@ object TagManagerApi {
     val resp = httpClient.newCall(req).execute
 
     resp.code match {
-      case 404 => Left(SponsorshipNotFound("Sponsorship for tag with id $id not found."))
+      case 404 => Left(SponsorshipNotFound(s"Sponsorship for tag with id $id not found."))
       case 200 =>
         val responseJson = Json.parse(resp.body().string())
         (responseJson \ "data" \\ "data").headOption.map(_.as[Sponsorship]).map(Right(_)) getOrElse Left(

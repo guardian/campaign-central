@@ -14,15 +14,19 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   extends AbstractController(components) {
 
   def getCampaign(id: String) = authAction {
-    CampaignRepository.getCampaign(id) map { campaign =>
-      Ok(Json.toJson(campaign))
-    } getOrElse NotFound
+    CampaignRepository.getCampaign(id) match {
+      case Left(CampaignNotFound(error)) => NotFound(error)
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(_)                       => InternalServerError
+      case Right(campaign)               => Ok(Json.toJson(campaign))
+    }
   }
 
   def getAllCampaigns() = authAction {
     CampaignRepository.getAllCampaigns() match {
-      case Left(_)          => InternalServerError
-      case Right(campaigns) => Ok(Json.toJson(campaigns))
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(_)                       => InternalServerError
+      case Right(campaigns)              => Ok(Json.toJson(campaigns))
     }
   }
 
@@ -49,8 +53,9 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
       case None => BadRequest("Could not convert json to campaign")
       case Some(campaign) =>
         CampaignRepository.putCampaign(campaign) match {
-          case Left(_)  => InternalServerError
-          case Right(_) => Ok(Json.toJson(campaign))
+          case Left(CampaignPutError(_, e)) => InternalServerError(e.getMessage)
+          case Left(_)                      => InternalServerError
+          case Right(_)                     => Ok(Json.toJson(campaign))
         }
     }
   }
@@ -66,8 +71,9 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
 
   def getCampaignPageViewsFromDatalake(id: String) = authAction { _ =>
     CampaignService.getPageViews(id) match {
-      case Left(_)          => InternalServerError
-      case Right(pageViews) => Ok(Json.toJson(pageViews))
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(_)                       => InternalServerError
+      case Right(pageViews)              => Ok(Json.toJson(pageViews))
     }
   }
 
@@ -78,8 +84,9 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
 
   def getCampaignContent(id: String) = authAction { _ =>
     CampaignContentRepository.getContentForCampaign(id) match {
-      case Left(_)        => InternalServerError
-      case Right(content) => Ok(Json.toJson(content))
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(_)                       => InternalServerError
+      case Right(content)                => Ok(Json.toJson(content))
     }
   }
 
@@ -109,8 +116,9 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   def getCampaignReferrals(campaignId: String) = authAction { _ =>
     Logger.info(s"Loading on-platform referrals for campaign $campaignId")
     CampaignReferralRepository.getCampaignReferrals(campaignId) match {
-      case Left(_)          => InternalServerError
-      case Right(referrals) => Ok(Json.toJson(referrals))
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(_)                       => InternalServerError
+      case Right(referrals)              => Ok(Json.toJson(referrals))
     }
   }
 }
