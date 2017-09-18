@@ -14,19 +14,6 @@ class CampaignContent extends Component {
     }
   }
 
-  renderContentAtoms = (atom) => {
-    return (
-      <div key={atom.id} className="campaign-content-list__row">
-        <div className="campaign-content-list__content-type"></div>
-        <div className="campaign-content-list__atom-title">{atom.type}: {atom.title}</div>
-        <div className="campaign-content-list__content-status"></div>
-        <div className="campaign-content-list__content-links">
-          <a href={mediaAtomEditUrl(atom.id)} target="_blank" title="Edit in atom builder"><i className="i-atom" /></a>
-        </div>
-      </div>
-    );
-  }
-
   renderContentItem = (content) => {
     var contentTypeIcon;
 
@@ -61,7 +48,6 @@ class CampaignContent extends Component {
             <a href={liveUrl(content.path)} target="_blank" title="See live"><i className="i-live-site" /></a>
           </div>
         </div>
-        {content.atoms.map( this.renderContentAtoms )}
       </div>
     );
   }

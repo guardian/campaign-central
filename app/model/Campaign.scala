@@ -1,14 +1,11 @@
 package model
 
 import ai.x.play.json.Jsonx
+import cats.syntax.either._
 import com.amazonaws.services.dynamodbv2.document.Item
+import model.command.{CampaignCentralApiError, JsonParsingError}
 import org.joda.time.DateTime
-import play.api.Logger
-import play.api.libs.json.JodaReads._
-import play.api.libs.json.JodaWrites._
 import play.api.libs.json._
-
-import scala.util.control.NonFatal
 
 case class Campaign(
   id: String,
@@ -22,7 +19,6 @@ case class Campaign(
   tagId: Option[Long] = None,
   campaignLogo: Option[String] = None,
   pathPrefix: Option[String] = None,
-  callToActions: List[CallToAction] = Nil,
   nominalValue: Option[Long] = None,
   actualValue: Option[Long] = None,
   startDate: Option[DateTime] = None,
@@ -32,7 +28,8 @@ case class Campaign(
   targets: Map[String, Long] = Map.empty
 ) {
 
-  def toItem = Item.fromJSON(Json.toJson(this).toString())
+  def toItem: Either[CampaignCentralApiError, Item] =
+    Option(Item.fromJSON(Json.toJson(this).toString())).map(Right(_)) getOrElse Left(JsonParsingError(""))
 
   def gaFilterExpression: Option[String] = pathPrefix.map { path =>
     s"ga:pagePath=~/$path"
@@ -40,17 +37,13 @@ case class Campaign(
 }
 
 object Campaign {
-  implicit val campaignFormat: Format[Campaign] = Jsonx.formatCaseClass[Campaign]
+  implicit val campaignFormat: Format[Campaign]    = Jsonx.formatCaseClass[Campaign]
+  implicit val defaultJodaReads: Reads[DateTime]   = JodaReads.DefaultJodaDateTimeReads
+  implicit val defaultJodaWrites: Writes[DateTime] = JodaWrites.JodaDateTimeNumberWrites
 
-  def fromJson(json: JsValue) = json.as[Campaign]
+  def fromJson(json: JsValue): Either[CampaignCentralApiError, Campaign] =
+    json.asOpt[Campaign].map(Right(_)) getOrElse Left(JsonParsingError(""))
 
-  def fromItem(item: Item) =
-    try {
-      Json.parse(item.toJSON).as[Campaign]
-    } catch {
-      case NonFatal(e) => {
-        Logger.error(s"failed to load campaign ${item.toJSON}", e)
-        throw e
-      }
-    }
+  def fromItem(item: Item): Either[CampaignCentralApiError, Campaign] =
+    Either.catchNonFatal(Json.parse(item.toJSON).as[Campaign]).leftMap(e => JsonParsingError(e.getMessage))
 }

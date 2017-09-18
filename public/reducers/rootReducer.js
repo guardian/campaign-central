@@ -6,7 +6,6 @@ import campaign from './campaignReducer';
 import campaignPageViews from './campaignPageViewsReducer';
 import campaignUniques from './campaignUniquesReducer';
 import campaignTargetsReport from './campaignTargetsReportReducer';
-import campaignQualifiedReport from './campaignQualifiedReportReducer';
 import campaignCtaStats from './campaignCtaStatsReducer';
 import campaignContent from './campaignContentReducer';
 import campaignReferrals from './campaignReferralReducer';
@@ -22,7 +21,6 @@ export default combineReducers({
   campaignPageViews,
   campaignUniques,
   campaignTargetsReport,
-  campaignQualifiedReport,
   campaignCtaStats,
   campaignContent,
   campaignReferrals,

@@ -7,6 +7,7 @@ name := "campaign-central"
 version := "1.0"
 
 resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-tools"
+resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 val slf4jVersion    = "1.7.25"
 val playJsonVersion = "2.6.2"
@@ -14,6 +15,7 @@ val playJsonVersion = "2.6.2"
 lazy val dependencies = Seq(
   "com.typesafe.play"                %% "play-json"                             % playJsonVersion,
   "com.typesafe.play"                %% "play-json-joda"                        % playJsonVersion,
+  "org.typelevel"                    %% "cats-core"                             % "0.9.0",
   "ai.x"                             %% "play-json-extensions"                  % "0.10.0",
   "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor"                % "2.8.9",
   "com.amazonaws"                    % "aws-java-sdk"                           % "1.11.170",
@@ -45,6 +47,9 @@ lazy val root = (project in file("."))
       "-J-XX:+PrintGCDateStamps",
       s"-J-Xloggc:/var/log/${packageName.value}/gc.log"
     ),
+    scalacOptions := Seq(
+      "-Ypartial-unification"
+    ),
     debianPackageDependencies := Seq("openjdk-8-jre-headless"),
     maintainer := "Commercial Dev Team <commercial.dev@theguardian.com>",
     packageSummary := description.value,
@@ -63,8 +68,8 @@ lazy val root = (project in file("."))
       riffRaffPackageType.value              -> s"${name.value}/${riffRaffPackageType.value.getName}",
       baseDirectory.value / "riff-raff.yaml" -> "riff-raff.yaml"
     ),
-    scalaVersion := "2.11.8",
-    scalaVersion in ThisBuild := "2.11.8",
+    scalaVersion := "2.11.11",
+    scalaVersion in ThisBuild := "2.11.11",
     libraryDependencies ++= dependencies,
     scalafmtOnCompile := true
   )

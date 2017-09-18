@@ -48,8 +48,6 @@ sealed trait Config {
   def composerUrl: String
   def liveUrl: String
   def previewUrl: String
-  def mediaAtomMakerUrl: String
-  def ctaAtomMakerUrl: String
 
   // remote configuration is used for things we don't want to check in to version control
   // such as passwords, private urls, and gossip about other teams
@@ -110,8 +108,6 @@ class DevConfig extends Config {
   override def composerUrl           = "https://composer.local.dev-gutools.co.uk"
   override def liveUrl               = "https://www.theguardian.com"
   override def previewUrl            = "https://viewer.gutools.co.uk/preview"
-  override def mediaAtomMakerUrl     = "https://video.local.dev-gutools.co.uk"
-  override def ctaAtomMakerUrl       = "https://cta-atom-maker.local.dev-gutools.co.uk"
 }
 
 class ProdConfig extends Config {
@@ -122,6 +118,4 @@ class ProdConfig extends Config {
   override def composerUrl           = "https://composer.gutools.co.uk"
   override def liveUrl               = "https://www.theguardian.com"
   override def previewUrl            = "https://viewer.gutools.co.uk/preview"
-  override def mediaAtomMakerUrl     = "https://video.gutools.co.uk"
-  override def ctaAtomMakerUrl       = "https://cta-atom-maker.gutools.co.uk"
 }

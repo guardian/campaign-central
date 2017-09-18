@@ -50,7 +50,7 @@ class AppComponents(context: Context)
   val appController           = new App(controllerComponents, authAction)
   val campaignApiController   = new CampaignApi(controllerComponents, authAction)
   val managementApiController = new ManagementApi(controllerComponents, authAction)
-  val managementController    = new Management(controllerComponents)
+  val healthcheckController   = new Healthcheck(controllerComponents)
   val assetsController        = new Assets(httpErrorHandler, assetsMetadata)
   val logInController         = new LogIn(wsClient, controllerComponents, googleAuthConfig)
 
@@ -61,6 +61,6 @@ class AppComponents(context: Context)
     campaignApiController,
     managementApiController,
     assetsController,
-    managementController
+    healthcheckController
   )
 }

@@ -1,14 +1,18 @@
 package repositories
 
-import com.amazonaws.services.dynamodbv2.model.{DeleteItemResult, PutItemResult}
-import com.gu.scanamo.Scanamo
-import com.gu.scanamo.syntax._
+import com.amazonaws.services.dynamodbv2.document.{DeleteItemOutcome, Item, PutItemOutcome}
 import model.ContentItem
-import model.command.{CampaignCentralApiError, CampaignItemDeletionFailed, ContentItemFailedToPersist}
+import model.command.{
+  CampaignCentralApiError,
+  CampaignItemDeletionFailed,
+  ContentItemFailedToPersist,
+  ContentItemNotFound
+}
 import play.api.Logger
 import services.AWS.DynamoClient
 import services.Config
 import util.DynamoResults.getResults
+import cats.implicits._
 
 import scala.util.{Failure, Success, Try}
 
@@ -23,6 +27,25 @@ object CampaignContentRepository {
 
   def getContentForCampaign(campaignId: String): List[ContentItem] =
     getResults(Scanamo.query[ContentItem](DynamoClient)(tableName)('campaignId -> campaignId))
+  def getContentForCampaign(campaignId: String): Either[CampaignCentralApiError, List[ContentItem]] = {
+    val result: List[Either[CampaignCentralApiError, ContentItem]] = getItemsForCampaignId(campaignId).map {
+      ContentItem.fromItem
+    }
+    result.sequence
+  }
+
+  def getContent(campaignId: String, id: String): Either[CampaignCentralApiError, ContentItem] = {
+    val contentItemOrError: Either[CampaignCentralApiError, Option[ContentItem]] = {
+      val result: Option[Either[CampaignCentralApiError, ContentItem]] =
+        Option(Dynamo.campaignContentTable.getItem("campaignId", campaignId, "id", id)).map { ContentItem.fromItem }
+      result.sequence
+    }
+
+    contentItemOrError.flatMap(
+      item =>
+        item.map(Right(_)) getOrElse Left(
+          ContentItemNotFound(s"Could not find content item with campaign id $campaignId and id $id")))
+  }
 
   def deleteContentForCampaign(campaignId: String): Either[CampaignCentralApiError, DeleteCampaignContentResult] = {
     Try {

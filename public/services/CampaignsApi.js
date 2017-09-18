@@ -47,7 +47,7 @@ export function fetchLatestAnalyticsForCampaign(id) {
 
 export function fetchCampaignPageViews(id) {
   return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/pageViews',
+    url: '/api/v2/campaigns/' + id + '/pageViews',
     method: 'get'
   });
 }
@@ -66,13 +66,6 @@ export function fetchCampaignTargetsReport(id) {
   });
 }
 
-export function fetchCampaignQualifiedReport(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/qualifiedReport',
-    method: 'get'
-  });
-}
-
 export function fetchCampaignContent(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/content',
@@ -83,13 +76,6 @@ export function fetchCampaignContent(id) {
 export function fetchCampaignReferrals(id) {
   return AuthedReqwest({
     url: '/api/v2/campaigns/' + id + '/referrals',
-    method: 'get'
-  });
-}
-
-export function fetchCampaignCtaStats(id) {
-  return AuthedReqwest({
-    url: '/api/campaigns/' + id + '/ctastats',
     method: 'get'
   });
 }
