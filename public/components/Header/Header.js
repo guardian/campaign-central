@@ -15,7 +15,7 @@ export default class Header extends React.Component {
                     <div className="header__logo__text--small">Central</div>
                 </Link>
                 <div className="header__title">
-                  This tool is under active development and we want your feedback to make it better. Contact the team on <span style={{color: '#37c7ba'}}>commercial.dev@guardian.co.uk</span>
+                  This tool is under active development and we want your feedback to make it better. Contact the team on <span style={{color: '#37c7ba'}}><a href="mailto:commercial.dev@theguardian.com?subject=Campaign%20Central%20Feedback">commercial.dev@theguardian.com</a></span>
                 </div>
             </header>
         );
