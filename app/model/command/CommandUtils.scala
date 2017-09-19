@@ -69,7 +69,7 @@ object CommandUtils {
         Left(firstLeft)
       case (Nil, _) =>
         val startDate = apiContent.flatMap(_.fields.flatMap(_.firstPublicationDate)).sortBy(_.dateTime).headOption
-        val endDate   = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1)))
+        val endDate   = sponsorship.flatMap(_.validTo.map(_.withTimeAtStartOfDay().plusDays(1))) orElse Some(DateTime.now.plusYears(1)) // give default endDate.
 
         val status = (startDate, endDate) match {
           case (_, Some(ed)) if ed.isBeforeNow => "dead"
