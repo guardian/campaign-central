@@ -13,10 +13,10 @@ import util.DynamoResults.getResultsOrFirstFailure
 
 object CampaignReferralRepository {
 
+  private val table = Table[CampaignReferralRow](Config().campaignReferralTableName)
+
   def getCampaignReferrals(campaignId: String): Either[CampaignCentralApiError, List[CampaignReferral]] = {
-    val query  = 'campaignId -> campaignId
-    val result = Scanamo.query[CampaignReferralRow](DynamoClient)(Config().campaignReferralTableName)(query)
-    getResultsOrFirstFailure(result) match {
+    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.query('campaignId -> campaignId))) match {
 
       case Left(e) => Left(JsonParsingError(e.show))
 

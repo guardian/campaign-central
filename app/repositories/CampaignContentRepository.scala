@@ -2,7 +2,7 @@ package repositories
 
 import cats.implicits._
 import com.amazonaws.services.dynamodbv2.model.{DeleteItemResult, PutItemResult}
-import com.gu.scanamo.Scanamo
+import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.syntax._
 import model.ContentItem
 import model.command._
@@ -18,17 +18,16 @@ case class DeleteCampaignContentResult(campignId: String, deletedItemCount: Int,
 
 object CampaignContentRepository {
 
-  private val tableName = Config().campaignContentTableName
+  private val table = Table[ContentItem](Config().campaignContentTableName)
 
   def getContentForCampaign(campaignId: String): Either[CampaignCentralApiError, List[ContentItem]] = {
-    val result = Scanamo.query[ContentItem](DynamoClient)(tableName)('campaignId -> campaignId)
-    getResultsOrFirstFailure(result).leftMap { e =>
+    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.query('campaignId -> campaignId))).leftMap { e =>
       JsonParsingError(e.show)
     }
   }
 
   def getContent(campaignId: String, id: String): Either[CampaignCentralApiError, ContentItem] =
-    Scanamo.get[ContentItem](DynamoClient)(tableName)('campaignId -> campaignId and 'id -> id) map {
+    Scanamo.exec(DynamoClient)(table.get('campaignId -> campaignId and 'id -> id)) map {
       case Left(e)            => Left(JsonParsingError(e.show))
       case Right(contentItem) => Right(contentItem)
     } getOrElse
@@ -40,7 +39,7 @@ object CampaignContentRepository {
       case Right(content) =>
         Try {
           for (item <- content)
-            yield Scanamo.delete(DynamoClient)(tableName)('campaignId -> campaignId and 'id -> item.id)
+            yield Scanamo.exec(DynamoClient)(table.delete('campaignId -> campaignId and 'id -> item.id))
         } match {
           case Success(results) =>
             Logger.info(s"Deleted ${results.length} items for $campaignId")
@@ -52,7 +51,7 @@ object CampaignContentRepository {
     }
 
   def putContent(contentItem: ContentItem): Either[CampaignCentralApiError, PutContentItemResult] =
-    Try(Scanamo.put(DynamoClient)(tableName)(contentItem)) match {
+    Try(Scanamo.exec(DynamoClient)(table.put(contentItem))) match {
       case Success(putItemResult) =>
         Logger.info(s"Successfully put ContentItem $contentItem; ${putItemResult.toString}")
         Right(PutContentItemResult(contentItem, putItemResult))

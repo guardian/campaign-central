@@ -1,9 +1,8 @@
 package repositories
 
 import cats.implicits._
-import com.gu.scanamo.error.DynamoReadError
 import com.gu.scanamo.syntax._
-import com.gu.scanamo.{DynamoFormat, Scanamo}
+import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
 import model.command.{CampaignCentralApiError, CampaignDeletionFailed, CampaignPutError, _}
 import model.{Campaign, CampaignWithSubItems}
 import org.joda.time.DateTime
@@ -20,18 +19,16 @@ case class CampaignRepositoryDeleteResult(campaignId: String)
 
 object CampaignRepository {
 
+  private val table = Table[Campaign](Config().campaignTableName)
+
   implicit val jodaLongFormat: DynamoFormat[DateTime] = DynamoFormat.xmap[DateTime, Long] { epochMillis =>
     Right(new DateTime(epochMillis).withZone(UTC))
   } { dateTime =>
     dateTime.withZone(UTC).getMillis
   }
 
-  private val tableName = Config().campaignTableName
-
   def getCampaign(campaignId: String): Either[CampaignCentralApiError, Campaign] = {
-    val result: Option[Either[DynamoReadError, Campaign]] =
-      Scanamo.get[Campaign](DynamoClient)(tableName)('id -> campaignId)
-    result map {
+    Scanamo.exec(DynamoClient)(table.get('id -> campaignId)) map {
       case Left(e)         => Left(JsonParsingError(e.show))
       case Right(campaign) => Right(campaign)
     } getOrElse
@@ -39,9 +36,7 @@ object CampaignRepository {
   }
 
   def getCampaignByTag(tagId: Long): Either[CampaignCentralApiError, Campaign] = {
-    val result: Option[Either[DynamoReadError, Campaign]] =
-      Scanamo.get[Campaign](DynamoClient)(tableName)('tagId -> tagId)
-    result map {
+    Scanamo.exec(DynamoClient)(table.get('tagId -> tagId)) map {
       case Left(e)         => Left(JsonParsingError(e.show))
       case Right(campaign) => Right(campaign)
     } getOrElse
@@ -49,7 +44,7 @@ object CampaignRepository {
   }
 
   def getAllCampaigns(): Either[CampaignCentralApiError, List[Campaign]] =
-    getResultsOrFirstFailure(Scanamo.scan[Campaign](DynamoClient)(tableName)).leftMap { e =>
+    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.scan)).leftMap { e =>
       JsonParsingError(e.show)
     }
 
@@ -60,7 +55,7 @@ object CampaignRepository {
     } yield CampaignWithSubItems(campaign, content)
 
   def deleteCampaign(campaignId: String): Either[CampaignCentralApiError, CampaignRepositoryDeleteResult] =
-    Try(Scanamo.delete(DynamoClient)(tableName)('campaignId -> campaignId)) match {
+    Try(Scanamo.exec(DynamoClient)(table.delete('campaignId -> campaignId))) match {
       case Success(result) =>
         Logger.debug(result.toString)
         Right(CampaignRepositoryDeleteResult(campaignId))
@@ -70,7 +65,7 @@ object CampaignRepository {
     }
 
   def putCampaign(campaign: Campaign): Either[CampaignCentralApiError, CampaignRepositoryPutResult] =
-    Try(Scanamo.put[Campaign](DynamoClient)(tableName)(campaign)) match {
+    Try(Scanamo.exec(DynamoClient)(table.put(campaign))) match {
       case Success(result) =>
         Logger.debug(result.toString)
         Right(CampaignRepositoryPutResult(campaign))
