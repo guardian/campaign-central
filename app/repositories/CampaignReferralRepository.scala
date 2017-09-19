@@ -2,25 +2,24 @@ package repositories
 
 import java.time.LocalDate
 
-import model.command.{CampaignCentralApiError}
-import model.{CampaignReferral, CampaignReferralRow, Component}
-import services.Dynamo
 import cats.implicits._
-
-import scala.collection.JavaConversions._
+import com.gu.scanamo._
+import com.gu.scanamo.syntax._
+import model.command.{CampaignCentralApiError, JsonParsingError}
+import model.{CampaignReferral, CampaignReferralRow, Component}
+import services.AWS.DynamoClient
+import services.Config
+import util.DynamoResults.getResultsOrFirstFailure
 
 object CampaignReferralRepository {
 
+  private val table = Table[CampaignReferralRow](Config().campaignReferralTableName)
+
   def getCampaignReferrals(campaignId: String): Either[CampaignCentralApiError, List[CampaignReferral]] = {
+    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.query('campaignId -> campaignId))) match {
 
-    val rowsOrError: Either[CampaignCentralApiError, List[CampaignReferralRow]] = {
-      val results: List[Either[CampaignCentralApiError, CampaignReferralRow]] =
-        Dynamo.campaignReferralTable.query("campaignId", campaignId).map(CampaignReferralRow.fromItem).toList
-      results.sequence
-    }
+      case Left(e) => Left(JsonParsingError(e.show))
 
-    rowsOrError match {
-      case Left(error) => Left(error)
       case Right(rows) =>
         val groupedRows = rows.groupBy(row => (row.platform, row.edition, row.path, row.containerIndex, row.cardIndex))
 
@@ -58,5 +57,4 @@ object CampaignReferralRepository {
     case "WINDOWS_NATIVE_APP" => "Windows"
     case other                => other
   }
-
 }

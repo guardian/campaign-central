@@ -1,9 +1,8 @@
 package services
 
-import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
+import com.amazonaws.auth.{AWSCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.dynamodbv2.document.{DynamoDB, Table}
 import com.amazonaws.services.dynamodbv2.{AmazonDynamoDB, AmazonDynamoDBClientBuilder}
 import com.amazonaws.services.ec2.model.{DescribeTagsRequest, Filter}
 import com.amazonaws.services.ec2.{AmazonEC2, AmazonEC2ClientBuilder}
@@ -55,18 +54,4 @@ trait AwsInstanceTags {
       tagsResult.getTags.asScala.find(_.getKey == tagName).map(_.getValue)
     }
   }
-}
-
-object Dynamo {
-  lazy val dynamoDb = new DynamoDB(AWS.DynamoClient)
-
-  lazy val campaignTable: Table                = dynamoDb.getTable(Config().campaignTableName)
-  lazy val campaignNotesTable: Table           = dynamoDb.getTable(Config().campaignNotesTableName)
-  lazy val campaignContentTable: Table         = dynamoDb.getTable(Config().campaignContentTableName)
-  lazy val clientTable: Table                  = dynamoDb.getTable(Config().clientTableName)
-  lazy val analyticsDataCacheTable: Table      = dynamoDb.getTable(Config().analyticsDataCacheTableName)
-  lazy val campaignPageviewsTable: Table       = dynamoDb.getTable(Config().campaignPageviewsTableName)
-  lazy val campaignUniquesTable: Table         = dynamoDb.getTable(Config().campaignUniquesTableName)
-  lazy val latestCampaignAnalyticsTable: Table = dynamoDb.getTable(Config().latestCampaignAnalyticsTableName)
-  lazy val campaignReferralTable: Table        = dynamoDb.getTable(Config().campaignReferralTableName)
 }

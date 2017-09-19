@@ -1,18 +1,21 @@
 package repositories
 
-import model.CampaignUniquesItem
-import model.command.CampaignCentralApiError
-import services.Dynamo
 import cats.implicits._
-
-import scala.collection.JavaConversions._
+import com.gu.scanamo.syntax._
+import com.gu.scanamo.{Scanamo, Table}
+import model.CampaignUniquesItem
+import model.command.{CampaignCentralApiError, JsonParsingError}
+import services.AWS.DynamoClient
+import services.Config
+import util.DynamoResults.getResultsOrFirstFailure
 
 object CampaignUniquesRepository {
 
-  def getCampaignUniques(campaignId: String): Either[CampaignCentralApiError, List[CampaignUniquesItem]] = {
-    val result: List[Either[CampaignCentralApiError, CampaignUniquesItem]] =
-      Dynamo.campaignUniquesTable.query("campaignId", campaignId).map(CampaignUniquesItem.fromItem).toList
-    result.sequence
-  }
+  private val table = Table[CampaignUniquesItem](Config().campaignUniquesTableName)
 
+  def getCampaignUniques(campaignId: String): Either[CampaignCentralApiError, List[CampaignUniquesItem]] = {
+    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.query('campaignId -> campaignId))).leftMap { e =>
+      JsonParsingError(e.show)
+    }
+  }
 }

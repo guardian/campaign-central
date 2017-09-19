@@ -1,18 +1,21 @@
 package repositories
 
-import model.CampaignPageViewsItem
-import model.command.CampaignCentralApiError
-import services.Dynamo
 import cats.implicits._
-
-import scala.collection.JavaConversions._
+import com.gu.scanamo.syntax._
+import com.gu.scanamo.{Scanamo, Table}
+import model.CampaignPageViewsItem
+import model.command.{CampaignCentralApiError, JsonParsingError}
+import services.AWS.DynamoClient
+import services.Config
+import util.DynamoResults.getResultsOrFirstFailure
 
 object CampaignPageViewsRepository {
 
-  def getCampaignPageViews(campaignId: String): Either[CampaignCentralApiError, List[CampaignPageViewsItem]] = {
-    val result: List[Either[CampaignCentralApiError, CampaignPageViewsItem]] =
-      Dynamo.campaignPageviewsTable.query("campaignId", campaignId).map { CampaignPageViewsItem.fromItem }.toList
-    result.sequence
-  }
+  private val table = Table[CampaignPageViewsItem](Config().campaignPageviewsTableName)
 
+  def getCampaignPageViews(campaignId: String): Either[CampaignCentralApiError, List[CampaignPageViewsItem]] = {
+    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.query('campaignId -> campaignId))).leftMap { e =>
+      JsonParsingError(e.show)
+    }
+  }
 }
