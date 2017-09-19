@@ -49,7 +49,7 @@ object CampaignRepository {
   }
 
   def getAllCampaigns(): Either[CampaignCentralApiError, List[Campaign]] =
-    getResultsOrFirstFailure(Scanamo.scan[Campaign](DynamoClient)(tableName)).left map { e =>
+    getResultsOrFirstFailure(Scanamo.scan[Campaign](DynamoClient)(tableName)).leftMap { e =>
       JsonParsingError(e.show)
     }
 

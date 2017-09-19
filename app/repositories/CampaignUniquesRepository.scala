@@ -14,7 +14,7 @@ object CampaignUniquesRepository {
   def getCampaignUniques(campaignId: String): Either[CampaignCentralApiError, List[CampaignUniquesItem]] = {
     val tableName = Config().campaignUniquesTableName
     val result    = Scanamo.query[CampaignUniquesItem](DynamoClient)(tableName)('campaignId -> campaignId)
-    getResultsOrFirstFailure(result).left map { e =>
+    getResultsOrFirstFailure(result).leftMap { e =>
       JsonParsingError(e.show)
     }
   }

@@ -22,7 +22,7 @@ object CampaignContentRepository {
 
   def getContentForCampaign(campaignId: String): Either[CampaignCentralApiError, List[ContentItem]] = {
     val result = Scanamo.query[ContentItem](DynamoClient)(tableName)('campaignId -> campaignId)
-    getResultsOrFirstFailure(result).left map { e =>
+    getResultsOrFirstFailure(result).leftMap { e =>
       JsonParsingError(e.show)
     }
   }

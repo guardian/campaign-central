@@ -14,7 +14,7 @@ object CampaignPageViewsRepository {
   def getCampaignPageViews(campaignId: String): Either[CampaignCentralApiError, List[CampaignPageViewsItem]] = {
     val tableName = Config().campaignPageviewsTableName
     val result    = Scanamo.query[CampaignPageViewsItem](DynamoClient)(tableName)('campaignId -> campaignId)
-    getResultsOrFirstFailure(result).left map { e =>
+    getResultsOrFirstFailure(result).leftMap { e =>
       JsonParsingError(e.show)
     }
   }

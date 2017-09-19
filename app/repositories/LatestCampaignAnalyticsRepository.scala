@@ -14,7 +14,7 @@ object LatestCampaignAnalyticsRepository {
   private val tableName = Config().latestCampaignAnalyticsTableName
 
   def getLatestCampaignAnalytics(): Either[CampaignCentralApiError, List[LatestCampaignAnalyticsItem]] =
-    getResultsOrFirstFailure(Scanamo.scan[LatestCampaignAnalyticsItem](DynamoClient)(tableName)).left map { e =>
+    getResultsOrFirstFailure(Scanamo.scan[LatestCampaignAnalyticsItem](DynamoClient)(tableName)).leftMap { e =>
       JsonParsingError(e.show)
     }
 
