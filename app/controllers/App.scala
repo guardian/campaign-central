@@ -10,7 +10,6 @@ class App(components: ControllerComponents, authAction: AuthAction[AnyContent])
   extends AbstractController(components) {
 
   def index(id: String = "") = authAction { implicit request =>
-
     Logger.info(s"${request.user.email} accessed Campaign Central.")
 
     val jsFileName = "build/app.js"
