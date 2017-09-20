@@ -17,7 +17,7 @@ lazy val dependencies = Seq(
   "com.typesafe.play"                %% "play-json-joda"         % playJsonVersion,
   "org.typelevel"                    %% "cats-core"              % "0.9.0",
   "ai.x"                             %% "play-json-extensions"   % "0.10.0",
-  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.8.9",
+  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.8.9" % Runtime,
   "com.amazonaws"                    % "aws-java-sdk"            % "1.11.199",
   "com.gu"                           %% "play-googleauth"        % "0.7.0",
   "com.gu"                           %% "content-api-client"     % "11.25",
