@@ -5,6 +5,7 @@ GET	/campaigns/:id		            controllers.App.index(id)
 GET	/campaign/:id		              controllers.App.index(id)
 GET	/capiImport		                controllers.App.index(id = "")
 GET	/management/analytics         controllers.App.index(id = "")
+GET	/glossary                     controllers.App.index(id = "")
 
 
 GET /login            controllers.LogIn.logIn()
