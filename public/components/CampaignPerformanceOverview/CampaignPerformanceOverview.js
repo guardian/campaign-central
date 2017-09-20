@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 import R from 'ramda';
+import { DwellTimeExplainerText, MedianAttentionTimeExplainerText } from '../Glossary/Glossary';
+
 
 class AttentionTimePerPlatform extends React.Component {
   render() {
@@ -39,6 +41,30 @@ class AverageDwellTimePerPath extends React.Component {
   }
 }
 
+class Explainer extends React.Component {
+  explainerStyle = {
+    margin: '0 0.4em 0 0.2em',
+    display: 'inline-block',
+    cursor: 'pointer',
+  };
+
+  questionMarkPosition = {
+    position: 'absolute',
+    textDecoration: 'underline dotted',
+    top: 0,
+  };
+
+  render() {
+    return (
+      <div style={this.explainerStyle} className="explainer hover">
+        <div style={this.questionMarkPosition} className="question-mark">?</div>
+        <div className="hover-content">
+          <div className="hover-popover">{this.props.text}</div>
+        </div>
+      </div>
+    );
+  }
+}
 
 export default class CampaignPerformanceOverview extends React.Component {
 
@@ -65,7 +91,7 @@ export default class CampaignPerformanceOverview extends React.Component {
 
     const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
     const medianPerDevice = this.props.latestAnalyticsForCampaign.medianAttentionTimeByDevice || {};
-    
+
     const weightedAverageDwellTime = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
     const averageDwellTimePerPathSeconds = this.props.latestAnalyticsForCampaign.averageDwellTimePerPathSeconds || {};
 
@@ -90,6 +116,7 @@ export default class CampaignPerformanceOverview extends React.Component {
                 <AttentionTimePerPlatform medianAttentionTimeSeconds={ medianPerDevice } />
               </div>
             </label>
+            <Explainer text={MedianAttentionTimeExplainerText} />
             <span className="campaign-info__field__value">{ medianAttentionTime ? `${medianAttentionTime} seconds` : "not available" }</span>
           </div>
           <div className="campaign-info__field">
@@ -99,6 +126,7 @@ export default class CampaignPerformanceOverview extends React.Component {
                 <AverageDwellTimePerPath averageDwellTimePerPathSeconds={ averageDwellTimePerPathSeconds } />
               </div>
             </label>
+            <Explainer text={DwellTimeExplainerText} />
             <span className="campaign-info__field__value">{weightedAverageDwellTime ? `${weightedAverageDwellTime} seconds` : "none available"} </span>
           </div>
         </div>

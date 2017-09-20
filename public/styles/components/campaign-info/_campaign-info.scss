@@ -10,6 +10,8 @@
 
     padding: 5px 0;
   }
+
+  position: relative;
 }
 
 .campaign-info__field__value {
@@ -43,7 +45,8 @@
   border-radius: 5px;
   padding: 1em;
   margin-top: 6px;
-  width: auto;
+  left: 0;
+  right: auto;
   position: absolute;
   z-index: 999;
 }
