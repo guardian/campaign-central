@@ -10,19 +10,17 @@ resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-to
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 val slf4jVersion    = "1.7.25"
-val playJsonVersion = "2.6.2"
+val playJsonVersion = "2.6.5"
 
 lazy val dependencies = Seq(
-  "com.typesafe.play"                %% "play-json"                             % playJsonVersion,
-  "com.typesafe.play"                %% "play-json-joda"                        % playJsonVersion,
-  "org.typelevel"                    %% "cats-core"                             % "0.9.0",
-  "ai.x"                             %% "play-json-extensions"                  % "0.10.0",
-  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor"                % "2.8.9",
-  "com.amazonaws"                    % "aws-java-sdk"                           % "1.11.170",
-  "com.gu"                           %% "play-googleauth"                       % "0.7.0",
-  "com.gu"                           %% "content-api-client"                    % "11.19",
-  "com.google.apis"                  % "google-api-services-analyticsreporting" % "v4-rev115-1.22.0",
-  "com.squareup.okhttp3"             % "okhttp"                                 % "3.4.1",
+  "com.typesafe.play"    %% "play-json"            % playJsonVersion,
+  "com.typesafe.play"    %% "play-json-joda"       % playJsonVersion,
+  "org.typelevel"        %% "cats-core"            % "0.9.0",
+  "ai.x"                 %% "play-json-extensions" % "0.10.0",
+  "com.amazonaws"        % "aws-java-sdk"          % "1.11.199",
+  "com.gu"               %% "play-googleauth"      % "0.7.0",
+  "com.gu"               %% "content-api-client"   % "11.25",
+  "com.squareup.okhttp3" % "okhttp"                % "3.9.0",
   ws,
   "commons-io"           % "commons-io"               % "2.5",
   "net.logstash.logback" % "logstash-logback-encoder" % "4.11",
@@ -30,7 +28,7 @@ lazy val dependencies = Seq(
   "org.slf4j"            % "slf4j-api"                % slf4jVersion,
   "org.slf4j"            % "jcl-over-slf4j"           % slf4jVersion,
   "com.gu"               %% "scanamo"                 % "0.9.5",
-  "org.scalatest"        %% "scalatest"               % "3.0.3" % Test
+  "org.scalatest"        %% "scalatest"               % "3.0.4" % Test
 )
 
 lazy val root = (project in file("."))
@@ -68,8 +66,7 @@ lazy val root = (project in file("."))
       riffRaffPackageType.value              -> s"${name.value}/${riffRaffPackageType.value.getName}",
       baseDirectory.value / "riff-raff.yaml" -> "riff-raff.yaml"
     ),
-    scalaVersion := "2.11.11",
-    scalaVersion in ThisBuild := "2.11.11",
+    scalaVersion := "2.12.3",
     libraryDependencies ++= dependencies,
     scalafmtOnCompile := true
   )

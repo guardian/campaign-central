@@ -6,16 +6,16 @@ import java.util.Properties
 import com.amazonaws.services.s3.model.GetObjectRequest
 import services.Config._
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 object Config extends AwsInstanceTags {
 
-  lazy val conf = readTag("Stage") match {
+  lazy val conf: Config = readTag("Stage") match {
     case Some("PROD") => new ProdConfig
     case _            => new DevConfig
   }
 
-  def apply() = {
+  def apply(): Config = {
     conf
   }
 }
@@ -24,10 +24,10 @@ sealed trait Config {
 
   def stage: String
 
-  def googleAuthClientId     = getRequiredRemoteStringProperty("googleauth.client.id")
-  def googleAuthClientSecret = getRequiredRemoteStringProperty("googleauth.client.secret")
-  def googleAuthRedirectUrl  = getRequiredRemoteStringProperty("googleauth.redirect.url")
-  def googleAuthDomain       = getRequiredRemoteStringProperty("googleauth.domain")
+  def googleAuthClientId: String     = getRequiredRemoteStringProperty("googleauth.client.id")
+  def googleAuthClientSecret: String = getRequiredRemoteStringProperty("googleauth.client.secret")
+  def googleAuthRedirectUrl: String  = getRequiredRemoteStringProperty("googleauth.redirect.url")
+  def googleAuthDomain: String       = getRequiredRemoteStringProperty("googleauth.domain")
 
   def logShippingStreamName: Option[String] = None
 
@@ -58,13 +58,13 @@ sealed trait Config {
 
   private val remoteConfiguration: Map[String, String] = loadRemoteConfiguration
 
-  lazy val googleAnalyticsViewId      = getRequiredRemoteStringProperty("googleAnalytivsViewId")
-  lazy val googleAnalyticsGlabsViewId = getRequiredRemoteStringProperty("googleAnalytivsGlabsViewId")
+  lazy val googleAnalyticsViewId: String      = getRequiredRemoteStringProperty("googleAnalytivsViewId")
+  lazy val googleAnalyticsGlabsViewId: String = getRequiredRemoteStringProperty("googleAnalytivsGlabsViewId")
 
-  lazy val capiKey             = getRequiredRemoteStringProperty("capi.key")
-  lazy val capiPreviewUrl      = getRequiredRemoteStringProperty("capi.preview.url")
-  lazy val capiPreviewUser     = getRequiredRemoteStringProperty("capi.preview.username")
-  lazy val capiPreviewPassword = getRequiredRemoteStringProperty("capi.preview.password")
+  lazy val capiKey: String             = getRequiredRemoteStringProperty("capi.key")
+  lazy val capiPreviewUrl: String      = getRequiredRemoteStringProperty("capi.preview.url")
+  lazy val capiPreviewUser: String     = getRequiredRemoteStringProperty("capi.preview.username")
+  lazy val capiPreviewPassword: String = getRequiredRemoteStringProperty("capi.preview.password")
 
   def googleServiceAccountJsonInputStream: InputStream = {
     val jsonLocation    = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")
@@ -95,7 +95,7 @@ sealed trait Config {
     loadPropertiesFromS3(s"$app/global.properties", props)
     loadPropertiesFromS3(s"$app/$stage.properties", props)
 
-    props.toMap
+    props.asScala.toMap
   }
 }
 
