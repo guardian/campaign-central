@@ -38,9 +38,8 @@ object CampaignService {
       campaign <- CampaignRepository.getCampaign(campaignId)
       latest   <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(campaignId)
     } yield {
-      val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
-      val uniquesTarget: Long    = campaign.targets.getOrElse("uniques", 0)
-      LatestCampaignAnalytics(latest, uniquesDeviceBreakdown, uniquesTarget)
+      val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
+      LatestCampaignAnalytics(latest, uniquesTarget)
     }
   }
 
@@ -56,9 +55,8 @@ object CampaignService {
         for {
           latest <- latestCampaignAnalytics.find(_.campaignId == campaign.id)
         } yield {
-          val uniquesDeviceBreakdown = breakdownUniquesByMobileAndDesktop(latest.uniques, latest.uniquesByDevice)
-          val uniquesTarget: Long    = campaign.targets.getOrElse("uniques", 0)
-          campaign.id -> LatestCampaignAnalytics(latest, uniquesDeviceBreakdown, uniquesTarget)
+          val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
+          campaign.id -> LatestCampaignAnalytics(latest, uniquesTarget)
         }
       }
 
@@ -98,25 +96,5 @@ object CampaignService {
         }.toSeq
       }
     }
-  }
-
-  case class DeviceBreakdown(mobile: Long, desktop: Long)
-
-  private def breakdownUniquesByMobileAndDesktop(totalUniques: Long,
-                                                 uniquesPerDevice: Map[String, Long]): DeviceBreakdown = {
-
-    val uniquesFromOther: Long =
-      uniquesPerDevice.filter { case (key, _) => DeviceTypes.ExcludedDeviceTypes.contains(key) }.values.sum
-
-    val uniquesByDeviceWithoutExcludes = uniquesPerDevice -- DeviceTypes.ExcludedDeviceTypes
-
-    val (mobile, _) = uniquesByDeviceWithoutExcludes.partition {
-      case (key, _) => DeviceTypes.MobileDeviceTypes.contains(key)
-    }
-
-    val uniquesFromMobile  = mobile.values.sum + (if (uniquesFromOther > 0) uniquesFromOther / 2 else 0)
-    val uniquesFromDesktop = totalUniques - uniquesFromMobile
-
-    DeviceBreakdown(uniquesFromMobile, uniquesFromDesktop)
   }
 }

@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 import CampaignInformationEdit from './CampaignInformationEdit';
 import CampaignTargetsEdit from './CampaignTargetsEdit';
-import CampaignPerformanceOverview from '../CampaignPerformanceOverview/CampaignPerformanceOverview';
 
 class CampaignEdit extends React.Component {
 
@@ -42,11 +41,6 @@ class CampaignEdit extends React.Component {
           Campaign Info
         </div>
         <div className="campaign-box__body">
-          <div className="campaign__column">
-            <CampaignPerformanceOverview
-              campaign={this.props.campaign}
-              latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}/>
-          </div>
           <div className="campaign__column">
             <CampaignInformationEdit
               campaign={this.props.campaign}

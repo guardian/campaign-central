@@ -2,14 +2,13 @@ package model
 
 import ai.x.play.json.Jsonx
 import play.api.libs.json.Format
-import services.CampaignService.DeviceBreakdown
 
 case class LatestCampaignAnalytics(campaignId: String,
                                    uniques: Long,
-                                   uniquesFromMobile: Long,
-                                   uniquesFromDesktop: Long,
+                                   uniquesByDevice: Option[Map[String, Long]],
                                    uniquesTarget: Long,
                                    pageviews: Long,
+                                   pageviewsByDevice: Option[Map[String, Long]],
                                    medianAttentionTimeSeconds: Option[Long],
                                    medianAttentionTimeByDevice: Option[Map[String, Long]],
                                    weightedAverageDwellTimeForCampaign: Option[Double],
@@ -19,19 +18,17 @@ object LatestCampaignAnalytics {
   implicit val latestCampaignAnalyticsFormat: Format[LatestCampaignAnalytics] =
     Jsonx.formatCaseClass[LatestCampaignAnalytics]
 
-  def apply(latestCampaignAnalyticsItem: LatestCampaignAnalyticsItem,
-            deviceBreakdown: DeviceBreakdown,
-            uniquesTarget: Long): LatestCampaignAnalytics = {
+  def apply(latestCampaignAnalyticsItem: LatestCampaignAnalyticsItem, uniquesTarget: Long): LatestCampaignAnalytics = {
 
     import util.DoubleUtils._
 
     LatestCampaignAnalytics(
       latestCampaignAnalyticsItem.campaignId,
       latestCampaignAnalyticsItem.uniques,
-      deviceBreakdown.mobile,
-      deviceBreakdown.desktop,
+      latestCampaignAnalyticsItem.uniquesByDevice.map(normaliseDeviceData),
       uniquesTarget,
       latestCampaignAnalyticsItem.pageviews,
+      latestCampaignAnalyticsItem.pageviewsByDevice.map(normaliseDeviceData),
       latestCampaignAnalyticsItem.medianAttentionTimeSeconds,
       latestCampaignAnalyticsItem.medianAttentionTimeByDevice.map(normaliseDeviceData),
       latestCampaignAnalyticsItem.weightedAverageDwellTimeForCampaign.map(_.to2Dp),

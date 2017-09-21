@@ -51,3 +51,67 @@
   padding: 10px;
   background-color: $c-grey-300;
 }
+
+#metrics {
+    width: 95%;
+    margin: 20px auto;
+}
+.box {
+    background-color: #ededed;
+    height: 200px;
+    width: 23%;
+    margin: 1%;
+    color: grey;
+    text-align: center;
+    display: inline-block;
+    overflow: hidden;
+}
+
+.box > .align-icon-right {
+  positon: absolute;
+  left:90px;
+  top: 10px;
+}
+
+.head {
+    padding: 15px;
+    padding-top:25px;
+    padding-bottom: 25px;
+    font-size: 20px;
+    line-height: 35px;
+    text-transform: uppercase;
+}
+
+.head > .align-icon-top-right {
+  positon: absolute;
+  top: -10px;
+}
+
+.align-icon-top-right-in-modal {
+  position:absolute;
+  right:10px;
+  top:15px;
+}
+
+.i-info-grey {
+  padding:0;
+  margin:0;
+}
+
+.i-cross:hover {
+  cursor:pointer;
+}
+
+.i-plus:hover {
+  cursor:pointer;
+}
+
+.top_margin {
+    margin-top: 10px
+}
+.count {
+    font-size: 35px;
+}
+.unit {
+    font-size: 20px;
+}
