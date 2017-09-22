@@ -36,13 +36,7 @@ export default class BigCardMetric extends React.Component {
     return (
       <div className="box">
           {this.renderOpenModalIcon()}
-          <div className="head hover">{this.props.metricLabel} <i className="i-info-grey align-icon-top-right"/>
-            <div className="hover-content">
-              <div className="hover-popover">
-                <p>Explain data here.</p>
-              </div>
-            </div>
-          </div>
+          <div className="head">{this.props.metricLabel}</div>
           <div className="count ">{this.props.metricValue}</div>
           <div className="unit">{this.props.metricUnit ? this.props.metricUnit : this.props.metricTargetMessage}</div>
           <Modal
