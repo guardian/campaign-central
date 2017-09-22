@@ -8,7 +8,6 @@
 }
 
 .campaign-referral-list__platform,
-.campaign-referral-list__edition,
 .campaign-referral-list__path,
 .campaign-referral-list__container,
 .campaign-referral-list__card,
@@ -33,24 +32,19 @@
   width: 10%;
 }
 
-.campaign-referral-list__edition,
-.campaign-referral-list__edition--header {
-  width: 10%;
-}
-
 .campaign-referral-list__path,
 .campaign-referral-list__path--header {
-  width: 20%;
+  width: 25%;
 }
 
 .campaign-referral-list__container,
 .campaign-referral-list__container--header {
-  width: 15%;
+  width: 20%;
 }
 
 .campaign-referral-list__card,
 .campaign-referral-list__card--header {
-  width: 15%;
+  width: 30%;
 }
 
 .campaign-referral-list__clicks,

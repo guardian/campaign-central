@@ -114,7 +114,6 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   def getCampaignReferrals(campaignId: String) = authAction { _ =>
-    Logger.info(s"Loading on-platform referrals for campaign $campaignId")
     CampaignReferralRepository.getCampaignReferrals(campaignId) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError

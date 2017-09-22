@@ -1,11 +1,11 @@
 package model
 
 import java.time.LocalDate
+
 import play.api.libs.json.{Json, Writes}
 
 case class Component(
   platform: String,
-  edition: String,
   path: String,
   containerIndex: Int,
   containerName: String,
