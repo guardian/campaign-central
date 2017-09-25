@@ -21,16 +21,15 @@ object CampaignReferralRepository {
       case Left(e) => Left(JsonParsingError(e.show))
 
       case Right(rows) =>
-        val groupedRows = rows.groupBy(row => (row.platform, row.edition, row.path, row.containerIndex, row.cardIndex))
+        val groupedRows = rows.groupBy(row => (row.platform, row.path, row.containerIndex, row.cardIndex))
 
         val campaignReferrals = groupedRows
           .map { row =>
-            val (platform, edition, path, containerIndex, cardIndex) = row._1
-            val groupedValues                                        = row._2
+            val (platform, path, containerIndex, cardIndex) = row._1
+            val groupedValues                               = row._2
             CampaignReferral(
               component = Component(
                 platform = formatPlatform(platform),
-                edition = edition getOrElse "unknown",
                 path = path getOrElse "unknown",
                 containerIndex = containerIndex getOrElse 0,
                 containerName = groupedValues.headOption.flatMap(_.containerName) getOrElse "",
@@ -43,8 +42,13 @@ object CampaignReferralRepository {
             )
           }
           .toList
-          .sortBy(_.numClicks)
-          .reverse
+          .sortBy(
+            ref =>
+              (-ref.numClicks,
+               ref.component.platform,
+               ref.component.path,
+               ref.component.containerIndex,
+               ref.component.cardIndex))
 
         Right(campaignReferrals)
     }

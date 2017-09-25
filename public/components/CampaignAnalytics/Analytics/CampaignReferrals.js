@@ -27,7 +27,6 @@ class CampaignReferrals extends React.Component {
       <div key={index} className="campaign-referral-list__item">
         <div className="campaign-referral-list__row">
           <div className="campaign-referral-list__platform">{referral.component.platform}</div>
-          <div className="campaign-referral-list__edition">{referral.component.edition}</div>
           <div className="campaign-referral-list__path">{referral.component.path}</div>
           <div className="campaign-referral-list__container">#{referral.component.containerIndex}: {referral.component.containerName}</div>
           <div className="campaign-referral-list__card">#{referral.component.cardIndex}: {referral.component.cardName}</div>
@@ -60,7 +59,6 @@ class CampaignReferrals extends React.Component {
             <div className="campaign-referral-list campaign-assets__field__value">
               <div className="campaign-referral-list__row">
                 <div className="campaign-referral-list__platform--header">Platform</div>
-                <div className="campaign-referral-list__edition--header">Edition</div>
                 <div className="campaign-referral-list__path--header">Path</div>
                 <div className="campaign-referral-list__container--header">Container</div>
                 <div className="campaign-referral-list__card--header">Card</div>
