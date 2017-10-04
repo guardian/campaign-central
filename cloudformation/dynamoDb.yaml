@@ -177,12 +177,12 @@ Resources:
       AttributeDefinitions:
       - AttributeName: campaignId
         AttributeType: S
-      - AttributeName: platformUrlComponent
+      - AttributeName: hash
         AttributeType: S
       KeySchema:
       - AttributeName: campaignId
         KeyType: HASH
-      - AttributeName: platformUrlComponent
+      - AttributeName: hash
         KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: '5'
