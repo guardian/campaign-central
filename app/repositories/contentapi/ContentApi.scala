@@ -1,18 +1,18 @@
-package repositories
+package repositories.contentapi
 
 import java.util.concurrent.Executors
 
 import com.gu.contentapi.client.ContentApiClientLogic
 import com.gu.contentapi.client.model._
-import com.gu.contentapi.client.model.v1.Content
+import com.gu.contentapi.client.model.v1.{Content, Section}
 import dispatch.FunctionHandler
 import okhttp3.Credentials
 import play.api.Logger
 import services.Config
 
 import scala.annotation.tailrec
-import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 object ContentApi {
 
@@ -20,6 +20,21 @@ object ContentApi {
 
   private val executorService           = Executors.newFixedThreadPool(2)
   private implicit val executionContext = ExecutionContext.fromExecutor(executorService)
+
+  def getSectionsWithPaidContentSponsorship(): Seq[Section] = {
+    val query      = SectionsQuery().sponsorshipType("paid-content")
+    val response   = previewApiClient.getResponse(query)
+    val resultPage = Await.result(response, 5.seconds)
+    val sections   = resultPage.results
+    sections
+  }
+
+  def getSection(sectionId: String): Option[Section] = {
+    val query      = ItemQuery(sectionId)
+    val response   = previewApiClient.getResponse(query)
+    val resultPage = Await.result(response, 5.seconds)
+    resultPage.section
+  }
 
   @tailrec
   def loadAllContentInSection(pathPrefix: String, page: Int = 1, content: List[Content] = Nil): List[Content] = {
@@ -60,7 +75,7 @@ class DraftContentApiClass(override val apiKey: String) extends ContentApiClient
       case (r, (name, value)) => r.setHeader(name, value)
     }
 
-    def handler = new FunctionHandler(r => HttpResponse(r.getResponseBodyAsBytes(), r.getStatusCode, r.getStatusText))
+    def handler = new FunctionHandler(r => HttpResponse(r.getResponseBodyAsBytes, r.getStatusCode, r.getStatusText))
     http(req.toRequest, handler)
   }
 }

@@ -2,12 +2,9 @@ package controllers
 
 import com.gu.googleauth.AuthAction
 import model._
-import play.api.Logger
 import play.api.mvc._
 import repositories._
 import services.CampaignService
-import cats.syntax.either._
-import model.command._
 import play.api.libs.json.Json
 
 class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyContent])
@@ -90,23 +87,9 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     }
   }
 
-  def importFromTag() = authAction { req =>
-    implicit val user: User = User(req.user)
-    req.body.asJson.flatMap(_.asOpt[ImportCampaignCommand]) map { importCommand =>
-      Commands.importCampaign(importCommand) match {
-        case Left(_) =>
-          InternalServerError
-        case Right(campaign) =>
-          Ok(Json.toJson(campaign))
-      }
-    } getOrElse {
-      BadRequest("Expecting Json data")
-    }
-  }
-
   def refreshCampaignFromCAPI(campaignId: String) = authAction { req =>
     implicit val user: User = User(req.user)
-    Commands.refreshCampaignById(campaignId) match {
+    CampaignService.refreshCampaignById(campaignId) match {
       case Right(campaign)                 => Ok(Json.toJson(campaign))
       case Left(CampaignNotFound(message)) => NotFound(message)
       case Left(_)                         => InternalServerError

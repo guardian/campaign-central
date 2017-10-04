@@ -20,7 +20,7 @@ lazy val dependencies = Seq(
   "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.8.9" % Runtime,
   "com.amazonaws"                    % "aws-java-sdk"            % "1.11.199",
   "com.gu"                           %% "play-googleauth"        % "0.7.0",
-  "com.gu"                           %% "content-api-client"     % "11.25",
+  "com.gu"                           %% "content-api-client"     % "11.26",
   "com.squareup.okhttp3"             % "okhttp"                  % "3.9.0",
   ws,
   "commons-io"           % "commons-io"               % "2.5",

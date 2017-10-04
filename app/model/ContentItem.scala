@@ -3,7 +3,6 @@ package model
 import ai.x.play.json.Jsonx
 import com.amazonaws.services.dynamodbv2.document.Item
 import cats.syntax.either._
-import model.command.{CampaignCentralApiError, JsonParsingError}
 import play.api.libs.json.{Format, JsValue, Json}
 
 case class ContentItem(campaignId: String,

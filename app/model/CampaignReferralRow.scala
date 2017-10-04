@@ -1,7 +1,6 @@
 package model
 
 import com.amazonaws.services.dynamodbv2.document.Item
-import model.command.{CampaignCentralApiError, JsonParsingError}
 import play.api.libs.json.{Json, Reads}
 import cats.syntax.either._
 

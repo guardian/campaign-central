@@ -5,8 +5,7 @@ import java.time.LocalDate
 import cats.implicits._
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
-import model.command.{CampaignCentralApiError, JsonParsingError}
-import model.{CampaignReferral, CampaignReferralRow, Component}
+import model._
 import services.AWS.DynamoClient
 import services.Config
 import util.DynamoResults.getResultsOrFirstFailure

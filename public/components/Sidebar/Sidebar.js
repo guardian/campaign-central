@@ -32,7 +32,6 @@ export default class Sidebar extends React.Component {
         </div>
         <div className="sidebar__link-group">
           <div className="sidebar__link-group__header">Tools</div>
-          <SidebarLink to="/capiImport">Import campaign</SidebarLink>
           <SidebarLink to="/glossary">Glossary</SidebarLink>
         </div>
       </div>
