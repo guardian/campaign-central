@@ -80,15 +80,6 @@ export function fetchCampaignReferrals(id) {
   });
 }
 
-export function importCampaignFromTag(tag) {
-  return AuthedReqwest({
-    url: '/api/campaigns/import',
-    data: JSON.stringify(tag),
-    contentType: 'application/json',
-    method: 'post'
-  });
-}
-
 export function refreshCampaignFromCAPI(id) {
   return AuthedReqwest({
     url: '/api/campaigns/' + id + '/refreshFromCAPI',

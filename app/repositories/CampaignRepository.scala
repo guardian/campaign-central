@@ -3,8 +3,7 @@ package repositories
 import cats.implicits._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{DynamoFormat, Scanamo, Table}
-import model.command.{CampaignCentralApiError, CampaignDeletionFailed, CampaignPutError, _}
-import model.{Campaign, CampaignWithSubItems}
+import model._
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.UTC
 import play.api.Logger

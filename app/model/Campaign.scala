@@ -13,15 +13,12 @@ case class Campaign(
   createdBy: User,
   lastModified: DateTime,
   lastModifiedBy: User,
-  tagId: Option[Long] = None,
   campaignLogo: Option[String] = None,
-  pathPrefix: Option[String] = None,
+  pathPrefix: String,
   nominalValue: Option[Long] = None,
   actualValue: Option[Long] = None,
   startDate: Option[DateTime] = None,
-  endDate: Option[DateTime] = None,
-  category: Option[String] = None,
-  collaborators: List[User] = Nil,
+  endDate: DateTime,
   targets: Map[String, Long] = Map.empty
 )
 

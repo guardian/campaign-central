@@ -1,15 +1,12 @@
 package services
 
-import model.command.CampaignCentralApiError
-import model.{CampaignPageViewsItem, CampaignUniquesItem, GraphDataPoint, LatestCampaignAnalytics}
+import com.gu.contentapi.client.model.v1.{Content => CapiContent, Section => CapiSection}
+import model._
 import org.joda.time.DateTime
-import cats.syntax.either._
-import repositories.{
-  CampaignPageViewsRepository,
-  CampaignRepository,
-  CampaignUniquesRepository,
-  LatestCampaignAnalyticsRepository
-}
+import play.api.Logger
+import repositories._
+import cats.implicits._
+import repositories.contentapi.{CapiContentTransformer, ContentApi}
 
 object CampaignService {
 
@@ -96,5 +93,100 @@ object CampaignService {
         }.toSeq
       }
     }
+  }
+
+  def refreshCampaignById(campaignId: String)(implicit user: User): Either[CampaignCentralApiError, Campaign] = {
+    CampaignRepository.getCampaign(campaignId) flatMap { campaign =>
+      val sectionId = campaign.pathPrefix
+      val content   = ContentApi.loadAllContentInSection(sectionId)
+
+      val sectionOrError = ContentApi
+        .getSection(sectionId)
+        .map(Right(_))
+        .getOrElse(Left(CampaignSectionNotFound(s"Could not find section with id: $sectionId")))
+
+      for {
+        section <- sectionOrError
+        updatedCampaign = CampaignTransformer.updateExistingCampaign(section, campaign, user)
+        _ <- updateCampaignContent(content, updatedCampaign)
+        _ <- CampaignRepository.putCampaign(updatedCampaign)
+      } yield {
+        Logger.info(s"refreshing campaign ${updatedCampaign.name} (${updatedCampaign.id})")
+        updatedCampaign
+      }
+    }
+  }
+
+  def synchroniseCampaigns()(implicit user: User): Either[CampaignCentralApiError, List[Campaign]] = {
+
+    val sectionsToCreateOrUpdate: Seq[(CapiSection, Option[Campaign])] = {
+      val currentCampaigns = CampaignRepository
+        .getAllCampaigns()
+        .toOption
+        .getOrElse(Nil)
+        .map { campaign =>
+          campaign.pathPrefix -> campaign
+        }
+        .toMap
+
+      val sections = ContentApi.getSectionsWithPaidContentSponsorship()
+
+      sections map { section =>
+        (section, currentCampaigns.get(section.id))
+      }
+    }
+
+    val campaigns: Seq[Campaign] = sectionsToCreateOrUpdate.flatMap {
+      case (section, Some(existingCampaign)) =>
+        Some(CampaignTransformer.updateExistingCampaign(section, existingCampaign, user))
+      case (section, None) =>
+        CampaignTransformer.createDefaultCampaign(section) orElse {
+          Logger.warn(s"Could not create campaign from section: ${section.id}")
+          None
+        }
+    }
+
+    val updatedCampaignsOrError: List[Either[CampaignCentralApiError, Campaign]] = campaigns.map { campaign =>
+      val sectionId = campaign.pathPrefix
+      val content   = ContentApi.loadAllContentInSection(sectionId)
+
+      val sectionOrError = ContentApi
+        .getSection(sectionId)
+        .map(Right(_))
+        .getOrElse(Left(CampaignSectionNotFound(s"Could not find section with id: $sectionId")))
+
+      for {
+        section <- sectionOrError
+        _       <- updateCampaignContent(content, campaign)
+        _       <- CampaignRepository.putCampaign(campaign)
+      } yield {
+        Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
+        campaign
+      }
+
+    }.toList
+
+    updatedCampaignsOrError.sequence
+  }
+
+  private def updateCampaignContent(apiContent: List[CapiContent],
+                                    campaign: Campaign): Either[CampaignCentralApiError, Seq[PutContentItemResult]] = {
+
+    val contentItems: List[ContentItem] = CapiContentTransformer.buildContentItems(apiContent, campaign.id)
+
+    val putContentResults: List[Either[CampaignCentralApiError, PutContentItemResult]] = for {
+      item <- contentItems
+    } yield CampaignContentRepository.putContent(item)
+
+    putContentResults.collectFirst {
+      case Left(e) =>
+        Logger.error(s"Failures putting content for campaign ${campaign.id} (${campaign.name}): $e")
+        e
+    } toLeft {
+      putContentResults collect {
+        case Right(result) => result
+      }
+    }
+
   }
 }

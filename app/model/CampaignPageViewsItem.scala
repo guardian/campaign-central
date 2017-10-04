@@ -2,7 +2,6 @@ package model
 
 import ai.x.play.json.Jsonx
 import com.amazonaws.services.dynamodbv2.document.Item
-import model.command.{CampaignCentralApiError, JsonParsingError}
 import play.api.libs.json.{Format, JsValue, Json}
 import cats.syntax.either._
 

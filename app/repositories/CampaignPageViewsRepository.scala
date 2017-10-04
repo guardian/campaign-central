@@ -3,8 +3,7 @@ package repositories
 import cats.implicits._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
-import model.CampaignPageViewsItem
-import model.command.{CampaignCentralApiError, JsonParsingError}
+import model.{CampaignCentralApiError, CampaignPageViewsItem, JsonParsingError}
 import services.AWS.DynamoClient
 import services.Config
 import util.DynamoResults.getResultsOrFirstFailure

@@ -3,8 +3,13 @@ package repositories
 import cats.implicits._
 import com.gu.scanamo.syntax._
 import com.gu.scanamo.{Scanamo, Table}
-import model.LatestCampaignAnalyticsItem
-import model.command.{CampaignCentralApiError, JsonParsingError, LatestCampaignAnalyticsItemNotFound}
+import model.{
+  CampaignCentralApiError,
+  JsonParsingError,
+  LatestCampaignAnalyticsItem,
+  LatestCampaignAnalyticsItemNotFound
+}
+import model.{JsonParsingError, LatestCampaignAnalyticsItemNotFound}
 import services.AWS.DynamoClient
 import services.Config
 import util.DynamoResults.getResultsOrFirstFailure

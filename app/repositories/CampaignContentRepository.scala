@@ -4,8 +4,7 @@ import cats.implicits._
 import com.amazonaws.services.dynamodbv2.model.{DeleteItemResult, PutItemResult}
 import com.gu.scanamo.{Scanamo, Table}
 import com.gu.scanamo.syntax._
-import model.ContentItem
-import model.command._
+import model._
 import play.api.Logger
 import services.AWS.DynamoClient
 import services.Config
