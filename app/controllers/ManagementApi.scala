@@ -15,7 +15,7 @@ class ManagementApi(components: ControllerComponents, authAction: AuthAction[Any
   implicit val ec: ExecutionContextExecutor = ExecutionContext.fromExecutor(Executors.newCachedThreadPool())
   implicit val user                         = User("Campaign Central", "Admin", "commercial.dev@theguardian.com")
 
-  def refreshCampaigns = authAction {
+  def refreshCampaigns = Action {
     CampaignService.synchroniseCampaigns() match {
       case Left(error: JsonParsingError) => BadRequest(error.message)
       case Left(_)                       => InternalServerError
