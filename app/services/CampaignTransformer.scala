@@ -16,15 +16,15 @@ object CampaignTransformer {
 
     val startDate = CapiSectionTransformer.deriveStartDate(section)
     val endDate   = CapiSectionTransformer.deriveEndDateOrDefaultToNow(section)
+    val campaignName = CapiSectionTransformer.deriveCampaignName(section)
 
     for {
-      sponsorName     <- CapiSectionTransformer.deriveSponsorName(section)
       sponsorshipType <- CapiSectionTransformer.deriveSponsorshipType(section)
       logo = CapiSectionTransformer.deriveSponsorshipLogo(section)
     } yield {
       Campaign(
         id = UUID.randomUUID().toString,
-        name = sponsorName,
+        name = campaignName,
         `type` = sponsorshipType,
         status = CapiSectionTransformer.deriveStatus(startDate, endDate),
         pathPrefix = section.id,
@@ -48,7 +48,7 @@ object CampaignTransformer {
     val endDate   = CapiSectionTransformer.deriveEndDateOrDefaultToNow(section)
 
     campaign.copy(
-      name = CapiSectionTransformer.deriveSponsorName(section) getOrElse campaign.name,
+      name = CapiSectionTransformer.deriveCampaignName(section),
       `type` = CapiSectionTransformer.deriveSponsorshipType(section) getOrElse campaign.`type`,
       status = CapiSectionTransformer.deriveStatus(startDate, endDate),
       pathPrefix = section.id,
