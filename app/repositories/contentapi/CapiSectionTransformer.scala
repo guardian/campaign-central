@@ -16,8 +16,7 @@ object CapiSectionTransformer {
       .map(dt => new DateTime(dt.dateTime)) getOrElse DateTime.now.plusYears(1)
   }
 
-  def deriveSponsorName(section: CapiSection): Option[String] =
-    section.activeSponsorships.flatMap(_.headOption.map(_.sponsorName))
+  def deriveCampaignName(section: CapiSection): String = section.webTitle
 
   def deriveSponsorshipType(section: CapiSection): Option[String] =
     section.activeSponsorships.flatMap(_.headOption.map(_.sponsorshipType.name))
