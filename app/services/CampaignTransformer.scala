@@ -14,8 +14,8 @@ object CampaignTransformer {
     val now: DateTime = DateTime.now
     val user          = User("Campaign Central", "Admin", "commercial.dev@theguardian.com")
 
-    val startDate = CapiSectionTransformer.deriveStartDate(section)
-    val endDate   = CapiSectionTransformer.deriveEndDateOrDefaultToNow(section)
+    val startDate    = CapiSectionTransformer.deriveStartDate(section)
+    val endDate      = CapiSectionTransformer.deriveEndDateOrDefaultToNow(section)
     val campaignName = CapiSectionTransformer.deriveCampaignName(section)
 
     for {
