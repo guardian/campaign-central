@@ -29,6 +29,8 @@ sealed trait Config {
   def googleAuthRedirectUrl: String  = getRequiredRemoteStringProperty("googleauth.redirect.url")
   def googleAuthDomain: String       = getRequiredRemoteStringProperty("googleauth.domain")
 
+  def campaignCentralApiKey: String = getRequiredRemoteStringProperty("campaign-central.api.key")
+
   def logShippingStreamName: Option[String] = None
 
   def campaignTableName        = s"campaign-central-$stage-campaigns"
