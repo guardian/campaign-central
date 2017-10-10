@@ -29,7 +29,7 @@ object CampaignReferralRepository {
             CampaignReferral(
               component = Component(
                 platform = formatPlatform(platform),
-                path = path getOrElse "unknown",
+                path = formatPath(path),
                 containerIndex = containerIndex getOrElse 0,
                 containerName = groupedValues.headOption.flatMap(_.containerName) getOrElse "",
                 cardIndex = cardIndex getOrElse 0,
@@ -59,5 +59,13 @@ object CampaignReferralRepository {
     case "IOS_NATIVE_APP"     => "iOS"
     case "WINDOWS_NATIVE_APP" => "Windows"
     case other                => other
+  }
+
+  private def formatPath(maybePath: Option[String]): String = {
+    maybePath match {
+      case Some(s) if s.startsWith("uk/") => s.stripPrefix("uk")
+      case Some(p)                        => p
+      case _                              => "unknown"
+    }
   }
 }
