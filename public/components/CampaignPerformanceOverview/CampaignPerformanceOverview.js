@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import R from 'ramda';
 import BigCardMetric from './BigCardMetric';
 
 export default class CampaignPerformanceOverview extends React.Component {
