@@ -2,6 +2,7 @@ import React from "react";
 import ProgressSpinner from "../../utils/ProgressSpinner";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import NumberFormat from 'react-number-format';
 import * as getCampaignReferrals from "../../../actions/CampaignActions/getCampaignReferrals";
 
 class CampaignReferrals extends React.Component {
@@ -30,7 +31,9 @@ class CampaignReferrals extends React.Component {
           <div className="campaign-referral-list__path">{referral.component.path}</div>
           <div className="campaign-referral-list__container">#{referral.component.containerIndex}: {referral.component.containerName}</div>
           <div className="campaign-referral-list__card">#{referral.component.cardIndex}: {referral.component.cardName}</div>
-          <div className="campaign-referral-list__clicks">{referral.numClicks}</div>
+          <div className="campaign-referral-list__impressions"><NumberFormat value={referral.impressionCount} displayType={'text'} thousandSeparator={true} /></div>
+          <div className="campaign-referral-list__clicks"><NumberFormat value={referral.clickCount} displayType={'text'} thousandSeparator={true} /></div>
+          <div className="campaign-referral-list__ctr"><NumberFormat value={referral.ctr * 100} displayType={'text'} decimalPrecision={2} /></div>
           <div className="campaign-referral-list__date">{dateFormat(referral.firstReferral)}</div>
           <div className="campaign-referral-list__date">{dateFormat(referral.lastReferral)}</div>
         </div>
@@ -62,7 +65,9 @@ class CampaignReferrals extends React.Component {
                 <div className="campaign-referral-list__path--header">Path</div>
                 <div className="campaign-referral-list__container--header">Container</div>
                 <div className="campaign-referral-list__card--header">Card</div>
+                <div className="campaign-referral-list__impressions--header">Impressions</div>
                 <div className="campaign-referral-list__clicks--header">Clicks</div>
+                <div className="campaign-referral-list__ctr--header">CTR (%)</div>
                 <div className="campaign-referral-list__date--header">First referral</div>
                 <div className="campaign-referral-list__date--header">Last referral</div>
               </div>

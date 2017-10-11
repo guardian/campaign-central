@@ -11,7 +11,9 @@
 .campaign-referral-list__path,
 .campaign-referral-list__container,
 .campaign-referral-list__card,
+.campaign-referral-list__impressions,
 .campaign-referral-list__clicks,
+.campaign-referral-list__ctr,
 .campaign-referral-list__date {
   @extend %table__cell;
   white-space: normal;
@@ -34,7 +36,7 @@
 
 .campaign-referral-list__path,
 .campaign-referral-list__path--header {
-  width: 25%;
+  width: 15%;
 }
 
 .campaign-referral-list__container,
@@ -44,15 +46,25 @@
 
 .campaign-referral-list__card,
 .campaign-referral-list__card--header {
-  width: 30%;
+  width: 20%;
+}
+
+.campaign-referral-list__impressions,
+.campaign-referral-list__impressions--header {
+  width: 10%;
 }
 
 .campaign-referral-list__clicks,
 .campaign-referral-list__clicks--header {
-  width: 10%;
+  width: 7%;
+}
+
+.campaign-referral-list__ctr,
+.campaign-referral-list__ctr--header {
+  width: 7%;
 }
 
 .campaign-referral-list__date,
 .campaign-referral-list__date--header {
-  width: 10%;
+  width: 7%;
 }

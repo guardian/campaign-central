@@ -18,7 +18,6 @@ class ManagementApi(components: ControllerComponents) extends AbstractController
   val Stage = Config.conf.stage.toUpperCase
 
   def refreshCampaigns = Action.async { implicit request =>
-
     val isRefreshCampaignAllowed: Boolean = request.queryString.get("api-key").flatMap(_.headOption) match {
       case Some(apiKey) if apiKey == Config.conf.campaignCentralApiKey && Stage == "PROD" => true
       case Some(_) | None if Stage == "DEV"                                               => true
