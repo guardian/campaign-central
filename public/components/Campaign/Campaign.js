@@ -5,6 +5,7 @@ import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
 import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
 import CampaignReferrals from '../CampaignAnalytics/Analytics/CampaignReferrals';
 import CampaignPerformanceOverview from '../CampaignPerformanceOverview/CampaignPerformanceOverview';
+import CampaignPerformanceBreakdown from '../CampaignPerformanceBreakdown/CampaignPerformanceBreakdown';
 
 class Campaign extends React.Component {
 
@@ -70,6 +71,10 @@ class Campaign extends React.Component {
         <div className="campaign__row">
           <CampaignPerformanceOverview campaign={campaign}
                         latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign} />
+
+          <CampaignPerformanceBreakdown campaign={campaign}
+                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign} />
+
           <CampaignEdit campaign={campaign}
                         latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
                         updateCampaign={this.props.campaignActions.updateCampaign}
