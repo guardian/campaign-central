@@ -5,6 +5,7 @@ class CampaignPerformanceBreakdownTable extends React.Component {
   render() {
 
     const analytics = Object.entries(this.props.analyticsBreakdown || {});
+    const dataUnavailable = 'Unavailable';
 
     return (
       <table className="pure-table">
@@ -22,9 +23,9 @@ class CampaignPerformanceBreakdownTable extends React.Component {
           return(
             <tr key={breakdownKey}>
               <td>{breakdownKey}</td>
-              <td>{values.uniques}</td>
-              <td>{values.pageviews}</td>
-              <td> We do not have this data available yet. </td>
+              <td>{values.uniques ? values.uniques : dataUnavailable}</td>
+              <td>{values.pageviews ? values.pageviews : dataUnavailable}</td>
+              <td>{values.timeSpentOnPage ? values.timeSpentOnPage : dataUnavailable}</td>
             </tr>
           );
 
@@ -39,7 +40,8 @@ export default class CampaignPerformanceBreakdown extends React.Component {
 
   view = {
     'LOCATION': 'LOCATION',
-    'DEVICE': 'DEVICE'
+    'DEVICE': 'DEVICE',
+    'PATH': 'PATH'
   };
 
   constructor(props) {
@@ -59,12 +61,15 @@ export default class CampaignPerformanceBreakdown extends React.Component {
   renderBreakdownTable() {
     const analyticsByCountryCode = this.props.latestAnalyticsForCampaign.analyticsByCountryCode || {};
     const analyticsByDevice = this.props.latestAnalyticsForCampaign.analyticsByDevice || {};
+    const analyticsByPath = this.props.latestAnalyticsForCampaign.analyticsByPath || {};
 
     switch(this.state.currentView) {
       case this.view.LOCATION:
         return(<CampaignPerformanceBreakdownTable breakdownLabel="Country" analyticsBreakdown={analyticsByCountryCode}/>);
       case this.view.DEVICE:
         return(<CampaignPerformanceBreakdownTable breakdownLabel="Device" analyticsBreakdown={analyticsByDevice}/>);
+      case this.view.PATH:
+        return(<CampaignPerformanceBreakdownTable breakdownLabel="Path" analyticsBreakdown={analyticsByPath}/>);
       default:
         return(<CampaignPerformanceBreakdownTable breakdownLabel="Country" analyticsBreakdown={analyticsByCountryCode}/>);
     }
@@ -80,6 +85,7 @@ export default class CampaignPerformanceBreakdown extends React.Component {
         <div id ="performance-breakdown-nav" className="pure-button-group" role="group" aria-label="...">
           <button className={this.state.currentView === this.view.LOCATION ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.LOCATION)}>Location</button>
           <button className={this.state.currentView === this.view.DEVICE ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.DEVICE)}>Device</button>
+          <button className={this.state.currentView === this.view.PATH ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.PATH)}>Path</button>
         </div>
 
         {this.renderBreakdownTable()}
