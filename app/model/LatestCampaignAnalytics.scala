@@ -5,7 +5,7 @@ import play.api.libs.json.Format
 
 import scala.collection.immutable.ListMap
 
-case class LatestAnalyticsBreakdownItem(uniques: Long, pageviews: Long)
+case class LatestAnalyticsBreakdownItem(uniques: Long, pageviews: Long, timeSpentOnPage: Option[Double] = None)
 
 object LatestAnalyticsBreakdownItem {
   implicit val latestCampaignAnalyticsBreakdownItemFormat: Format[LatestAnalyticsBreakdownItem] =
@@ -23,7 +23,8 @@ case class LatestCampaignAnalytics(campaignId: String,
                                    weightedAverageDwellTimeForCampaign: Option[Double],
                                    averageDwellTimePerPathSeconds: Option[Map[String, Double]],
                                    analyticsByCountryCode: Map[String, LatestAnalyticsBreakdownItem],
-                                   analyticsByDevice: Map[String, LatestAnalyticsBreakdownItem])
+                                   analyticsByDevice: Map[String, LatestAnalyticsBreakdownItem],
+                                   analyticsByPath: Map[String, LatestAnalyticsBreakdownItem])
 
 object LatestCampaignAnalytics {
   implicit val latestCampaignAnalyticsFormat: Format[LatestCampaignAnalytics] =
@@ -51,6 +52,12 @@ object LatestCampaignAnalytics {
           }
       }
 
+    val metricsByPath: Map[String, LatestAnalyticsBreakdownItem] =
+      latestCampaignAnalyticsItem.averageDwellTimePerPathSeconds.getOrElse(Map.empty).map {
+        case (path, averageTimeSpentOnPage) =>
+          path -> LatestAnalyticsBreakdownItem(0, 0, Some(averageTimeSpentOnPage.to2Dp))
+      }
+
     def sortByUniques: ((String, LatestAnalyticsBreakdownItem), (String, LatestAnalyticsBreakdownItem)) => Boolean = {
       case ((_, lb1), (_, lb2)) => lb1.uniques > lb2.uniques
     }
@@ -67,7 +74,8 @@ object LatestCampaignAnalytics {
       latestCampaignAnalyticsItem.weightedAverageDwellTimeForCampaign.map(_.to2Dp),
       latestCampaignAnalyticsItem.averageDwellTimePerPathSeconds.map(_.mapValues(_.to2Dp)),
       ListMap(metricsByCountryCode.toSeq.sortWith(sortByUniques): _*),
-      ListMap(metricsByDevice.toSeq.sortWith(sortByUniques): _*)
+      ListMap(metricsByDevice.toSeq.sortWith(sortByUniques): _*),
+      ListMap(metricsByPath.toSeq.sortWith(sortByUniques): _*)
     )
   }
 
