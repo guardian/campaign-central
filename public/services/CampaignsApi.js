@@ -86,3 +86,10 @@ export function refreshCampaignFromCAPI(id) {
     method: 'post'
   });
 }
+
+export function getCampaignBenchmarks() {
+  return AuthedReqwest({
+    url: '/api/v2/campaigns/benchmarks',
+    method: 'get'
+  });
+}

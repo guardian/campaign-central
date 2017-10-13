@@ -27,6 +27,15 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     }
   }
 
+  def getBenchmarksAcrossCampaigns() = authAction {
+    CampaignService.getBenchmarksAcrossCampaigns() match {
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(_)                       => InternalServerError
+      case Right(benchmarks)             => Ok(Json.toJson(benchmarks))
+    }
+
+  }
+
   def getLatestCampaignAnalytics() = authAction {
     CampaignService.getLatestCampaignAnalytics() match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
