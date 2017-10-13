@@ -10,26 +10,26 @@ resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-to
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 val slf4jVersion    = "1.7.25"
-val playJsonVersion = "2.6.5"
+val playJsonVersion = "2.6.6"
 
 lazy val dependencies = Seq(
-  "com.typesafe.play"                %% "play-json"              % playJsonVersion,
-  "com.typesafe.play"                %% "play-json-joda"         % playJsonVersion,
-  "org.typelevel"                    %% "cats-core"              % "0.9.0",
-  "ai.x"                             %% "play-json-extensions"   % "0.10.0",
-  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % "2.8.9" % Runtime,
-  "com.amazonaws"                    % "aws-java-sdk"            % "1.11.199",
-  "com.gu"                           %% "play-googleauth"        % "0.7.0",
-  "com.gu"                           %% "content-api-client"     % "11.26",
-  "com.squareup.okhttp3"             % "okhttp"                  % "3.9.0",
   ws,
-  "commons-io"           % "commons-io"               % "2.5",
-  "net.logstash.logback" % "logstash-logback-encoder" % "4.11",
-  "com.gu"               % "kinesis-logback-appender" % "1.4.0",
-  "org.slf4j"            % "slf4j-api"                % slf4jVersion,
-  "org.slf4j"            % "jcl-over-slf4j"           % slf4jVersion,
-  "com.gu"               %% "scanamo"                 % "0.9.5",
-  "org.scalatest"        %% "scalatest"               % "3.0.4" % Test
+  "com.typesafe.play"                %% "play-json"               % playJsonVersion,
+  "com.typesafe.play"                %% "play-json-joda"          % playJsonVersion,
+  "org.typelevel"                    %% "cats-core"               % "0.9.0",
+  "ai.x"                             %% "play-json-extensions"    % "0.10.0",
+  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor"  % "2.8.9" % Runtime,
+  "com.amazonaws"                    % "aws-java-sdk"             % "1.11.213",
+  "com.gu"                           %% "play-googleauth"         % "0.7.0",
+  "com.gu"                           %% "content-api-client"      % "11.26",
+  "com.squareup.okhttp3"             % "okhttp"                   % "3.9.0",
+  "commons-io"                       % "commons-io"               % "2.5",
+  "net.logstash.logback"             % "logstash-logback-encoder" % "4.11",
+  "com.gu"                           % "kinesis-logback-appender" % "1.4.0",
+  "org.slf4j"                        % "slf4j-api"                % slf4jVersion,
+  "org.slf4j"                        % "jcl-over-slf4j"           % slf4jVersion,
+  "com.gu"                           %% "scanamo"                 % "0.9.5",
+  "org.scalatest"                    %% "scalatest"               % "3.0.4" % Test
 )
 
 lazy val root = (project in file("."))
