@@ -37,7 +37,7 @@ export default class BigCardMetric extends React.Component {
       <div className="box">
           {this.renderOpenModalIcon()}
           <div className="head">{this.props.metricLabel}</div>
-          <div className="count ">{this.props.metricValue}</div>
+          <div className="count ">{this.props.metricValue.toLocaleString()}</div>
           <div className="unit">{this.props.metricUnit ? this.props.metricUnit : this.props.metricTargetMessage}</div>
           <Modal
               visible={this.state.visible}
