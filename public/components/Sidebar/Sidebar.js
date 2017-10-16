@@ -16,6 +16,7 @@ export default class Sidebar extends React.Component {
       <div className="sidebar">
         <div className="sidebar__link-group">
           <div className="sidebar__link-group__header">Campaigns</div>
+          <SidebarLink to="/benchmarks">Benchmarks</SidebarLink>
           <SidebarLink to="/campaigns">All Campaigns</SidebarLink>
           <div className="sidebar__filter-group">
             <div className="sidebar__filter-group__header">State:</div>

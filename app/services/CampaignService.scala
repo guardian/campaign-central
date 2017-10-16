@@ -61,6 +61,34 @@ object CampaignService {
     }
   }
 
+  def getBenchmarksAcrossCampaigns(): Either[CampaignCentralApiError, Benchmarks] = {
+    for {
+      latestCampaignAnalytics <- getLatestCampaignAnalytics()
+      campaigns               <- CampaignRepository.getAllCampaigns()
+    } yield {
+
+      val paidForCampaignsIds = campaigns.filter(_.`type`.toLowerCase == "paidcontent").map(_.id)
+      val hostedCampaignIds   = campaigns.filter(_.`type`.toLowerCase == "hosted").map(_.id)
+
+      val allCampaignAnalytics     = latestCampaignAnalytics.values.toSeq
+      val paidForCampaignAnalytics = paidForCampaignsIds.flatMap(latestCampaignAnalytics.get)
+      val hostedCampaignAnalytics  = hostedCampaignIds.flatMap(latestCampaignAnalytics.get)
+
+      Benchmarks(
+        totals = Totals(allCampaignAnalytics),
+        averages = Averages(allCampaignAnalytics),
+        paidFor = PaidFor(
+          totals = Totals(paidForCampaignAnalytics),
+          averages = Averages(paidForCampaignAnalytics)
+        ),
+        hosted = Hosted(
+          totals = Totals(hostedCampaignAnalytics),
+          averages = Averages(hostedCampaignAnalytics)
+        )
+      )
+    }
+  }
+
   def getUniquesDataForGraph(campaignId: String): Either[CampaignCentralApiError, Option[Seq[GraphDataPoint]]] = {
 
     for {

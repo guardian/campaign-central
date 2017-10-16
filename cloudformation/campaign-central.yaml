@@ -22,12 +22,12 @@ Parameters:
   PublicVpcSubnets:
     Description: Subnets to use in VPC for public internet-facing ELB eg. subnet-abcd1234
     Type: List<AWS::EC2::Subnet::Id>
-    Default: subnet-c3620fa6,subnet-2b37bd5c,subnet-3667c86f
+    Default: subnet-c3620fa6,subnet-2b37bd5c
 
   PrivateVpcSubnets:
     Description: Subnets to use in VPC for private EC2 instances eg. subnet-abcd1234
     Type: List<AWS::EC2::Subnet::Id>
-    Default: subnet-c2620fa7,subnet-2a37bd5d,subnet-2967c870
+    Default: subnet-c2620fa7,subnet-2a37bd5d
 
   AMI:
     Description: AMIgo AMI id
@@ -52,12 +52,10 @@ Mappings:
     CODE:
       MinSize: 1
       MaxSize: 2
-      DesiredCapacity: 1
       InstanceType: t2.micro
     PROD:
-      MinSize: 3
-      MaxSize: 6
-      DesiredCapacity: 3
+      MinSize: 2
+      MaxSize: 4
       InstanceType: t2.micro
 
 Resources:
@@ -239,7 +237,7 @@ Resources:
       - IpProtocol: tcp
         FromPort: '22'
         ToPort: '22'
-        CidrIp: 0.0.0.0/0
+        CidrIp: 10.0.0.0/8
 
   AppServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -314,7 +312,12 @@ Resources:
     Type: AWS::AutoScaling::AutoScalingGroup
     Properties:
       AvailabilityZones:
-        Fn::GetAZs: ''
+        - Fn::Select:
+          - 0
+          - Fn::GetAZs: !Ref "AWS::Region"
+        - Fn::Select:
+          - 1
+          - Fn::GetAZs: !Ref "AWS::Region"
       VPCZoneIdentifier:
         Ref: PrivateVpcSubnets
       LaunchConfigurationName:
@@ -329,11 +332,6 @@ Resources:
         - Config
         - Ref: Stage
         - MaxSize
-      DesiredCapacity:
-        Fn::FindInMap:
-        - Config
-        - Ref: Stage
-        - DesiredCapacity
       HealthCheckType: ELB
       HealthCheckGracePeriod: 300
       LoadBalancerNames:

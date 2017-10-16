@@ -6,6 +6,7 @@ GET	/campaign/:id		              controllers.App.index(id)
 GET	/capiImport		                controllers.App.index(id = "")
 GET	/management/analytics         controllers.App.index(id = "")
 GET	/glossary                     controllers.App.index(id = "")
+GET	/benchmarks                   controllers.App.index(id = "")
 
 
 GET /login            controllers.LogIn.logIn()
@@ -16,6 +17,7 @@ GET /oauth2callback   controllers.LogIn.oauth2Callback()
 #Campaign Api
 
 GET /api/campaigns                         controllers.CampaignApi.getAllCampaigns
+GET /api/v2/campaigns/benchmarks           controllers.CampaignApi.getBenchmarksAcrossCampaigns
 GET /api/v2/campaigns/latestAnalytics      controllers.CampaignApi.getLatestCampaignAnalytics
 GET /api/v2/campaigns/:id/latestAnalytics  controllers.CampaignApi.getLatestAnalyticsForCampaign(id: String)
 

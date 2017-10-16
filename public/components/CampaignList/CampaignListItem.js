@@ -41,16 +41,19 @@ class CampaignListItem extends React.Component {
     const daysGone = this.daysBetween(startDate, now);
     const days = this.daysBetween(startDate, endDate);
 
+    if (isNaN(daysGone)) {
+      return(<td className={'campaign-list__item ' + ((totalUniques >= targetToDate) ? ahead : behind)}>
+        {totalUniques}
+      </td>);
+    }
+
     return(<td className={'campaign-list__item ' + ((totalUniques >= targetToDate) ? ahead : behind)}>
       {totalUniques}
-
       <i className="i-info-grey" />
-
       <div className="campaign-list__helper" onClick={e => e.stopPropagation()}>
         {daysGone} days into campaign ({Math.round(100*daysGone/days)}%)<br/>
       </div>
     </td>);
-
 
   };
 

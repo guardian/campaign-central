@@ -23,7 +23,6 @@
     "panda-session": "^0.1.6",
     "ramda": "^0.22.1",
     "react": "^15.3.0",
-    "react-awesome-modal": "^2.0.1",
     "react-dom": "^15.3.0",
     "react-number-format": "^2.0.0",
     "react-redux": "^4.4.5",

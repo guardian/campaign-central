@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import R from 'ramda';
 import BigCardMetric from './BigCardMetric';
 
 export default class CampaignPerformanceOverview extends React.Component {
@@ -15,16 +14,9 @@ export default class CampaignPerformanceOverview extends React.Component {
   render () {
 
     const totalPageviews = this.props.latestAnalyticsForCampaign.pageviews;
-    const pageviewsPerDevice = this.props.latestAnalyticsForCampaign.pageviewsByDevice;
-
     const totalUniques = this.props.latestAnalyticsForCampaign.uniques;
-    const uniquesPerDevice = this.props.latestAnalyticsForCampaign.uniquesByDevice;
     const uniquesTarget = this.props.campaign.targets && this.props.campaign.targets.uniques;
-
     const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
-    const medianPerDevice = this.props.latestAnalyticsForCampaign.medianAttentionTimeByDevice || {};
-
-    const averageDwellTimePerPathSeconds = this.props.latestAnalyticsForCampaign.averageDwellTimePerPathSeconds || {};
     const weightedAverageDwellTime = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
 
     return (
@@ -34,23 +26,19 @@ export default class CampaignPerformanceOverview extends React.Component {
           <div id="metrics">
               <BigCardMetric metricLabel="Uniques"
                              metricTargetMessage={this.renderPercentageOfTarget(totalUniques, uniquesTarget)}
-                             metricValue={totalUniques}
-                             metricByDevice={uniquesPerDevice}/>
+                             metricValue={totalUniques}/>
 
               <BigCardMetric metricLabel="Pageviews"
                              metricUnit=""
-                             metricValue={totalPageviews}
-                             metricByDevice={pageviewsPerDevice}/>
+                             metricValue={totalPageviews}/>
 
               <BigCardMetric metricLabel="Attention Time"
                              metricUnit="seconds"
-                             metricValue={medianAttentionTime}
-                             metricByDevice={medianPerDevice}/>
+                             metricValue={medianAttentionTime}/>
 
               <BigCardMetric metricLabel="Time on Page"
                              metricUnit="seconds"
-                             metricValue={weightedAverageDwellTime}
-                             metricByPath={averageDwellTimePerPathSeconds}/>
+                             metricValue={weightedAverageDwellTime}/>
           </div>
         </div>
       </div>
