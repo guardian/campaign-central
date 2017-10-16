@@ -49,14 +49,14 @@ object LatestCampaignAnalytics {
 
     val top20PlusSumOfOtherMetricsByCountryCode: Map[String, LatestAnalyticsBreakdownItem] = {
       val sortedMetricsByCountryCode = ListMap(metricsByCountryCode.toSeq.sortWith(sortByUniques): _*)
-      val (top20, other) = sortedMetricsByCountryCode.splitAt(20)
+      val (top20, other)             = sortedMetricsByCountryCode.splitAt(20)
 
       top20 + ("other" ->
         LatestAnalyticsBreakdownItem(
           uniques = other.values.map(_.uniques).sum,
           pageviews = other.values.map(_.pageviews).sum,
           timeSpentOnPage = Some(other.values.flatMap(_.timeSpentOnPage).sum)
-      ))
+        ))
     }
 
     val metricsByDevice: Map[String, LatestAnalyticsBreakdownItem] =
