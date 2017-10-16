@@ -20,7 +20,7 @@ object CapiSectionTransformer {
 
   def deriveSponsorshipType(section: CapiSection): Option[String] = {
     def isHosted(section: CapiSection): Boolean = section.id.startsWith("advertiser-content")
-    if (isHosted(section)) Some("hosted") else section.activeSponsorships.flatMap(_.headOption.map(_.sponsorshipType.name))
+    if (isHosted(section)) Some("hosted") else section.activeSponsorships.flatMap(_.headOption.map(_.sponsorshipType.name.toLowerCase))
   }
 
   def deriveSponsorshipLogo(section: CapiSection): Option[String] =
