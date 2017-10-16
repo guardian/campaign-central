@@ -61,4 +61,8 @@ object CampaignTransformer {
 
   }
 
+  def updateExistingCampaignThatsFinished(campaign: Campaign): Campaign = {
+    campaign.copy(status = "dead")
+  }
+
 }

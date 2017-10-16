@@ -147,7 +147,7 @@ object CampaignService {
 
   def synchroniseCampaigns()(implicit user: User): Either[CampaignCentralApiError, List[Campaign]] = {
 
-    val sectionsToCreateOrUpdate: Seq[(CapiSection, Option[Campaign])] = {
+    val sectionsToCreateOrUpdate: Seq[(Option[CapiSection], Option[Campaign])] = {
       val currentCampaigns = CampaignRepository
         .getAllCampaigns()
         .toOption
@@ -159,15 +159,26 @@ object CampaignService {
 
       val sections = ContentApi.getSectionsWithPaidContentSponsorship()
 
-      sections map { section =>
-        (section, currentCampaigns.get(section.id))
+      val existingCampaigns = sections map { section =>
+        (Some(section), currentCampaigns.get(section.id))
       }
+
+      val deadCampaigns: Seq[(Option[CapiSection], Option[Campaign])] = {
+        val deadCampaignIds = (currentCampaigns.keys.toSet  diff sections.map(_.id).toSet).toSeq
+        deadCampaignIds.flatMap(currentCampaigns.get).map { deadCampaign => (None, Some(deadCampaign)) }
+      }
+
+      deadCampaigns ++ existingCampaigns
     }
 
     val campaigns: Seq[Campaign] = sectionsToCreateOrUpdate.flatMap {
-      case (section, Some(existingCampaign)) =>
+      case (Some(section), Some(existingCampaign)) =>
         Some(CampaignTransformer.updateExistingCampaign(section, existingCampaign, user))
-      case (section, None) =>
+
+      case (None, Some(existingCampaign)) =>
+        Some(CampaignTransformer.updateExistingCampaignThatsFinished(existingCampaign))
+
+      case (Some(section), None) =>
         CampaignTransformer.createDefaultCampaign(section) orElse {
           Logger.warn(s"Could not create campaign from section: ${section.id}")
           None
