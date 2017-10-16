@@ -2,7 +2,7 @@ package model
 
 import java.time.LocalDate
 
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{JsNumber, Json, Writes}
 
 case class Component(
   platform: String,
@@ -20,11 +20,16 @@ object Component {
 // A referral to any item in a campaign from an on-platform source in a particular period
 case class CampaignReferral(
   component: Component,
-  numClicks: Int,
+  clickCount: Int,
+  impressionCount: Int,
   firstReferral: LocalDate,
   lastReferral: LocalDate
-)
+) {
+  val ctr: Double = clickCount / impressionCount.toDouble
+}
 
 object CampaignReferral {
-  implicit val referralWrites: Writes[CampaignReferral] = Json.writes[CampaignReferral]
+  implicit val referralWrites: Writes[CampaignReferral] = { referral =>
+    Json.writes[CampaignReferral].writes(referral) + ("ctr" -> JsNumber(referral.ctr))
+  }
 }
