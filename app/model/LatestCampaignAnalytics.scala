@@ -34,6 +34,10 @@ object LatestCampaignAnalytics {
 
     import util.DoubleUtils._
 
+    def sortByUniques: ((String, LatestAnalyticsBreakdownItem), (String, LatestAnalyticsBreakdownItem)) => Boolean = {
+      case ((_, lb1), (_, lb2)) => lb1.uniques > lb2.uniques
+    }
+
     val metricsByCountryCode: Map[String, LatestAnalyticsBreakdownItem] =
       latestCampaignAnalyticsItem.uniquesByCountryCode.flatMap {
         case (key, uniques) =>
@@ -42,6 +46,18 @@ object LatestCampaignAnalytics {
             key -> LatestAnalyticsBreakdownItem(uniques, pageviews)
           }
       }
+
+    val top20PlusSumOfOtherMetricsByCountryCode: Map[String, LatestAnalyticsBreakdownItem] = {
+      val sortedMetricsByCountryCode = ListMap(metricsByCountryCode.toSeq.sortWith(sortByUniques): _*)
+      val (top20, other) = sortedMetricsByCountryCode.splitAt(20)
+
+      top20 + ("other" ->
+        LatestAnalyticsBreakdownItem(
+          uniques = other.values.map(_.uniques).sum,
+          pageviews = other.values.map(_.pageviews).sum,
+          timeSpentOnPage = Some(other.values.flatMap(_.timeSpentOnPage).sum)
+      ))
+    }
 
     val metricsByDevice: Map[String, LatestAnalyticsBreakdownItem] =
       latestCampaignAnalyticsItem.uniquesByDevice.getOrElse(Map.empty).flatMap {
@@ -58,10 +74,6 @@ object LatestCampaignAnalytics {
           path -> LatestAnalyticsBreakdownItem(0, 0, Some(averageTimeSpentOnPage.to2Dp))
       }
 
-    def sortByUniques: ((String, LatestAnalyticsBreakdownItem), (String, LatestAnalyticsBreakdownItem)) => Boolean = {
-      case ((_, lb1), (_, lb2)) => lb1.uniques > lb2.uniques
-    }
-
     LatestCampaignAnalytics(
       latestCampaignAnalyticsItem.campaignId,
       latestCampaignAnalyticsItem.uniques,
@@ -73,7 +85,7 @@ object LatestCampaignAnalytics {
       latestCampaignAnalyticsItem.medianAttentionTimeByDevice.map(normaliseDeviceData),
       latestCampaignAnalyticsItem.weightedAverageDwellTimeForCampaign.map(_.to2Dp),
       latestCampaignAnalyticsItem.averageDwellTimePerPathSeconds.map(_.mapValues(_.to2Dp)),
-      ListMap(metricsByCountryCode.toSeq.sortWith(sortByUniques): _*),
+      top20PlusSumOfOtherMetricsByCountryCode,
       ListMap(metricsByDevice.toSeq.sortWith(sortByUniques): _*),
       ListMap(metricsByPath.toSeq.sortWith(sortByUniques): _*)
     )
