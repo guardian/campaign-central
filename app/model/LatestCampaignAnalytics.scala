@@ -71,7 +71,10 @@ object LatestCampaignAnalytics {
     val metricsByPath: Map[String, LatestAnalyticsBreakdownItem] =
       latestCampaignAnalyticsItem.averageDwellTimePerPathSeconds.getOrElse(Map.empty).map {
         case (path, averageTimeSpentOnPage) =>
-          path -> LatestAnalyticsBreakdownItem(0, 0, Some(averageTimeSpentOnPage.to2Dp))
+          val pageviews = latestCampaignAnalyticsItem.pageviewsByPath.flatMap(_.get(path)).getOrElse(0L)
+          val uniques   = latestCampaignAnalyticsItem.uniquesByPath.flatMap(_.get(path)).getOrElse(0L)
+
+          path -> LatestAnalyticsBreakdownItem(uniques, pageviews, Some(averageTimeSpentOnPage.to2Dp))
       }
 
     LatestCampaignAnalytics(

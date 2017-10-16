@@ -17,7 +17,9 @@ case class LatestCampaignAnalyticsItem(
   medianAttentionTimeSeconds: Option[Long],
   medianAttentionTimeByDevice: Option[Map[String, Long]],
   weightedAverageDwellTimeForCampaign: Option[Double],
-  averageDwellTimePerPathSeconds: Option[Map[String, Double]]
+  averageDwellTimePerPathSeconds: Option[Map[String, Double]],
+  pageviewsByPath: Option[Map[String, Long]],
+  uniquesByPath: Option[Map[String, Long]]
 ) {
   def toItem: Either[CampaignCentralApiError, Item] =
     Option(Item.fromJSON(Json.toJson(this).toString())).map(Right(_)) getOrElse Left(JsonParsingError(""))

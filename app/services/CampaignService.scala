@@ -164,8 +164,10 @@ object CampaignService {
       }
 
       val deadCampaigns: Seq[(Option[CapiSection], Option[Campaign])] = {
-        val deadCampaignIds = (currentCampaigns.keys.toSet  diff sections.map(_.id).toSet).toSeq
-        deadCampaignIds.flatMap(currentCampaigns.get).map { deadCampaign => (None, Some(deadCampaign)) }
+        val deadCampaignIds = (currentCampaigns.keys.toSet diff sections.map(_.id).toSet).toSeq
+        deadCampaignIds.flatMap(currentCampaigns.get).map { deadCampaign =>
+          (None, Some(deadCampaign))
+        }
       }
 
       deadCampaigns ++ existingCampaigns
