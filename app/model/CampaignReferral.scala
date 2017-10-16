@@ -2,7 +2,7 @@ package model
 
 import java.time.LocalDate
 
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.{JsNumber, Json, Writes}
 
 case class Component(
   platform: String,
@@ -22,27 +22,14 @@ case class CampaignReferral(
   component: Component,
   clickCount: Int,
   impressionCount: Int,
-  // Annoyingly react won't recognise CTR if it's a derived property so it has to go in as part of the constructor
-  ctr: Double,
   firstReferral: LocalDate,
   lastReferral: LocalDate
-)
+) {
+  val ctr: Double = clickCount / impressionCount.toDouble
+}
 
 object CampaignReferral {
-  implicit val referralWrites: Writes[CampaignReferral] = Json.writes[CampaignReferral]
-
-  def apply(
-    component: Component,
-    clickCount: Int,
-    impressionCount: Int,
-    firstReferral: LocalDate,
-    lastReferral: LocalDate
-  ): CampaignReferral = CampaignReferral(
-    component,
-    clickCount,
-    impressionCount,
-    clickCount / impressionCount.toDouble,
-    firstReferral,
-    lastReferral
-  )
+  implicit val referralWrites: Writes[CampaignReferral] = { referral =>
+    Json.writes[CampaignReferral].writes(referral) + ("ctr" -> JsNumber(referral.ctr))
+  }
 }
