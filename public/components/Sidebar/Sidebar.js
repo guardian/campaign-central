@@ -28,7 +28,7 @@ export default class Sidebar extends React.Component {
             <div className="sidebar__filter-group__header">Type:</div>
             {this.filterLink({type: undefined}, 'All')}
             {this.filterLink({type: 'hosted'}, 'Hosted')}
-            {this.filterLink({type: 'paidContent'}, 'Paid Content')}
+            {this.filterLink({type: 'paidcontent'}, 'Paid Content')}
           </div>
         </div>
         <div className="sidebar__link-group">
