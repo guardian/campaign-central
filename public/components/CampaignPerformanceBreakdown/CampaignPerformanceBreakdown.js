@@ -1,4 +1,5 @@
 import React, { PropTypes } from 'react';
+import {formatToMinutes} from '../../util/minutesFormatter';
 
 class CampaignPerformanceBreakdownTable extends React.Component {
 
@@ -14,7 +15,7 @@ class CampaignPerformanceBreakdownTable extends React.Component {
           <th>{this.props.breakdownLabel}</th>
           <th>Unique Users</th>
           <th>Total Page Views</th>
-          <th>Average Time on Page</th>
+          <th>Average Time on Page(minutes)</th>
         </tr>
         </thead>
 
@@ -25,7 +26,7 @@ class CampaignPerformanceBreakdownTable extends React.Component {
               <td>{breakdownKey}</td>
               <td>{values.uniques ? values.uniques : dataUnavailable}</td>
               <td>{values.pageviews ? values.pageviews : dataUnavailable}</td>
-              <td>{values.timeSpentOnPage ? values.timeSpentOnPage : dataUnavailable}</td>
+              <td>{values.timeSpentOnPage ? formatToMinutes(values.timeSpentOnPage) : dataUnavailable}</td>
             </tr>
           );
 
