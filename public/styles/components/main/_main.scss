@@ -1,12 +1,6 @@
-.main {
-    margin-top: $size-header-height;
-    height: calc(100vh - #{$size-header-height});
-    width: 100%;
-}
 
 .main__content {
     width: 100%;
-
     padding: 40px;
     padding-left: $size-sidebar-width + 40;
 }
@@ -14,6 +8,7 @@
 .main__sidebar {
     width: $size-sidebar-width;
     background-color: $c-grey-main;
-    position: fixed;
-    height: 100%;
+    float: left;
+    position: sticky;
+    top: 0;
 }
