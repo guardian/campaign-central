@@ -1,5 +1,6 @@
 import React, {Component, PropTypes} from 'react';
 import BigCardMetric from '../CampaignPerformanceOverview/BigCardMetric';
+import {formatToMinutes} from '../../util/minutesFormatter';
 
 
 class BenchmarkSet extends Component {
@@ -20,8 +21,8 @@ class BenchmarkSet extends Component {
                            metricValue={totals.pageviews}/>
 
             <BigCardMetric metricLabel="Total Time on Page"
-                           metricUnit="seconds"
-                           metricValue={totals.timeSpentOnPage}/>
+                           metricUnit="minutes"
+                           metricValue={formatToMinutes(totals.timeSpentOnPage)}/>
 
             <BigCardMetric metricLabel="Average Uniques"
                            metricValue={averages.uniques}/>
@@ -31,7 +32,7 @@ class BenchmarkSet extends Component {
 
             <BigCardMetric metricLabel="Average Time on Page"
                            metricUnit="minutes"
-                           metricValue={averages.timeSpentOnPage}/>
+                           metricValue={formatToMinutes(averages.timeSpentOnPage)}/>
           </div>
         </div>
       </div>
