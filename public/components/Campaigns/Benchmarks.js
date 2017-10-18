@@ -30,7 +30,7 @@ class BenchmarkSet extends Component {
                            metricValue={averages.pageviews}/>
 
             <BigCardMetric metricLabel="Average Time on Page"
-                           metricUnit="seconds"
+                           metricUnit="minutes"
                            metricValue={averages.timeSpentOnPage}/>
           </div>
         </div>
@@ -75,7 +75,6 @@ import { bindActionCreators } from 'redux';
 import * as getAllCampaignBenchmarks from '../../actions/CampaignActions/getAllCampaignBenchmarks';
 
 function mapStateToProps(state) {
-  console.log(state);
   return {
     benchmarks: state.benchmarks
   };

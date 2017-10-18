@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import BigCardMetric from './BigCardMetric';
+import {formatToMinutes} from '../../util/minutesFormatter';
 
 export default class CampaignPerformanceOverview extends React.Component {
 
@@ -17,7 +18,7 @@ export default class CampaignPerformanceOverview extends React.Component {
     const totalUniques = this.props.latestAnalyticsForCampaign.uniques;
     const uniquesTarget = this.props.campaign.targets && this.props.campaign.targets.uniques;
     const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
-    const weightedAverageDwellTime = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
+    const weightedAverageDwellTimeInSeconds = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
 
     return (
       <div className="campaign__row">
@@ -37,8 +38,8 @@ export default class CampaignPerformanceOverview extends React.Component {
                              metricValue={medianAttentionTime}/>
 
               <BigCardMetric metricLabel="Time on Page"
-                             metricUnit="seconds"
-                             metricValue={weightedAverageDwellTime}/>
+                             metricUnit="minutes"
+                             metricValue={formatToMinutes(weightedAverageDwellTimeInSeconds)}/>
           </div>
         </div>
       </div>
