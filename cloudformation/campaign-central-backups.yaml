@@ -1,0 +1,175 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Campaign central databases backups.
+Parameters:
+  SourceTableName:
+    Description: DynamoDB tableName to backup.
+    Type: String
+    Default: campaign-central-PROD-campaigns
+  DestinationTableName:
+    Description: DynamoDB tableName to write to.
+    Type: String
+    Default: campaign-central-DEV-campaigns
+Resources:
+  CampaignCentralDynamoDBBackup:
+    Type: "AWS::DataPipeline::Pipeline"
+    Properties:
+      Name: DynamoDBInputS3OutputHive
+      Description: "Pipeline to backup DynamoDB data to S3"
+      Activate: true
+      ParameterObjects:
+        -
+          Id: "myDDBReadThroughputRatio"
+          Attributes:
+            -
+              Key: "description"
+              StringValue: "DynamoDB read throughput ratio"
+            -
+              Key: "type"
+              StringValue: "Double"
+            -
+              Key: "default"
+              StringValue: "0.2"
+        -
+          Id: "myTableName1"
+          Attributes:
+            -
+              Key: "description"
+              StringValue: "DynamoDB TableName1"
+            -
+              Key: "type"
+              StringValue: "String"
+        -
+          Id: "myTableName2"
+          Attributes:
+            -
+              Key: "description"
+              StringValue: "DynamoDB TableName2"
+            -
+              Key: "type"
+              StringValue: "String"
+      ParameterValues:
+        -
+          Id: "myTableName1"
+          StringValue:
+            Ref: "SourceTableName"
+        -
+          Id: "myTableName2"
+          StringValue:
+            Ref: "DestinationTableName"
+      PipelineObjects:
+        -
+          Id: "DDBSourceTable"
+          Name: "DDBSourceTable"
+          Fields:
+            -
+              Key: "tableName"
+              StringValue: "#{myTableName1}"
+            -
+              Key: "type"
+              StringValue: "DynamoDBDataNode"
+            -
+              Key: "dataFormat"
+              RefValue: "DDBExportFormat"
+            -
+              Key: "readThroughputPercent"
+              StringValue: "#{myDDBReadThroughputRatio}"
+        -
+          Id: "DDBDestinationTable"
+          Name: "DDBDestinationTable"
+          Fields:
+            -
+              Key: "tableName"
+              StringValue: "#{myTableName2}"
+            -
+              Key: "type"
+              StringValue: "DynamoDBDataNode"
+            -
+              Key: "dataFormat"
+              RefValue: "DDBExportFormat"
+            -
+              Key: "readThroughputPercent"
+              StringValue: "#{myDDBReadThroughputRatio}"
+
+        -
+          Id: "DDBExportFormat"
+          Name: "DDBExportFormat"
+          Fields:
+            -
+              Key: "type"
+              StringValue: "DynamoDBExportDataFormat"
+        -
+          Id: "TableBackupActivity"
+          Name: "TableBackupActivity"
+          Fields:
+            -
+              Key: "resizeClusterBeforeRunning"
+              StringValue: "true"
+            -
+              Key: "type"
+              StringValue: "HiveCopyActivity"
+            -
+              Key: "input"
+              RefValue: "DDBSourceTable"
+            -
+              Key: "runsOn"
+              RefValue: "EmrClusterForBackup"
+            -
+              Key: "output"
+              RefValue: "DDBDestinationTable"
+        -
+          Id: "DefaultSchedule"
+          Name: "RunEveryWeek"
+          Fields:
+            -
+              Key: "startAt"
+              StringValue: "FIRST_ACTIVATION_DATE_TIME"
+            -
+              Key: "type"
+              StringValue: "Schedule"
+            -
+              Key: "period"
+              StringValue: "7 days"
+        -
+          Id: "Default"
+          Name: "Default"
+          Fields:
+            -
+              Key: "type"
+              StringValue: "Default"
+            -
+              Key: "scheduleType"
+              StringValue: "cron"
+            -
+              Key: "failureAndRerunMode"
+              StringValue: "CASCADE"
+            -
+              Key: "role"
+              StringValue: "DataPipelineDefaultRole"
+            -
+              Key: "resourceRole"
+              StringValue: "DataPipelineDefaultResourceRole"
+            -
+              Key: "schedule"
+              RefValue: "DefaultSchedule"
+        -
+          Id: "EmrClusterForBackup"
+          Name: "EmrClusterForBackup"
+          Fields:
+            -
+              Key: "terminateAfter"
+              StringValue: "2 Hours"
+            -
+              Key: "amiVersion"
+              StringValue: "3.3.2"
+            -
+              Key: "masterInstanceType"
+              StringValue: "m4.large"
+            -
+              Key: "coreInstanceType"
+              StringValue: "m4.large"
+            -
+              Key: "coreInstanceCount"
+              StringValue: "1"
+            -
+              Key: "type"
+              StringValue: "EmrCluster"
