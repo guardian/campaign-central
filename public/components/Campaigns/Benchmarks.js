@@ -21,7 +21,6 @@ class BenchmarkSet extends Component {
                            metricValue={totals.pageviews}/>
 
             <BigCardMetric metricLabel="Total Time on Page"
-                           metricUnit="minutes"
                            metricValue={formatToMinutes(totals.timeSpentOnPage)}/>
 
             <BigCardMetric metricLabel="Average Uniques"
@@ -31,7 +30,6 @@ class BenchmarkSet extends Component {
                            metricValue={averages.pageviews}/>
 
             <BigCardMetric metricLabel="Average Time on Page"
-                           metricUnit="minutes"
                            metricValue={formatToMinutes(averages.timeSpentOnPage)}/>
           </div>
         </div>
