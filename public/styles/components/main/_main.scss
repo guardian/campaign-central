@@ -1,12 +1,9 @@
 
-.main {
+.main__flex-container {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
 }
 
 .main__content {
-    flex: 1 0 auto;
     padding: 40px;
 }
 
@@ -15,6 +12,6 @@
     background-color: $c-grey-main;
     position: sticky;
     top: 0;
-
+    flex: 0 0 auto;
     align-self: flex-start;
 }
