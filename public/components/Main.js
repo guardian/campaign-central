@@ -32,11 +32,13 @@ class Main extends React.Component {
       <div className="main">
         <Header />
         {this.renderErrorBar()}
-        <div className="main__sidebar">
-          <Sidebar query={this.props.location.query}/>
-        </div>
-        <div className="main__content">
-          {this.props.children}
+        <div className="main__flex-container">
+          <div className="main__sidebar">
+            <Sidebar query={this.props.location.query}/>
+          </div>
+          <div className="main__content">
+            {this.props.children}
+          </div>
         </div>
       </div>
     );

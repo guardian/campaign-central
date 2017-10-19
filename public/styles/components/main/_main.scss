@@ -1,19 +1,17 @@
-.main {
-    margin-top: $size-header-height;
-    height: calc(100vh - #{$size-header-height});
-    width: 100%;
+
+.main__flex-container {
+    display: flex;
 }
 
 .main__content {
-    width: 100%;
-
     padding: 40px;
-    padding-left: $size-sidebar-width + 40;
 }
 
 .main__sidebar {
     width: $size-sidebar-width;
     background-color: $c-grey-main;
-    position: fixed;
-    height: 100%;
+    position: sticky;
+    top: 0;
+    flex: 0 0 auto;
+    align-self: flex-start;
 }

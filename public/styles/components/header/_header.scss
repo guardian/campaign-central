@@ -1,9 +1,4 @@
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-
   display: flex;
   min-height: $size-header-height;
   max-height: $size-header-height;
@@ -15,7 +10,7 @@
 
   @extend %f-data;
 
-  width: $size-sidebar-width;
+  min-width: $size-sidebar-width;
   background-color: $c-highlight-main;
   color: white;
 
@@ -39,7 +34,7 @@
 .header__title {
   line-height: $size-header-height;
   text-shadow: 1px 1px 1px black;
-  letter-spacing: 1px;
+  overflow: hidden;
   font-weight: 100;
   color: white;
   margin-left: 20px;
