@@ -38,7 +38,6 @@ export default class CampaignPerformanceOverview extends React.Component {
                              metricValue={medianAttentionTime}/>
 
               <BigCardMetric metricLabel="Time on Page"
-                             metricUnit="minutes"
                              metricValue={formatToMinutes(weightedAverageDwellTimeInSeconds)}/>
           </div>
         </div>
