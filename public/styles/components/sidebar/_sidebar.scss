@@ -18,10 +18,10 @@
 }
 
 .sidebar {
+  //before
   @extend %sidebar-shadow;
 
-  height: 100%;
-  position: relative;
+  height: calc(100vh);
 }
 
 

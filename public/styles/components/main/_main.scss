@@ -1,14 +1,20 @@
 
+.main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 .main__content {
-    width: 100%;
+    flex: 1 0 auto;
     padding: 40px;
-    padding-left: $size-sidebar-width + 40;
 }
 
 .main__sidebar {
     width: $size-sidebar-width;
     background-color: $c-grey-main;
-    float: left;
     position: sticky;
     top: 0;
+
+    align-self: flex-start;
 }

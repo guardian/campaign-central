@@ -4,6 +4,7 @@
   max-height: $size-header-height;
   background-color: $c-grey-main;
   z-index: 2;
+  flex: 0 0 100%;
 }
 
 .header__logo {
