@@ -13,7 +13,7 @@ Resources:
   CampaignCentralDynamoDBBackup:
     Type: "AWS::DataPipeline::Pipeline"
     Properties:
-      Name: DynamoDBInputS3OutputHive
+      Name: CampaignCentralDynamoDBBackup
       Description: "Pipeline to backup DynamoDB data to S3"
       Activate: true
       ParameterObjects:
