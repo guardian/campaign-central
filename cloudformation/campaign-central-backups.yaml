@@ -30,30 +30,30 @@ Resources:
               Key: "default"
               StringValue: "0.2"
         -
-          Id: "myTableName1"
+          Id: "mySourceTableName"
           Attributes:
             -
               Key: "description"
-              StringValue: "DynamoDB TableName1"
+              StringValue: "DynamoDB source table name"
             -
               Key: "type"
               StringValue: "String"
         -
-          Id: "myTableName2"
+          Id: "myDestinationTableName"
           Attributes:
             -
               Key: "description"
-              StringValue: "DynamoDB TableName2"
+              StringValue: "DynamoDB destination table name"
             -
               Key: "type"
               StringValue: "String"
       ParameterValues:
         -
-          Id: "myTableName1"
+          Id: "mySourceTableName"
           StringValue:
             Ref: "SourceTableName"
         -
-          Id: "myTableName2"
+          Id: "myDestinationTableName"
           StringValue:
             Ref: "DestinationTableName"
       PipelineObjects:
@@ -63,7 +63,7 @@ Resources:
           Fields:
             -
               Key: "tableName"
-              StringValue: "#{myTableName1}"
+              StringValue: "#{mySourceTableName}"
             -
               Key: "type"
               StringValue: "DynamoDBDataNode"
@@ -79,7 +79,7 @@ Resources:
           Fields:
             -
               Key: "tableName"
-              StringValue: "#{myTableName2}"
+              StringValue: "#{myDestinationTableName}"
             -
               Key: "type"
               StringValue: "DynamoDBDataNode"
