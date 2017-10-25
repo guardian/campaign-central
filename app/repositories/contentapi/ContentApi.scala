@@ -1,18 +1,17 @@
 package repositories.contentapi
 
+import java.io.IOException
 import java.util.concurrent.Executors
-
 import com.gu.contentapi.client.ContentApiClientLogic
 import com.gu.contentapi.client.model._
 import com.gu.contentapi.client.model.v1.{Content, Section}
-import dispatch.FunctionHandler
-import okhttp3.Credentials
+import okhttp3._
 import play.api.Logger
 import services.Config
-
+import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 
 object ContentApi {
 
@@ -65,17 +64,28 @@ object ContentApi {
 class DraftContentApiClass(override val apiKey: String) extends ContentApiClientLogic() {
   override val targetUrl = Config().capiPreviewUrl
 
+  private val client: OkHttpClient = new OkHttpClient
+  
+  private val authHeaders = Map(
+    "Authorization" -> Credentials.basic(Config().capiPreviewUser, Config().capiPreviewPassword))
+
   override protected def get(url: String, headers: Map[String, String])(
     implicit context: ExecutionContext): Future[HttpResponse] = {
 
-    val headersWithAuth = headers ++ Map(
-      "Authorization" -> Credentials.basic(Config().capiPreviewUser, Config().capiPreviewPassword))
+    val promise          = Promise[HttpResponse]()
+    val request: Request = new Request.Builder().url(url).headers(Headers.of((headers ++ authHeaders).asJava)) build ()
 
-    val req = headersWithAuth.foldLeft(dispatch.url(url)) {
-      case (r, (name, value)) => r.setHeader(name, value)
-    }
+    client
+      .newCall(request)
+      .enqueue(
+        new Callback() {
+          override def onFailure(call: Call, e: IOException) { promise.failure(e) }
+          override def onResponse(call: Call, response: Response) {
+            promise.success(HttpResponse(response.body().bytes(), response.code, response.message))
+          }
+        }
+      )
 
-    def handler = new FunctionHandler(r => HttpResponse(r.getResponseBodyAsBytes, r.getStatusCode, r.getStatusText))
-    http(req.toRequest, handler)
+    promise.future
   }
 }

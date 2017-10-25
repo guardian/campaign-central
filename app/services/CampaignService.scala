@@ -185,6 +185,8 @@ object CampaignService {
           Logger.warn(s"Could not create campaign from section: ${section.id}")
           None
         }
+
+      case _ => None
     }
 
     val updatedCampaignsOrError: List[Either[CampaignCentralApiError, Campaign]] = campaigns.map { campaign =>
