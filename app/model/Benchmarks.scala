@@ -31,16 +31,34 @@ object Averages {
   }
 }
 
-case class PaidFor(totals: Totals, averages: Averages)
+case class Medians(attentionTime: Double)
+object Medians {
+  implicit val mediansFormat: Format[Medians] = Jsonx.formatCaseClass[Medians]
+
+  def apply(latestAnalytics: Seq[LatestCampaignAnalytics]): Medians = {
+    Medians(
+      attentionTime = {
+        val attnTimes      = latestAnalytics.flatMap(_.medianAttentionTimeSeconds)
+        val (lower, upper) = attnTimes.sorted.splitAt(attnTimes.size / 2)
+
+        if (attnTimes.size % 2 == 0) {
+          (lower.lastOption.map(_.toDouble).getOrElse(0.0) + upper.headOption.map(_.toDouble).getOrElse(0.0)) / 2.0
+        } else upper.headOption.map(_.toDouble).getOrElse(0.0)
+      }
+    )
+  }
+}
+
+case class PaidFor(totals: Totals, averages: Averages, medians: Medians)
 object PaidFor {
   implicit val paidForFormat: Format[PaidFor] = Jsonx.formatCaseClass[PaidFor]
 }
-case class Hosted(totals: Totals, averages: Averages)
+case class Hosted(totals: Totals, averages: Averages, medians: Medians)
 object Hosted {
   implicit val hostedFormat: Format[Hosted] = Jsonx.formatCaseClass[Hosted]
 }
 
-case class Benchmarks(totals: Totals, averages: Averages, paidFor: PaidFor, hosted: Hosted)
+case class Benchmarks(totals: Totals, averages: Averages, medians: Medians, paidFor: PaidFor, hosted: Hosted)
 
 object Benchmarks {
   implicit val benchmarksFormat: Format[Benchmarks] = Jsonx.formatCaseClass[Benchmarks]
