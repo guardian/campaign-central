@@ -65,7 +65,7 @@ class DraftContentApiClass(override val apiKey: String) extends ContentApiClient
   override val targetUrl = Config().capiPreviewUrl
 
   private val client: OkHttpClient = new OkHttpClient
-  
+
   private val authHeaders = Map(
     "Authorization" -> Credentials.basic(Config().capiPreviewUser, Config().capiPreviewPassword))
 
