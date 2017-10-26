@@ -6,6 +6,12 @@ class CampaignPerformanceBreakdownTable extends React.Component {
   render() {
 
     const analytics = Object.entries(this.props.analyticsBreakdown || {});
+
+    const sum = ( acc, cur ) => acc + cur
+    const percentageOfTotal = (amount, total) => ((amount / total) * 100).toFixed(2)
+    const totalUniques = analytics.map( ([key, values]) => values.uniques).reduce(sum, 0)
+    const totalPageviews = analytics.map( ([key, values]) => values.pageviews).reduce(sum, 0)
+    const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0)
     const dataUnavailable = 'Unavailable';
 
     return (
@@ -15,7 +21,7 @@ class CampaignPerformanceBreakdownTable extends React.Component {
           <th>{this.props.breakdownLabel}</th>
           <th>Unique Users</th>
           <th>Total Page Views</th>
-          <th>Average Time on Page(minutes)</th>
+          <th>Average Time on Page (minutes)</th>
         </tr>
         </thead>
 
@@ -24,9 +30,9 @@ class CampaignPerformanceBreakdownTable extends React.Component {
           return(
             <tr key={breakdownKey}>
               <td>{breakdownKey}</td>
-              <td>{values.uniques ? values.uniques : dataUnavailable}</td>
-              <td>{values.pageviews ? values.pageviews : dataUnavailable}</td>
-              <td>{values.timeSpentOnPage ? formatToMinutes(values.timeSpentOnPage) : dataUnavailable}</td>
+              <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
+              <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
+              <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
             </tr>
           );
 
