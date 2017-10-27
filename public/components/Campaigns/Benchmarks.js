@@ -8,6 +8,7 @@ class BenchmarkSet extends Component {
   render() {
     const totals = this.props.totals;
     const averages = this.props.averages;
+    const medians = this.props.medians;
 
     return(
       <div className="campaign__row">
@@ -31,6 +32,9 @@ class BenchmarkSet extends Component {
 
             <BigCardMetric metricLabel="Average Time on Page"
                            metricValue={formatToMinutes(averages.timeSpentOnPage)}/>
+
+            <BigCardMetric metricLabel="Median Attention Time"
+                           metricValue={formatToMinutes(medians.attentionTime)}/>
           </div>
         </div>
       </div>
@@ -60,9 +64,9 @@ class Benchmarks extends Component {
           campaign are not set correctly in the Tag Manager then this will have an underlining effect on these numbers.
         </p>
 
-        <BenchmarkSet totals={benchmarks.totals} averages={benchmarks.averages} title="Across All Campaigns" />
-        <BenchmarkSet totals={benchmarks.paidFor.totals} averages={benchmarks.paidFor.averages} title="Across Paid For Campaigns" />
-        <BenchmarkSet totals={benchmarks.hosted.totals} averages={benchmarks.hosted.averages} title="Across Hosted Campaigns" />
+        <BenchmarkSet totals={benchmarks.totals} averages={benchmarks.averages} medians={benchmarks.medians} title="Across All Campaigns" />
+        <BenchmarkSet totals={benchmarks.paidFor.totals} averages={benchmarks.paidFor.averages} medians={benchmarks.paidFor.medians} title="Across Paid For Campaigns" />
+        <BenchmarkSet totals={benchmarks.hosted.totals} averages={benchmarks.hosted.averages} medians={benchmarks.hosted.medians} title="Across Hosted Campaigns" />
       </div>
     );
   }

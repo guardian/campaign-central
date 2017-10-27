@@ -77,13 +77,16 @@ object CampaignService {
       Benchmarks(
         totals = Totals(allCampaignAnalytics),
         averages = Averages(allCampaignAnalytics),
+        medians = Medians(allCampaignAnalytics),
         paidFor = PaidFor(
           totals = Totals(paidForCampaignAnalytics),
-          averages = Averages(paidForCampaignAnalytics)
+          averages = Averages(paidForCampaignAnalytics),
+          medians = Medians(paidForCampaignAnalytics)
         ),
         hosted = Hosted(
           totals = Totals(hostedCampaignAnalytics),
-          averages = Averages(hostedCampaignAnalytics)
+          averages = Averages(hostedCampaignAnalytics),
+          medians = Medians(hostedCampaignAnalytics)
         )
       )
     }
