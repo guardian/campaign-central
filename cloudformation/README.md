@@ -1,6 +1,17 @@
  Cloudformation templates
  ========================
  
+ ### campaign-central dynamo Db
+ 
+ ```
+ aws cloudformation update-stack \
+    --stack-name CampaignCentralDynamo-DEV \
+    --template-body file:///$PWD/dynamoDb.yaml \
+    --parameters  ParameterKey=Stage,ParameterValue=DEV \
+    --profile composer \
+    --region eu-west-1
+```
+ 
  ### campaign-central-backups
  
  This template is an AWS Data Pipeline which schedules a weekly job that drops the contents of an old dev-environment
