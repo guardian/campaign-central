@@ -62,6 +62,7 @@ class CampaignListItem extends React.Component {
     var image = this.props.campaign.campaignLogo && <img src={this.props.campaign.campaignLogo} className="campaign-list__item__logo"/>;
     var startDate = this.props.campaign.startDate ? shortFormatMillisecondDate(this.props.campaign.startDate) : 'Not yet started';
     var endDate = this.props.campaign.endDate ? shortFormatMillisecondDate(this.props.campaign.endDate) : 'Not yet configured';
+    var productionOffice = this.props.campaign.productionOffice ? this.props.campaign.productionOffice : '-';
 
     var daysLeft = '';
     if (this.props.campaign.startDate && this.props.campaign.endDate) {
@@ -82,6 +83,7 @@ class CampaignListItem extends React.Component {
         <td className="campaign-list__item">{daysLeft}</td>
         <td className="campaign-list__item">{this.props.campaign.targets && this.props.campaign.targets.uniques}</td>
         {this.renderProgressSummary()}
+        <td className="campaign-list__item">{productionOffice}</td>
       </tr>
     );
   }
