@@ -30,7 +30,6 @@ class Main extends React.Component {
   render () {
     return (
       <div className="main">
-        <Header />
         {this.renderErrorBar()}
         <div className="main__flex-container">
           <div className="main__sidebar">
