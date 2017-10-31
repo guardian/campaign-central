@@ -22,6 +22,16 @@ object CampaignService {
     val ExcludedDeviceTypes = Set("UNKNOWN", "OTHER")
   }
 
+  private val blacklistedSections = Seq(
+    "advertiser-content/john-lewis-curtains-and-blinds",
+    "advertiser-content/john-lewis-curtains---blinds",
+    "australia-ashes-trail",
+    "trivago-travels",
+    "arthritis-uk",
+    "Sanofi Genzyme MS",
+    "barclays-make-a-change"
+  )
+
   def getPageViews(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignPageViewsItem]] = {
     CampaignPageViewsRepository.getCampaignPageViews(campaignId)
   }
@@ -160,7 +170,9 @@ object CampaignService {
         }
         .toMap
 
-      val sections = ContentApi.getSectionsWithPaidContentSponsorship()
+      val sections = ContentApi
+        .getSectionsWithPaidContentSponsorship()
+        .filterNot(section => blacklistedSections.contains(section.id) || section.id.contains("DNU"))
 
       val existingCampaigns = sections map { section =>
         (Some(section), currentCampaigns.get(section.id))
