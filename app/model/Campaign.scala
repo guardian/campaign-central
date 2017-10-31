@@ -19,7 +19,8 @@ case class Campaign(
   actualValue: Option[Long] = None,
   startDate: Option[DateTime] = None,
   endDate: DateTime,
-  targets: Map[String, Long] = Map.empty
+  targets: Map[String, Long] = Map.empty,
+  productionOffice: Option[String]
 )
 
 object Campaign {

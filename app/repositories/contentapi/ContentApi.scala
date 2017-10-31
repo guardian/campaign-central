@@ -42,7 +42,7 @@ object ContentApi {
       new SearchQuery()
         .section(pathPrefix)
         .showAtoms("all")
-        .showFields("internalComposerCode,isLive,firstPublicationDate,headline")
+        .showFields("internalComposerCode,isLive,firstPublicationDate,headline,productionOffice")
         .showTags("all")
         .pageSize(10)
         .page(page)

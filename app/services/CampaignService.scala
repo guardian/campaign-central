@@ -192,9 +192,16 @@ object CampaignService {
       case _ => None
     }
 
-    val updatedCampaignsOrError: List[Either[CampaignCentralApiError, Campaign]] = campaigns.map { campaign =>
-      val sectionId = campaign.pathPrefix
+    def findMostFrequentProductionOffice(content: Seq[CapiContent]): String =
+      content.flatMap(_.fields.flatMap(_.productionOffice)).groupBy(identity).maxBy(_._2.size)._1.name
+
+    val updatedCampaignsOrError: List[Either[CampaignCentralApiError, Campaign]] = campaigns.map { c =>
+      val sectionId = c.pathPrefix
       val content   = ContentApi.loadAllContentInSection(sectionId)
+
+      // We use the most frequent occurrence of production office across the content to determine the origin of the campaign.
+      // This is imperfect, as with tagging, but is the most accurate means we have right now.
+      val campaignWithProductionOffice = c.copy(productionOffice = Some(findMostFrequentProductionOffice(content)))
 
       val sectionOrError = ContentApi
         .getSection(sectionId)
@@ -203,11 +210,11 @@ object CampaignService {
 
       for {
         section <- sectionOrError
-        _       <- updateCampaignContent(content, campaign)
-        _       <- CampaignRepository.putCampaign(campaign)
+        _       <- updateCampaignContent(content, campaignWithProductionOffice)
+        _       <- CampaignRepository.putCampaign(campaignWithProductionOffice)
       } yield {
-        Logger.info(s"refreshing campaign ${campaign.name} (${campaign.id})")
-        campaign
+        Logger.info(s"refreshing campaign ${campaignWithProductionOffice.name} (${campaignWithProductionOffice.id})")
+        campaignWithProductionOffice
       }
 
     }.toList
