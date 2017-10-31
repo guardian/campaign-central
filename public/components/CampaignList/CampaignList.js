@@ -56,6 +56,7 @@ class CampaignList extends React.Component {
             <th className="campaign-list__header">Days left</th>
             <th className="campaign-list__header">Target</th>
             <th className="campaign-list__header">Uniques</th>
+            <th className="campaign-list__header">Production Office</th>
           </tr>
         </thead>
           <tbody>
