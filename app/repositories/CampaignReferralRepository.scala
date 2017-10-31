@@ -1,7 +1,5 @@
 package repositories
 
-import java.time.LocalDate
-
 import cats.implicits._
 import com.gu.scanamo._
 import com.gu.scanamo.syntax._
@@ -15,48 +13,56 @@ object CampaignReferralRepository {
   private val table = Table[CampaignReferralRow](Config().campaignReferralTableName)
 
   def getCampaignReferrals(campaignId: String): Either[CampaignCentralApiError, List[CampaignReferral]] = {
+
+    def subReferrals[A](rows: Seq[CampaignReferralRow])(group: CampaignReferralRow => A)(description: A => String)(
+      children: Seq[CampaignReferralRow] => Option[Seq[CampaignReferral]]): List[CampaignReferral] =
+      rows
+        .groupBy(group)
+        .flatMap {
+          case (a, subRows) =>
+            Some(
+              CampaignReferral(
+                sourceDescription = description(a),
+                stats = ReferralStats.fromRows(subRows),
+                children = children(subRows)
+              ))
+        }
+        .toList
+        .sortBy(ref => (-ref.stats.ctr, ref.sourceDescription))
+
     getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.query('campaignId -> campaignId))) match {
 
       case Left(e) => Left(JsonParsingError(e.show))
 
       case Right(rows) =>
-        val groupedRows = rows
+        val filtered = rows
           .filter { row =>
             row.path.nonEmpty && row.impressionCount > 0
           }
-          .groupBy { row =>
-            (row.platform, row.formattedPath, row.containerIndex, row.cardIndex)
-          }
 
-        val campaignReferrals = groupedRows
-          .map { row =>
-            val (platform, path, containerIndex, cardIndex) = row._1
-            val groupedValues                               = row._2
-            CampaignReferral(
-              component = Component(
-                platform = formatPlatform(platform),
-                path = path,
-                containerIndex = containerIndex getOrElse 0,
-                containerName = groupedValues.headOption.flatMap(_.containerName) getOrElse "",
-                cardIndex = cardIndex getOrElse 0,
-                cardName = groupedValues.headOption.flatMap(_.cardName) getOrElse ""
-              ),
-              clickCount = groupedValues.map(_.clickCount).sum.toInt,
-              impressionCount = groupedValues.map(_.impressionCount).sum.toInt,
-              firstReferral = LocalDate.parse(groupedValues.map(_.referralDate).min),
-              lastReferral = LocalDate.parse(groupedValues.map(_.referralDate).max)
-            )
-          }
-          .toList
-          .sortBy(
-            ref =>
-              (-ref.ctr,
-               ref.component.platform,
-               ref.component.path,
-               ref.component.containerIndex,
-               ref.component.cardIndex))
+        val referrals = subReferrals(filtered)(_.formattedPath)(identity) { pathRows =>
+          Some(subReferrals(pathRows) { row =>
+            (row.containerIndex, row.containerName)
+          } {
+            case (Some(containerIndex), Some(containerName)) => s"Container #$containerIndex: $containerName"
+            case _                                           => ""
+          } { containerRows =>
+            Some(subReferrals(containerRows) { row =>
+              (row.cardIndex, row.cardName)
+            } {
+              case (Some(cardIndex), Some(cardName)) => s"Card #$cardIndex: $cardName"
+              case _                                 => ""
+            } { cardRows =>
+              Some(subReferrals(cardRows)(_.platform)(formatPlatform) { platformRows =>
+                Some(subReferrals(platformRows)(_.referralDate)(identity) { _ =>
+                  None
+                })
+              })
+            })
+          })
+        }
 
-        Right(campaignReferrals)
+        Right(referrals)
     }
   }
 
