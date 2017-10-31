@@ -37,7 +37,8 @@ object CampaignTransformer {
         campaignLogo = logo,
         startDate = startDate,
         endDate = endDate,
-        targets = Map.empty
+        targets = Map.empty,
+        productionOffice = None
       )
     }
   }
