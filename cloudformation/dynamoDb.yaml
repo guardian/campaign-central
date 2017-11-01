@@ -239,3 +239,24 @@ Resources:
           - analytics
           - latest
     DeletionPolicy: Retain
+
+  CampaignMediaDBTable:
+    Type: AWS::DynamoDB::Table
+    DependsOn: CampaignAnalyticsLatestDBTable
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: campaignId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: campaignId
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: '5'
+        WriteCapacityUnits: '5'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - media
+    DeletionPolicy: Retain
