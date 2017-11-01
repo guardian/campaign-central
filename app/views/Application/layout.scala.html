@@ -11,6 +11,19 @@
         <link rel="stylesheet" href="https://unpkg.com/purecss@@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
     </head>
     <body>
-        @content
+
+      <header class="header">
+        <a class="header__logo" href="/">
+          <div class="header__logo__text--large">Campaign</div>
+          <div class="header__logo__text--small">Central</div>
+        </a>
+        <div class="header__title">
+          This tool is under active development and we want your feedback to make it better. Contact the team on <span style="color: rgb(55, 199, 186);">
+          <a href="mailto:commercial.dev@@theguardian.com?subject=Campaign%20Central%20Feedback">commercial.dev@@theguardian.com</a>
+        </span>
+        </div>
+      </header>
+
+      @content
     </body>
 </html>
