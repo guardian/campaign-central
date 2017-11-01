@@ -29,6 +29,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - campaigns
+    DeletionPolicy: Retain
 
   CampaignNotesDBTable:
     Type: AWS::DynamoDB::Table
@@ -52,6 +53,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - campaign-notes
+    DeletionPolicy: Retain
 
   CampaignContentDBTable:
     Type: AWS::DynamoDB::Table
@@ -75,6 +77,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - campaign-content
+    DeletionPolicy: Retain
 
   ClientDBTable:
     Type: AWS::DynamoDB::Table
@@ -94,6 +97,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - clients
+    DeletionPolicy: Retain
 
   CampaignAnalyticsDBTable:
     Type: AWS::DynamoDB::Table
@@ -117,6 +121,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - analytics
+    DeletionPolicy: Retain
 
   CampaignUniquesDBTable:
     Type: AWS::DynamoDB::Table
@@ -140,6 +145,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - campaign-uniques
+    DeletionPolicy: Retain
 
   CampaignPageViewsDBTable:
     Type: AWS::DynamoDB::Table
@@ -163,6 +169,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - campaign-page-views
+    DeletionPolicy: Retain
 
   CampaignReferralsDBTable:
     Type: AWS::DynamoDB::Table
@@ -186,6 +193,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - referrals
+    DeletionPolicy: Retain
 
   CampaignReferralsV2DBTable:
     Type: AWS::DynamoDB::Table
@@ -209,6 +217,7 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - referralsv2
+    DeletionPolicy: Retain
 
   CampaignAnalyticsLatestDBTable:
     Type: AWS::DynamoDB::Table
@@ -229,6 +238,7 @@ Resources:
           - Ref: Stage
           - analytics
           - latest
+    DeletionPolicy: Retain
 
   CampaignMediaDBTable:
     Type: AWS::DynamoDB::Table
@@ -249,3 +259,4 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - media
+    DeletionPolicy: Retain
