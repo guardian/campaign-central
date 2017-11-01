@@ -28,8 +28,9 @@ object CampaignService {
     "australia-ashes-trail",
     "trivago-travels",
     "arthritis-uk",
-    "Sanofi Genzyme MS",
-    "barclays-make-a-change"
+    "sanofi-genzyme-ms",
+    "barclays-make-a-change",
+    "mq-mental-health-matters"
   )
 
   def getPageViews(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignPageViewsItem]] = {
@@ -204,8 +205,9 @@ object CampaignService {
       case _ => None
     }
 
-    def findMostFrequentProductionOffice(content: Seq[CapiContent]): String =
-      content.flatMap(_.fields.flatMap(_.productionOffice)).groupBy(identity).maxBy(_._2.size)._1.name
+    def findMostFrequentProductionOffice(content: Seq[CapiContent]): Option[String] =
+      if (content.isEmpty) None
+      else Some(content.flatMap(_.fields.flatMap(_.productionOffice)).groupBy(identity).maxBy(_._2.size)._1.name)
 
     val updatedCampaignsOrError: List[Either[CampaignCentralApiError, Campaign]] = campaigns.map { c =>
       val sectionId = c.pathPrefix
@@ -213,7 +215,7 @@ object CampaignService {
 
       // We use the most frequent occurrence of production office across the content to determine the origin of the campaign.
       // This is imperfect, as with tagging, but is the most accurate means we have right now.
-      val campaignWithProductionOffice = c.copy(productionOffice = Some(findMostFrequentProductionOffice(content)))
+      val campaignWithProductionOffice = c.copy(productionOffice = findMostFrequentProductionOffice(content))
 
       val sectionOrError = ContentApi
         .getSection(sectionId)
