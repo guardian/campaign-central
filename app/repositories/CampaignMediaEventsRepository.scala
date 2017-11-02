@@ -14,11 +14,11 @@ object CampaignMediaEventsRepository {
   case class PageMedia(
     mediaId: String,
     path: String,
-    playEvent: Int,
-    percent25: Int,
-    percent50: Int,
-    percent75: Int,
-    endEvent: Int
+    playEvent: Long,
+    percent25: Long,
+    percent50: Long,
+    percent75: Long,
+    endEvent: Long
   )
   case class CampaignMediaEvents(
     campaignId: String,
