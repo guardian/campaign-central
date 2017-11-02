@@ -13,6 +13,7 @@ import campaignSort from './campaignSortReducer';
 import latestAnalytics from './latestAnalyticsReducer';
 import latestAnalyticsForCampaign from './latestAnalyticsForCampaignReducer';
 import benchmarks from './allCampaignBenchmarksReducer';
+import campaignMediaEvents from './campaignMediaEventsReducer';
 
 export default combineReducers({
   error,
@@ -28,5 +29,6 @@ export default combineReducers({
   campaignSort,
   latestAnalytics,
   latestAnalyticsForCampaign,
-  benchmarks
+  benchmarks,
+  campaignMediaEvents
 });
