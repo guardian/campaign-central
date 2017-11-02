@@ -66,7 +66,6 @@ class Campaign extends React.Component {
                         latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign} />
 
           <CampaignEdit campaign={campaign}
-                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
                         updateCampaign={this.props.campaignActions.updateCampaign}
                         saveCampaign={this.props.campaignActions.saveCampaign}/>
           <CampaignAnalytics campaign={campaign} />
