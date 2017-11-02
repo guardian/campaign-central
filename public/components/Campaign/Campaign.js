@@ -12,15 +12,14 @@ class Campaign extends React.Component {
 
   componentWillMount() {
     this.props.campaignActions.getCampaign(this.props.params.id);
-    this.props.analyticsActions.getLatestAnalyticsForCampaign(this.props.params.id);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.campaign && (!this.props.campaign || nextProps.campaign.id !== this.props.campaign.id)) {
-      this.props.campaignAnalyticsActions.clearCampaignAnalytics();
+      this.props.analyticsActions.clearCampaignAnalytics();
       if (this.isAnalysisAvailable(nextProps.campaign)) {
-        this.props.campaignAnalyticsActions.getCampaignPageViews(nextProps.campaign.id);
-        this.props.campaignAnalyticsActions.getCampaignUniques(nextProps.campaign.id);
+        this.props.analyticsActions.getCampaignPageViews(nextProps.campaign.id);
+        this.props.analyticsActions.getCampaignUniques(nextProps.campaign.id);
         this.props.analyticsActions.getCampaignMediaEvents(nextProps.campaign.id);
         this.props.analyticsActions.getLatestAnalyticsForCampaign(nextProps.campaign.id);
       }
@@ -104,9 +103,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
-    analyticsActions: bindActionCreators(Object.assign({}, getLatestAnalyticsForCampaign, getCampaignMediaEvents), dispatch),
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignUniques, clearCampaignAnalytics), dispatch)
+    campaignActions: bindActionCreators(Object.assign({},
+      getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
+    analyticsActions: bindActionCreators(Object.assign({},
+      getLatestAnalyticsForCampaign, getCampaignMediaEvents, getCampaignPageViews, getCampaignUniques, clearCampaignAnalytics), dispatch)
   };
 }
 
