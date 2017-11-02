@@ -173,7 +173,7 @@ object CampaignService {
 
       val sections = ContentApi
         .getSectionsWithPaidContentSponsorship()
-        .filterNot(section => blacklistedSections.contains(section.id) || section.id.contains("DNU"))
+        .filterNot(section => blacklistedSections.contains(section.id) || section.webTitle.contains("DNU"))
 
       val existingCampaigns = sections map { section =>
         (Some(section), currentCampaigns.get(section.id))
