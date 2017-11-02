@@ -112,4 +112,13 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
       case Right(referrals)              => Ok(Json.toJson(referrals))
     }
   }
+
+  def getCampaignMediaEvents(campaignId: String) = authAction { _ =>
+    CampaignMediaEventsRepository.getCampaignMediaEvents(campaignId) match {
+      case Left(JsonParsingError(error)) => InternalServerError(error)
+      case Left(CampaignNotFound(error)) => NotFound(error)
+      case Left(_)                       => InternalServerError
+      case Right(mediaEvents)            => Ok(Json.toJson(mediaEvents))
+    }
+  }
 }
