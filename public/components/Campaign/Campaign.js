@@ -51,18 +51,6 @@ class Campaign extends React.Component {
       return <div>Loading... </div>;
     }
 
-    const totalPageviews = this.props.latestAnalyticsForCampaign.pageviews;
-    const pageviewsPerDevice = this.props.latestAnalyticsForCampaign.pageviewsByDevice;
-    const totalUniques = this.props.latestAnalyticsForCampaign.uniques;
-    const uniquesPerDevice = this.props.latestAnalyticsForCampaign.uniquesByDevice;
-    const uniquesTarget = this.props.campaign.targets && this.props.campaign.targets.uniques;
-
-    const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
-    const medianPerDevice = this.props.latestAnalyticsForCampaign.medianAttentionTimeByDevice || {};
-
-    const averageDwellTimePerPathSeconds = this.props.latestAnalyticsForCampaign.averageDwellTimePerPathSeconds || {};
-    const weightedAverageDwellTime = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
-
     return (
       <div className="campaign">
         <h2>{campaign.name}</h2>
