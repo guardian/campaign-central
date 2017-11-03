@@ -1,14 +1,23 @@
 
 .campaign-media__table {
     width: 100%;
+
+    .campaign-media__table--header {
+        @extend %fs-data-3;
+        color: $c-grey-650;
+        font-weight: bold;
+        background-color: $c-grey-200;
+    }
 }
 
-.campaign-media__table--header {
-    background-color: $c-grey-200;
+.campaign-media__table--header--primary {
+    width: 35%;
+}
+
+.campaign-media__table--header--secondary {
     width: 10%;
 }
 
-.campaign-media__table--primary-header {
-    background-color: $c-grey-200;
-    width: 50%;
+.campaign-media__table--header--tertiary {
+    width: 15%;
 }
