@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import {Link} from 'react-router';
 import CampaignEdit from '../CampaignInformationEdit/CampaignEdit';
 import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
@@ -6,20 +6,21 @@ import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
 import CampaignReferrals from '../CampaignAnalytics/Analytics/CampaignReferrals';
 import CampaignPerformanceOverview from '../CampaignPerformanceOverview/CampaignPerformanceOverview';
 import CampaignPerformanceBreakdown from '../CampaignPerformanceBreakdown/CampaignPerformanceBreakdown';
+import CampaignMediaEvents from '../CampaignMediaEvents/CampaignMediaEvents';
 
 class Campaign extends React.Component {
 
   componentWillMount() {
     this.props.campaignActions.getCampaign(this.props.params.id);
-    this.props.analyticsActions.getLatestAnalyticsForCampaign(this.props.params.id);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.campaign && (!this.props.campaign || nextProps.campaign.id !== this.props.campaign.id)) {
-      this.props.campaignAnalyticsActions.clearCampaignAnalytics();
+      this.props.analyticsActions.clearCampaignAnalytics();
       if (this.isAnalysisAvailable(nextProps.campaign)) {
-        this.props.campaignAnalyticsActions.getCampaignPageViews(nextProps.campaign.id);
-        this.props.campaignAnalyticsActions.getCampaignUniques(nextProps.campaign.id);
+        this.props.analyticsActions.getCampaignPageViews(nextProps.campaign.id);
+        this.props.analyticsActions.getCampaignUniques(nextProps.campaign.id);
+        this.props.analyticsActions.getCampaignMediaEvents(nextProps.campaign.id);
         this.props.analyticsActions.getLatestAnalyticsForCampaign(nextProps.campaign.id);
       }
     }
@@ -49,18 +50,6 @@ class Campaign extends React.Component {
       return <div>Loading... </div>;
     }
 
-    const totalPageviews = this.props.latestAnalyticsForCampaign.pageviews;
-    const pageviewsPerDevice = this.props.latestAnalyticsForCampaign.pageviewsByDevice;
-    const totalUniques = this.props.latestAnalyticsForCampaign.uniques;
-    const uniquesPerDevice = this.props.latestAnalyticsForCampaign.uniquesByDevice;
-    const uniquesTarget = this.props.campaign.targets && this.props.campaign.targets.uniques;
-
-    const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
-    const medianPerDevice = this.props.latestAnalyticsForCampaign.medianAttentionTimeByDevice || {};
-
-    const averageDwellTimePerPathSeconds = this.props.latestAnalyticsForCampaign.averageDwellTimePerPathSeconds || {};
-    const weightedAverageDwellTime = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
-
     return (
       <div className="campaign">
         <h2>{campaign.name}</h2>
@@ -76,14 +65,14 @@ class Campaign extends React.Component {
                         latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign} />
 
           <CampaignEdit campaign={campaign}
-                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
                         updateCampaign={this.props.campaignActions.updateCampaign}
                         saveCampaign={this.props.campaignActions.saveCampaign}/>
-        <CampaignAnalytics campaign={campaign} />
+          <CampaignAnalytics campaign={campaign} />
           <CampaignAssets campaign={campaign}
                           getCampaign={this.props.campaignActions.getCampaign}
                           getCampaignContent={this.props.campaignActions.getCampaignContent} />
           <CampaignReferrals campaign={campaign} />
+          <CampaignMediaEvents campaign={campaign} mediaEventsData={this.props.campaignMediaEvents} />
         </div>
       </div>
     );
@@ -102,19 +91,22 @@ import * as getCampaignPageViews from '../../actions/CampaignActions/getCampaign
 import * as getCampaignUniques from '../../actions/CampaignActions/getCampaignUniques';
 import * as clearCampaignAnalytics from '../../actions/CampaignActions/clearCampaignAnalytics';
 import * as getLatestAnalyticsForCampaign from '../../actions/CampaignActions/getLatestAnalyticsForCampaign';
+import * as getCampaignMediaEvents from '../../actions/CampaignActions/getCampaignMediaEvents';
 
 function mapStateToProps(state) {
   return {
     campaign: state.campaign,
-    latestAnalyticsForCampaign: state.latestAnalyticsForCampaign
+    latestAnalyticsForCampaign: state.latestAnalyticsForCampaign,
+    campaignMediaEvents: state.campaignMediaEvents
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignActions: bindActionCreators(Object.assign({}, getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
-    analyticsActions: bindActionCreators(Object.assign({}, getLatestAnalyticsForCampaign), dispatch),
-    campaignAnalyticsActions: bindActionCreators(Object.assign({}, getCampaignPageViews, getCampaignUniques, clearCampaignAnalytics), dispatch)
+    campaignActions: bindActionCreators(Object.assign({},
+      getCampaign, updateCampaign, saveCampaign, deleteCampaign, getCampaignContent), dispatch),
+    analyticsActions: bindActionCreators(Object.assign({},
+      getLatestAnalyticsForCampaign, getCampaignMediaEvents, getCampaignPageViews, getCampaignUniques, clearCampaignAnalytics), dispatch)
   };
 }
 

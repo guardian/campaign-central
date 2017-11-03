@@ -44,7 +44,6 @@ class CampaignEdit extends React.Component {
           <div className="campaign__column">
             <CampaignInformationEdit
               campaign={this.props.campaign}
-              latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
               updateCampaign={this.triggerUpdate} />
           </div>
           <div className="campaign__column">

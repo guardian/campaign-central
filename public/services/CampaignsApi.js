@@ -93,3 +93,10 @@ export function getCampaignBenchmarks() {
     method: 'get'
   });
 }
+
+export function fetchCampaignMediaEvents(id) {
+  return AuthedReqwest({
+    url: '/api/campaigns/' + id + '/mediaEvents',
+    method: 'get'
+  });
+}
