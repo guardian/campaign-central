@@ -18,12 +18,13 @@ export default class CampaignMediaEvents extends React.Component {
               <table className="campaign-media__table pure-table">
                 <thead>
                   <tr>
-                    <th className="campaign-media__table--primary-header">Path</th>
-                    <th className="campaign-media__table--header">Play</th>
-                    <th className="campaign-media__table--header">25%</th>
-                    <th className="campaign-media__table--header">50%</th>
-                    <th className="campaign-media__table--header">75%</th>
-                    <th className="campaign-media__table--header">End</th>
+                    <th className="campaign-media__table--header campaign-media__table--header--primary">Path</th>
+                    <th className="campaign-media__table--header campaign-media__table--header--secondary">Play</th>
+                    <th className="campaign-media__table--header campaign-media__table--header--secondary">25%</th>
+                    <th className="campaign-media__table--header campaign-media__table--header--secondary">50%</th>
+                    <th className="campaign-media__table--header campaign-media__table--header--secondary">75%</th>
+                    <th className="campaign-media__table--header campaign-media__table--header--secondary">End</th>
+                    <th className="campaign-media__table--header campaign-media__table--header--tertiary">View-through rate</th>
                   </tr>
                 </thead>
 
@@ -48,6 +49,7 @@ export default class CampaignMediaEvents extends React.Component {
                       <td>{`${percent50.toLocaleString()}`}</td>
                       <td>{`${percent75.toLocaleString()}`}</td>
                       <td>{`${endEvent.toLocaleString()}`}</td>
+                      <td>{`${(100 * endEvent / playEvent).toFixed(2).toLocaleString()}%`}</td>
                     </tr>
                   );
 
