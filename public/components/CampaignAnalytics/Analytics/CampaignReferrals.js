@@ -1,9 +1,10 @@
 import React from "react";
-import ProgressSpinner from "../../utils/ProgressSpinner";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import NumberFormat from 'react-number-format';
 import * as getCampaignReferrals from "../../../actions/CampaignActions/getCampaignReferrals";
+import CampaignReferral from "./CampaignReferral";
+import InfinityMenu from "react-infinity-menu";
+import ProgressSpinner from "../../utils/ProgressSpinner";
 
 class CampaignReferrals extends React.Component {
 
@@ -12,68 +13,85 @@ class CampaignReferrals extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const campaignChanged = nextProps.campaign.id !== this.props.campaign.id;
-    if (campaignChanged) {
+    if (nextProps.campaign.id !== this.props.campaign.id) {
       this.props.campaignReferralActions.getCampaignReferrals(nextProps.campaign.id);
     }
   }
 
-  renderReferral = (referral, index) => {
+  componentDidUpdate(prevProps) {
+    if (this.props.campaignReferrals && prevProps.campaignReferrals !== this.props.campaignReferrals) {
+      this.addTreeToState(this.props.campaignReferrals)
+    }
+  }
 
-    const dateFormat = (date) => {
-      return new Date(date).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: 'numeric'})
-    };
+  buildTree = (referrals) => {
+    let len = referrals.length,
+      tree = [],
+      i;
 
-    return (
-      <div key={index} className="campaign-referral-list__item">
-        <div className="campaign-referral-list__row">
-          <div className="campaign-referral-list__platform">{referral.component.platform}</div>
-          <div className="campaign-referral-list__path">{referral.component.path}</div>
-          <div className="campaign-referral-list__container">#{referral.component.containerIndex}: {referral.component.containerName}</div>
-          <div className="campaign-referral-list__card">#{referral.component.cardIndex}: {referral.component.cardName}</div>
-          <div className="campaign-referral-list__impressions"><NumberFormat value={referral.impressionCount} displayType={'text'} thousandSeparator={true} /></div>
-          <div className="campaign-referral-list__clicks"><NumberFormat value={referral.clickCount} displayType={'text'} thousandSeparator={true} /></div>
-          <div className="campaign-referral-list__ctr"><NumberFormat value={referral.ctr * 100} displayType={'text'} decimalPrecision={2} /></div>
-          <div className="campaign-referral-list__date">{dateFormat(referral.firstReferral)}</div>
-          <div className="campaign-referral-list__date">{dateFormat(referral.lastReferral)}</div>
-        </div>
-      </div>
-    );
+    for (i = 0; i < len; i += 1) {
+
+      const children =
+        (referrals[i] && referrals[i].children && referrals[i].children.length > 0) ?
+          this.buildTree(referrals[i].children) :
+          [];
+
+      tree.push({
+        "name": referrals[i].sourceDescription,
+        "id": i,
+        "impressionCount": referrals[i].stats.impressionCount,
+        "clickCount": referrals[i].stats.clickCount,
+        "ctr": referrals[i].stats.ctr,
+        "customComponent": CampaignReferral,
+        "isOpen": false,
+        "children": children
+      });
+    }
+
+    return tree;
   };
+
+  addTreeToState = (referrals) => {
+    this.setState({
+      tree: this.buildTree(referrals),
+      level: 0
+    });
+  };
+
+  onNodeMouseClick(event, tree) {
+    this.setState({
+      tree: tree
+    });
+  }
 
   render() {
 
-    if(!this.props.campaignReferrals) {
-      return (
-        <div className="campaign-info campaign-box">
-          <div className="campaign-box__header">Referrals from on-platform</div>
-          <div className="campaign-box__body">
-            <ProgressSpinner/>
-          </div>
-        </div>
-      );
-    }
-
-    if(this.props.campaignReferrals.length > 0) {
+    if (this.state && this.state.tree) {
       return (
         <div className="campaign-info campaign-box">
           <div className="campaign-box__header">Referrals from on-platform</div>
           <div className="campaign-box__body">
             <div className="campaign-referral-list campaign-assets__field__value">
-              <div className="campaign-referral-list__row">
-                <div className="campaign-referral-list__platform--header">Platform</div>
-                <div className="campaign-referral-list__path--header">Path</div>
-                <div className="campaign-referral-list__container--header">Container</div>
-                <div className="campaign-referral-list__card--header">Card</div>
-                <div className="campaign-referral-list__impressions--header">Impressions</div>
-                <div className="campaign-referral-list__clicks--header">Clicks</div>
-                <div className="campaign-referral-list__ctr--header">CTR (%)</div>
-                <div className="campaign-referral-list__date--header">First referral</div>
-                <div className="campaign-referral-list__date--header">Last referral</div>
-              </div>
-              {this.props.campaignReferrals.map(this.renderReferral)}
-            </div>
+            <InfinityMenu
+              tree={this.state.tree}
+              disableDefaultHeaderContent={true}
+              headerContent={React.createClass({
+                render: function() {
+                  return (
+                    <div className="pure-g campaign-referral-list__row">
+                      <div className="pure-u-17-24 campaign-referral-list__source--header">From</div>
+                      <div className="pure-u-3-24 campaign-referral-list__impressions--header">Impressions</div>
+                      <div className="pure-u-2-24 campaign-referral-list__clicks--header">Clicks</div>
+                      <div className="pure-u-2-24 campaign-referral-list__ctr--header">CTR (%)</div>
+                    </div>
+                  );
+                }
+              })}
+              onNodeMouseClick={this.onNodeMouseClick.bind(this)}
+              maxLeaves={7}
+            />
           </div>
+        </div>
         </div>
       );
     }
@@ -82,11 +100,11 @@ class CampaignReferrals extends React.Component {
       <div className="campaign-info campaign-box">
         <div className="campaign-box__header">Referrals from on-platform</div>
         <div className="campaign-box__body">
-          <span className="campaign-assets__field__value">No traffic has been referred from on-platform to this campaign yet.</span>
+          <ProgressSpinner/>
         </div>
       </div>
-    )
-  };
+    );
+  }
 }
 
 function mapStateToProps(state) {

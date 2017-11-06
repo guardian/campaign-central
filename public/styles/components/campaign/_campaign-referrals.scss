@@ -1,25 +1,32 @@
+.infinity-menu-container {
+  font: inherit;
+}
+
+.infinity-menu-display-tree-container > li {
+  background: #F5F5F5;
+}
+
+.campaign-referral-list {
+  font: inherit;
+}
+
 .campaign-referral-list__item {
   border-bottom: 1px solid $c-grey-300;
 }
 
 .campaign-referral-list__row {
   @extend %table__row;
+  font: inherit;
   border-bottom: none;
 }
 
-.campaign-referral-list__platform,
-.campaign-referral-list__path,
-.campaign-referral-list__container,
-.campaign-referral-list__card,
-.campaign-referral-list__impressions,
-.campaign-referral-list__clicks,
-.campaign-referral-list__ctr,
-.campaign-referral-list__date {
+.campaign-referral-list__source {
   @extend %table__cell;
   white-space: normal;
   position: relative;
   overflow: auto;
   border-bottom: none;
+  font: inherit;
 
   &--header {
     @extend %table__cell;
@@ -29,42 +36,21 @@
   }
 }
 
-.campaign-referral-list__platform,
-.campaign-referral-list__platform--header {
-  width: 10%;
-}
-
-.campaign-referral-list__path,
-.campaign-referral-list__path--header {
-  width: 15%;
-}
-
-.campaign-referral-list__container,
-.campaign-referral-list__container--header {
-  width: 20%;
-}
-
-.campaign-referral-list__card,
-.campaign-referral-list__card--header {
-  width: 20%;
-}
-
 .campaign-referral-list__impressions,
-.campaign-referral-list__impressions--header {
-  width: 10%;
-}
-
 .campaign-referral-list__clicks,
-.campaign-referral-list__clicks--header {
-  width: 7%;
-}
+.campaign-referral-list__ctr {
+  @extend %table__cell;
+  white-space: normal;
+  position: relative;
+  overflow: auto;
+  border-bottom: none;
+  text-align: right;
+  font: inherit;
 
-.campaign-referral-list__ctr,
-.campaign-referral-list__ctr--header {
-  width: 7%;
-}
-
-.campaign-referral-list__date,
-.campaign-referral-list__date--header {
-  width: 7%;
+  &--header {
+    @extend %table__cell;
+    background-color: $c-grey-200;
+    font-weight: bold;
+    white-space: normal;
+  }
 }
