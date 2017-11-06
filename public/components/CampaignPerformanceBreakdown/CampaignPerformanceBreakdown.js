@@ -14,32 +14,66 @@ class CampaignPerformanceBreakdownTable extends React.Component {
     const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0)
     const dataUnavailable = 'Unavailable';
 
-    return (
-      <table className="pure-table">
-        <thead>
-        <tr>
-          <th>{this.props.breakdownLabel}</th>
-          <th>Unique Users</th>
-          <th>Total Page Views</th>
-          <th>Average Time on Page (minutes)</th>
-        </tr>
-        </thead>
+    if(this.props.breakdownLabel=='Path'){
 
-        <tbody>
-        {analytics.map(([breakdownKey, values]) => {
-          return(
-            <tr key={breakdownKey}>
-              <td>{breakdownKey}</td>
-              <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
-              <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
-              <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
-            </tr>
-          );
+      return (
+        <table className="pure-table">
+          <thead>
+          <tr>
+            <th>{this.props.breakdownLabel}</th>
+            <th>Unique Users</th>
+            <th>Total Page Views</th>
+            <th>Average Time on Page (minutes)</th>
+            <th>FB Shares</th>
+            <th>LinkedIn Shares</th>
+          </tr>
+          </thead>
+          <tbody>
+          {analytics.map(([breakdownKey, values]) => {
+            return(
+              <tr key={breakdownKey}>
+                <td>{breakdownKey}</td>
+                <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
+                <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
+                <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
+                <td>{values.facebookShares}</td>
+                <td>{values.linkedInShares}</td>
+              </tr>
+            );
+          })}
+          </tbody>
+        </table>
+      );
 
-        })}
-        </tbody>
-      </table>
-    );
+    }else{
+
+      return (
+        <table className="pure-table">
+          <thead>
+          <tr>
+            <th>{this.props.breakdownLabel}</th>
+            <th>Unique Users</th>
+            <th>Total Page Views</th>
+            <th>Average Time on Page (minutes)</th>
+          </tr>
+          </thead>
+          <tbody>
+          {analytics.map(([breakdownKey, values]) => {
+            return(
+              <tr key={breakdownKey}>
+                <td>{breakdownKey}</td>
+                <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
+                <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
+                <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
+              </tr>
+            );
+          })}
+          </tbody>
+        </table>
+      );
+
+    }
+
   }
 }
 
