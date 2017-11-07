@@ -43,7 +43,7 @@ object CampaignReferralRepository {
         val referrals = subReferrals(filtered)(_.formattedPath)(identity) { pathRows =>
           Some(subReferrals(pathRows)(_.containerName) {
             case Some(containerName) => s"Container: $containerName"
-            case _                   => ""
+            case None                => ""
           } { containerRows =>
             Some(subReferrals(containerRows) { row =>
               (row.cardIndex, row.cardName)
