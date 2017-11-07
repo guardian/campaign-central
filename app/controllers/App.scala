@@ -1,16 +1,24 @@
 package controllers
 
 import com.gu.googleauth.AuthAction
+import net.logstash.logback.argument.StructuredArguments.value
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import services.Config
+import services.LogShipping.logMessageAndCustomField
 
 class App(components: ControllerComponents, authAction: AuthAction[AnyContent])
   extends AbstractController(components) {
 
+  private lazy val logger = Logger(this.getClass)
+
   def index(id: String = "") = authAction { implicit request =>
-    Logger.info(s"${request.user.email} accessed Campaign Central.")
+    logMessageAndCustomField(
+      logger,
+      message = "{} accessed Campaign Central.",
+      field = value("accessedBy", request.user.email)
+    )
 
     val jsFileName = "build/app.js"
 
