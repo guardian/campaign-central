@@ -3,6 +3,7 @@ package services
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger => LogbackLogger}
 import com.gu.logback.appender.kinesis.KinesisAppender
+import net.logstash.logback.argument.StructuredArgument
 import net.logstash.logback.layout.LogstashLayout
 import org.slf4j.{LoggerFactory, Logger => SLFLogger}
 import play.api.Logger
@@ -38,4 +39,8 @@ object LogShipping extends AwsInstanceTags {
       rootLogger.info("Configured kinesis appender")
     }
   }
+
+  // see https://github.com/logstash/logstash-logback-encoder#loggingevent-fields
+  def logMessageAndCustomField(logger: Logger, message: String, field: StructuredArgument): Unit =
+    logger.underlyingLogger.info(message, field)
 }
