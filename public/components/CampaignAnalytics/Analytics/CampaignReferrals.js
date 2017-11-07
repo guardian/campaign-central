@@ -88,7 +88,6 @@ class CampaignReferrals extends React.Component {
                 }
               })}
               onNodeMouseClick={this.onNodeMouseClick.bind(this)}
-              maxLeaves={7}
             />
           </div>
         </div>
