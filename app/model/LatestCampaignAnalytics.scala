@@ -5,7 +5,11 @@ import play.api.libs.json.Format
 
 import scala.collection.immutable.ListMap
 
-case class LatestAnalyticsBreakdownItem(uniques: Long, pageviews: Long, timeSpentOnPage: Option[Double] = None)
+case class LatestAnalyticsBreakdownItem(uniques: Long,
+                                        pageviews: Long,
+                                        timeSpentOnPage: Option[Double] = None,
+                                        facebookShares: Option[Long] = None,
+                                        linkedInShares: Option[Long] = None)
 
 object LatestAnalyticsBreakdownItem {
   implicit val latestCampaignAnalyticsBreakdownItemFormat: Format[LatestAnalyticsBreakdownItem] =
