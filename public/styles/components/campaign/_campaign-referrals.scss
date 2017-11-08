@@ -1,4 +1,5 @@
 .infinity-menu-container {
+  border: 1px solid #dcdcdc;
   font: inherit;
 }
 
@@ -6,7 +7,7 @@
   cursor: pointer;
 }
 
-.infinity-menu-display-tree-container > li {
+.infinity-menu-display-tree-container li:hover {
   background: #F5F5F5;
 }
 

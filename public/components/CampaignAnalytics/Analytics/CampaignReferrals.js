@@ -66,6 +66,16 @@ class CampaignReferrals extends React.Component {
 
   render() {
 
+    if (this.state && this.state.tree && this.state.tree.length === 0) {
+      return (
+        <div className="campaign-info campaign-box">
+          <div className="campaign-box__header">Referrals from on-platform</div>
+          <div className="campaign-box__body">There are currently no on-platform referrals recorded for this campaign.
+          </div>
+        </div>
+      )
+    }
+
     if (this.state && this.state.tree) {
       return (
         <div className="campaign-info campaign-box">
