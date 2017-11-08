@@ -29,7 +29,7 @@ lazy val dependencies = Seq(
   "org.slf4j"                        % "slf4j-api"                % slf4jVersion,
   "org.slf4j"                        % "jcl-over-slf4j"           % slf4jVersion,
   "com.gu"                           %% "scanamo"                 % "0.9.5",
-  "org.scalatest"                    %% "scalatest"               % "3.0.4" % Test
+  "org.scalacheck"                   %% "scalacheck"              % "1.13.5" % Test
 )
 
 lazy val root = (project in file("."))
