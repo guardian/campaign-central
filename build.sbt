@@ -10,7 +10,7 @@ resolvers += "Guardian Bintray" at "https://dl.bintray.com/guardian/editorial-to
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
 val slf4jVersion    = "1.7.25"
-val playJsonVersion = "2.6.6"
+val playJsonVersion = "2.6.7"
 
 lazy val dependencies = Seq(
   ws,
@@ -19,13 +19,13 @@ lazy val dependencies = Seq(
   "org.typelevel"                    %% "cats-core"               % "0.9.0",
   "ai.x"                             %% "play-json-extensions"    % "0.10.0",
   "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor"  % "2.8.9" % Runtime,
-  "com.amazonaws"                    % "aws-java-sdk"             % "1.11.213",
+  "com.amazonaws"                    % "aws-java-sdk"             % "1.11.227",
   "com.gu"                           %% "play-googleauth"         % "0.7.0",
-  "com.gu"                           %% "content-api-client"      % "11.37",
+  "com.gu"                           %% "content-api-client"      % "11.40",
   "com.squareup.okhttp3"             % "okhttp"                   % "3.9.0",
-  "commons-io"                       % "commons-io"               % "2.5",
+  "commons-io"                       % "commons-io"               % "2.6",
   "net.logstash.logback"             % "logstash-logback-encoder" % "4.11",
-  "com.gu"                           % "kinesis-logback-appender" % "1.4.0",
+  "com.gu"                           % "kinesis-logback-appender" % "1.4.1",
   "org.slf4j"                        % "slf4j-api"                % slf4jVersion,
   "org.slf4j"                        % "jcl-over-slf4j"           % slf4jVersion,
   "com.gu"                           %% "scanamo"                 % "0.9.5",
@@ -67,7 +67,7 @@ lazy val root = (project in file("."))
       riffRaffPackageType.value              -> s"${name.value}/${riffRaffPackageType.value.getName}",
       baseDirectory.value / "riff-raff.yaml" -> "riff-raff.yaml"
     ),
-    scalaVersion := "2.12.3",
+    scalaVersion := "2.12.4",
     libraryDependencies ++= dependencies,
     scalafmtOnCompile := true
   )
