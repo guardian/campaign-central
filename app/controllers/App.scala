@@ -5,12 +5,18 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import services.Config
+import services.LogShipping.logMessageAndCustomField
 
-class App(components: ControllerComponents, authAction: AuthAction[AnyContent])
-  extends AbstractController(components) {
+class App(components: ControllerComponents, authAction: AuthAction[AnyContent]) extends AbstractController(components) {
+
+  private lazy implicit val logger: Logger = Logger(getClass)
 
   def index(id: String = "") = authAction { implicit request =>
-    Logger.info(s"${request.user.email} accessed Campaign Central.")
+    logMessageAndCustomField(
+      message = s"${request.user.email} accessed Campaign Central.",
+      fieldName = "accessedBy",
+      fieldValue = request.user.email
+    )
 
     val jsFileName = "build/app.js"
 

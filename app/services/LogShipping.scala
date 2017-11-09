@@ -4,6 +4,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.classic.{Logger => LogbackLogger}
 import com.gu.logback.appender.kinesis.KinesisAppender
 import net.logstash.logback.layout.LogstashLayout
+import net.logstash.logback.marker.Markers._
 import org.slf4j.{LoggerFactory, Logger => SLFLogger}
 import play.api.Logger
 
@@ -38,4 +39,7 @@ object LogShipping extends AwsInstanceTags {
       rootLogger.info("Configured kinesis appender")
     }
   }
+
+  def logMessageAndCustomField(message: String, fieldName: String, fieldValue: String)(implicit logger: Logger): Unit =
+    logger.underlyingLogger.info(append(fieldName, fieldValue), message)
 }
