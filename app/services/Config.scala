@@ -52,6 +52,8 @@ sealed trait Config {
   def liveUrl: String
   def previewUrl: String
 
+  def gaTrackingCode: String
+
   // remote configuration is used for things we don't want to check in to version control
   // such as passwords, private urls, and gossip about other teams
 
@@ -110,6 +112,8 @@ class DevConfig extends Config {
   override def composerUrl           = "https://composer.local.dev-gutools.co.uk"
   override def liveUrl               = "https://www.theguardian.com"
   override def previewUrl            = "https://viewer.gutools.co.uk/preview"
+
+  override def gaTrackingCode: String = "dummy"
 }
 
 class ProdConfig extends Config {
@@ -120,4 +124,6 @@ class ProdConfig extends Config {
   override def composerUrl           = "https://composer.gutools.co.uk"
   override def liveUrl               = "https://www.theguardian.com"
   override def previewUrl            = "https://viewer.gutools.co.uk/preview"
+
+  override def gaTrackingCode: String = "UA-78705427-12"
 }

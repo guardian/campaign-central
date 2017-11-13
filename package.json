@@ -24,6 +24,7 @@
     "ramda": "^0.22.1",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
+    "react-ga": "^2.3.5",
     "react-infinity-menu": "^3.2.0",
     "react-number-format": "^2.0.0",
     "react-redux": "^4.4.5",
