@@ -26,10 +26,12 @@ class App(components: ControllerComponents, authAction: AuthAction[AnyContent]) 
     }
 
     val clientConf = Map(
-      "tagManagerUrl" -> Config().tagManagerApiUrl,
-      "composerUrl"   -> Config().composerUrl,
-      "liveUrl"       -> Config().liveUrl,
-      "previewUrl"    -> Config().previewUrl
+      "stage"          -> Config().stage,
+      "tagManagerUrl"  -> Config().tagManagerApiUrl,
+      "composerUrl"    -> Config().composerUrl,
+      "liveUrl"        -> Config().liveUrl,
+      "previewUrl"     -> Config().previewUrl,
+      "gaTrackingCode" -> Config().gaTrackingCode
     )
 
     Ok(views.html.Application.app("Campaign Central", jsLocation, Json.toJson(clientConf).toString))
