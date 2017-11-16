@@ -1,8 +1,9 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import * as getCampaignReferrals from "../../../actions/CampaignActions/getCampaignReferrals";
+import {getCampaignReferrals} from "../../../actions/CampaignActions/getCampaignReferrals";
 import CampaignReferral from "./CampaignReferral";
+import CampaignReferralHeader from "./CampaignReferralHeader";
 import InfinityMenu from "react-infinity-menu";
 import ProgressSpinner from "../../utils/ProgressSpinner";
 
@@ -82,25 +83,14 @@ class CampaignReferrals extends React.Component {
           <div className="campaign-box__header">Referrals from on-platform</div>
           <div className="campaign-box__body">
             <div className="campaign-referral-list campaign-assets__field__value">
-            <InfinityMenu
-              tree={this.state.tree}
-              disableDefaultHeaderContent={true}
-              headerContent={React.createClass({
-                render: function() {
-                  return (
-                    <div className="pure-g campaign-referral-list__row">
-                      <div className="pure-u-17-24 campaign-referral-list__source--header">From</div>
-                      <div className="pure-u-3-24 campaign-referral-list__impressions--header">Impressions</div>
-                      <div className="pure-u-2-24 campaign-referral-list__clicks--header">Clicks</div>
-                      <div className="pure-u-2-24 campaign-referral-list__ctr--header">CTR (%)</div>
-                    </div>
-                  );
-                }
-              })}
-              onNodeMouseClick={this.onNodeMouseClick.bind(this)}
-            />
+              <InfinityMenu
+                tree={this.state.tree}
+                disableDefaultHeaderContent={true}
+                headerContent={CampaignReferralHeader}
+                onNodeMouseClick={this.onNodeMouseClick.bind(this)}
+              />
+            </div>
           </div>
-        </div>
         </div>
       );
     }

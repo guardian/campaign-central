@@ -32,13 +32,6 @@
   overflow: auto;
   border-bottom: none;
   font: inherit;
-
-  &--header {
-    @extend %table__cell;
-    background-color: $c-grey-200;
-    font-weight: bold;
-    white-space: normal;
-  }
 }
 
 .campaign-referral-list__impressions,
@@ -51,11 +44,11 @@
   border-bottom: none;
   text-align: right;
   font: inherit;
+}
 
-  &--header {
-    @extend %table__cell;
-    background-color: $c-grey-200;
-    font-weight: bold;
-    white-space: normal;
-  }
+.campaign-referral-list__header {
+  @extend %table__cell;
+  background-color: $c-grey-200;
+  font-weight: bold;
+  white-space: normal;
 }
