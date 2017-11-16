@@ -19,9 +19,9 @@ class CampaignReferralHeader extends React.Component {
         return (
             <div className="pure-g campaign-referral-list__row">
               <div className="pure-u-17-24 campaign-referral-list__header">From</div>
-              <div className={`pure-u-3-24 campaign-referral-list__header ${orderingArrow['impressions']}`} onClick={this.onHeaderClick.bind(this, 'impressions')}>Impressions</div>
-              <div className={`pure-u-2-24 campaign-referral-list__header ${orderingArrow['clicks']}`} onClick={this.onHeaderClick.bind(this, 'clicks')}>Clicks</div>
-              <div className={`pure-u-2-24 campaign-referral-list__header ${orderingArrow['ctr']}`} onClick={this.onHeaderClick.bind(this, 'ctr')}>CTR (%)</div>
+              <div className={`pure-u-3-24 campaign-referral-list__header campaign-referral-list__header--toggle ${orderingArrow['impressions']}`} onClick={this.onHeaderClick.bind(this, 'impressions')}>Impressions</div>
+              <div className={`pure-u-2-24 campaign-referral-list__header campaign-referral-list__header--toggle ${orderingArrow['clicks']}`} onClick={this.onHeaderClick.bind(this, 'clicks')}>Clicks</div>
+              <div className={`pure-u-2-24 campaign-referral-list__header campaign-referral-list__header--toggle ${orderingArrow['ctr']}`} onClick={this.onHeaderClick.bind(this, 'ctr')}>CTR (%)</div>
             </div>
         );
     }

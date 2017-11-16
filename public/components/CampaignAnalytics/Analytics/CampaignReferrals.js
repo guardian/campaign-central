@@ -108,13 +108,16 @@ class CampaignReferrals extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    campaignReferrals: state.campaignReferrals
+    campaignReferrals: state.campaignReferrals,
+    campaignReferralOrder: state.campaignReferralOrder
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    campaignReferralActions: bindActionCreators(Object.assign({}, getCampaignReferrals), dispatch)
+    campaignReferralActions: bindActionCreators(Object.assign({}, {
+      getCampaignReferrals: getCampaignReferrals
+    }), dispatch)
   };
 }
 
