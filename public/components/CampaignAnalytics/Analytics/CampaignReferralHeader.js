@@ -5,6 +5,10 @@ import {setToggleOrder} from "../../../actions/CampaignActions/getCampaignReferr
 
 class CampaignReferralHeader extends React.Component {
 
+    componentWillMount() {
+        this.props.campaignToggleOrderAction.setToggleOrder();
+    }
+
     onHeaderClick(fieldName){
         this.props.campaignToggleOrderAction.setToggleOrder(fieldName);
     }
