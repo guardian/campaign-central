@@ -17,15 +17,12 @@ class CampaignReferrals extends React.Component {
     if (nextProps.campaign.id !== this.props.campaign.id) {
       this.props.campaignReferralActions.getCampaignReferrals(nextProps.campaign.id);
     }
+
+    this.addTreeToState(nextProps.campaignReferrals, nextProps.campaignReferralOrder);
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.campaignReferrals && prevProps.campaignReferrals !== this.props.campaignReferrals) {
-      this.addTreeToState(this.props.campaignReferrals)
-    }
-  }
+  buildTree = (referrals, ordering) => {
 
-  buildTree = (referrals) => {
     let len = referrals.length,
       tree = [],
       i;
@@ -34,7 +31,7 @@ class CampaignReferrals extends React.Component {
 
       const children =
         (referrals[i] && referrals[i].children && referrals[i].children.length > 0) ?
-          this.buildTree(referrals[i].children) :
+          this.buildTree(referrals[i].children, ordering) :
           [];
 
       tree.push({
@@ -49,13 +46,40 @@ class CampaignReferrals extends React.Component {
       });
     }
 
+    // Sort children
+    if (ordering) {
+      const {order, field} = ordering;
+
+      tree.sort((a, b) => {
+
+        const compare = (numA, numB) => {
+          const invert = order === 'asc' ? 1 : -1;
+          if (numA < numB) {
+            return -1 * invert;
+          } else if (numA > numB) {
+            return invert;
+          } else {
+            return 0;
+          }
+        };
+
+        switch (field) {
+          case 'impressions':
+            return compare(a.impressionCount, b.impressionCount);
+          case 'clicks':
+            return compare(a.clickCount, b.clickCount);
+          case 'ctr':
+            return compare(a.ctr, b.ctr);
+        }
+      });
+    }
+
     return tree;
   };
 
-  addTreeToState = (referrals) => {
+  addTreeToState = (referrals, ordering) => {
     this.setState({
-      tree: this.buildTree(referrals),
-      level: 0
+      tree: this.buildTree(referrals, ordering)
     });
   };
 
