@@ -8,7 +8,7 @@ export default function campaignReferralOrderReducer(state = {field, order}, act
     case 'REFERRALS_ORDER':
       const toggle = state.order === 'desc' ? 'asc' : 'desc';
       return Object.assign({}, {
-        field: action.field,
+        field: action.field || state.field,
         order: state.field === action.field ? toggle : 'desc'
       });
 
