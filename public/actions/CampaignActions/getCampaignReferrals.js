@@ -25,6 +25,18 @@ function errorReceivingCampaignReferrals(error) {
     };
 }
 
+function toggleOrder(field) {
+    return {
+        type:       'REFERRALS_ORDER',
+        field,
+        receivedAt: Date.now()
+    };
+}
+
+export function setToggleOrder(field){
+    return dispatch => dispatch(toggleOrder(field));
+}
+
 export function getCampaignReferrals(id) {
     return dispatch => {
       dispatch(requestCampaignReferrals(id));
