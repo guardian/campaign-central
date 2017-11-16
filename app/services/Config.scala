@@ -34,14 +34,8 @@ sealed trait Config {
   def logShippingStreamName: Option[String] = None
 
   def campaignTableName            = s"campaign-central-$stage-campaigns"
-  def campaignNotesTableName       = s"campaign-central-$stage-campaign-notes"
   def campaignContentTableName     = s"campaign-central-$stage-campaign-content"
   def campaignMediaEventsTableName = s"campaign-central-$stage-media"
-
-  def clientTableName = s"campaign-central-$stage-clients"
-
-  def analyticsDataCacheTableName = s"campaign-central-$stage-analytics"
-
   def campaignPageviewsTableName       = s"campaign-central-$stage-campaign-page-views"
   def campaignUniquesTableName         = s"campaign-central-$stage-campaign-uniques"
   def latestCampaignAnalyticsTableName = s"campaign-central-$stage-analytics-latest"
