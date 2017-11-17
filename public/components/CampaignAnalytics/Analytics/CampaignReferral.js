@@ -5,6 +5,9 @@ import "react-infinity-menu/src/infinity-menu.css";
 export default class CampaignReferral extends React.Component {
 
   render() {
+    // The keyPath needs to be halved because it is typically something like:
+    // '0.children.0.children.0.children.0.children.0'
+    // should give a depth of 4.
     const depth = Math.floor(this.props.data.keyPath.split(".").length / 2);
     return (
       <li key={this.props.data.keyPath} className="pure-g campaign-referral-list" onClick={this.props.onClick}>
