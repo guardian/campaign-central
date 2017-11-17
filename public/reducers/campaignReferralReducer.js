@@ -21,7 +21,7 @@ function buildTree(referrals, ordering) {
       "clickCount": referrals[i].stats.clickCount,
       "ctr": referrals[i].stats.ctr,
       "customComponent": CampaignReferral,
-      "isOpen": true,
+      "isOpen": false,
       "children": children
     });
   }
@@ -30,33 +30,34 @@ function buildTree(referrals, ordering) {
 }
 
 function sortTree(tree, ordering){
-  // Sort children
-  /*if (ordering) {
-    const {order, field} = ordering;
 
-    tree.sort((a, b) => {
+  tree.sort((a, b) => {
 
-      const compare = (numA, numB) => {
-        const invert = order === 'asc' ? 1 : -1;
-        if (numA < numB) {
-          return -1 * invert;
-        } else if (numA > numB) {
-          return invert;
-        } else {
-          return 0;
-        }
-      };
-
-      switch (field) {
-        case 'impressions':
-          return compare(a.impressionCount, b.impressionCount);
-        case 'clicks':
-          return compare(a.clickCount, b.clickCount);
-        case 'ctr':
-          return compare(a.ctr, b.ctr);
+    const compare = (numA, numB) => {
+      const invert = ordering.order === 'asc' ? 1 : -1;
+      if (numA < numB) {
+        return -1 * invert;
+      } else if (numA > numB) {
+        return invert;
+      } else {
+        return 0;
       }
-    });
-  }*/
+    };
+
+    switch (ordering.field) {
+      case 'impressions':
+        return compare(a.impressionCount, b.impressionCount);
+      case 'clicks':
+        return compare(a.clickCount, b.clickCount);
+      case 'ctr':
+        return compare(a.ctr, b.ctr);
+    }
+  });
+
+  tree.forEach( node => {
+    sortTree(node.children, ordering);
+  });
+
   return tree;
 }
 
@@ -93,6 +94,10 @@ export default function campaignReferrals(state = initialState, action) {
       // Deep copy, don't use Object.assign(). This appears to perform no modification,
       // but this copy is necessary. The InfinityMenu has already updated 'state', but those changes
       // will not propagate to the redux store, causing any props mapped from redux state to lose updates.
+      //
+      // FAQ: Why do this at all, why not just leave the InfinityMenu alone, given that it maintains it's own state?
+      // We pass the tree state through the redux store, and the parent's props, because this reducer is then
+      // given the opportunity to reorder children.
       return cloneDeep(state);
     }
     default:
