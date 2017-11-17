@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getCampaignReferrals} from "../../../actions/CampaignActions/getCampaignReferrals";
+import {getCampaignReferrals, setToggleNode} from "../../../actions/CampaignActions/getCampaignReferrals";
 import CampaignReferralHeader from "./CampaignReferralHeader";
 import InfinityMenu from "react-infinity-menu";
 import ProgressSpinner from "../../utils/ProgressSpinner";
@@ -18,8 +18,8 @@ class CampaignReferrals extends React.Component {
     }
   }
 
-  onNodeMouseClick(event, tree, node, level, keyPath) {
-    console.log('on node mouse click ', event, tree, node, level, keyPath);
+  onNodeMouseClick() {
+    this.props.campaignReferralActions.setToggleNode();
   }
 
   render() {
@@ -74,7 +74,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     campaignReferralActions: bindActionCreators(Object.assign({}, {
-      getCampaignReferrals: getCampaignReferrals
+      getCampaignReferrals: getCampaignReferrals,
+      setToggleNode: setToggleNode
     }), dispatch)
   };
 }

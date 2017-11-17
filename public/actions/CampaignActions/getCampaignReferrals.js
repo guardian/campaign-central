@@ -33,7 +33,18 @@ function toggleOrder(field) {
     };
 }
 
-export function setToggleOrder(field){
+export function toggleNode() {
+    return {
+        type:       'REFERRALS_TOGGLE_NODE',
+        receivedAt: Date.now()
+    }
+}
+
+export function setToggleNode() {
+    return dispatch => dispatch(toggleNode());
+}
+
+export function setToggleOrder(field) {
     return dispatch => dispatch(toggleOrder(field));
 }
 

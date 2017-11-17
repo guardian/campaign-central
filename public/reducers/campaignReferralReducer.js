@@ -1,4 +1,5 @@
 import CampaignReferral from "../components/CampaignAnalytics/Analytics/CampaignReferral";
+import { cloneDeep } from 'lodash';
 
 function buildTree(referrals, ordering) {
 
@@ -20,7 +21,7 @@ function buildTree(referrals, ordering) {
       "clickCount": referrals[i].stats.clickCount,
       "ctr": referrals[i].stats.ctr,
       "customComponent": CampaignReferral,
-      "isOpen": false,
+      "isOpen": true,
       "children": children
     });
   }
@@ -72,7 +73,7 @@ export default function campaignReferrals(state = initialState, action) {
   switch (action.type) {
     case 'REFERRALS_GET_RECEIVE': {
       // Deep copy, don't use Object.assign().
-      const newState = JSON.parse(JSON.stringify(state));
+      const newState = cloneDeep(state);
       const tree = buildTree(action.campaignReferrals || []);
       newState.tree = tree;
       sortTree(newState.tree, newState.ordering);
@@ -80,13 +81,19 @@ export default function campaignReferrals(state = initialState, action) {
     }
     case 'REFERRALS_TOGGLE_ORDER': {
       // Deep copy, don't use Object.assign().
-      const newState = JSON.parse(JSON.stringify(state));
+      const newState = cloneDeep(state);
       newState.ordering.field = action.field || state.ordering.field;
       // If the field has not changed, toggle the order.
-      const toggle = state.order === 'desc' ? 'asc' : 'desc';
-      newState.ordering.order = state.ordering.field === action.ordering.field ? toggle : 'desc';
+      const toggle = state.ordering.order === 'desc' ? 'asc' : 'desc';
+      newState.ordering.order = state.ordering.field === action.field ? toggle : 'desc';
       sortTree(newState.tree, newState.ordering);
       return newState;
+    }
+    case 'REFERRALS_TOGGLE_NODE': {
+      // Deep copy, don't use Object.assign(). This appears to perform no modification,
+      // but this copy is necessary. The InfinityMenu has already updated 'state', but those changes
+      // will not propagate to the redux store, causing any props mapped from redux state to lose updates.
+      return cloneDeep(state);
     }
     default:
       return state;
