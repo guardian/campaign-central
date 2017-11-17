@@ -5,10 +5,6 @@ import {setToggleOrder} from "../../../actions/CampaignActions/getCampaignReferr
 
 class CampaignReferralHeader extends React.Component {
 
-    componentWillMount() {
-        this.props.campaignToggleOrderAction.setToggleOrder();
-    }
-
     onHeaderClick(fieldName){
         this.props.campaignToggleOrderAction.setToggleOrder(fieldName);
     }
@@ -19,7 +15,7 @@ class CampaignReferralHeader extends React.Component {
             clicks: '',
             ctr: ''
         };
-        orderingArrow[this.props.campaignReferralOrder.field] = `campaign-referral-list__header--${this.props.campaignReferralOrder.order}`;
+        orderingArrow[this.props.campaignReferrals.ordering.field] = `campaign-referral-list__header--${this.props.campaignReferrals.ordering.order}`;
         return (
             <div className="pure-g campaign-referral-list__row">
               <div className="pure-u-17-24 campaign-referral-list__header">From</div>
@@ -33,7 +29,7 @@ class CampaignReferralHeader extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    campaignReferralOrder: state.campaignReferralOrder
+    campaignReferrals: state.campaignReferrals
   };
 }
 

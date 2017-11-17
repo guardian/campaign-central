@@ -9,7 +9,6 @@ import campaignTargetsReport from './campaignTargetsReportReducer';
 import campaignCtaStats from './campaignCtaStatsReducer';
 import campaignContent from './campaignContentReducer';
 import campaignReferrals from './campaignReferralReducer';
-import campaignReferralOrder from './campaignReferralOrderReducer';
 import campaignSort from './campaignSortReducer';
 import latestAnalytics from './latestAnalyticsReducer';
 import latestAnalyticsForCampaign from './latestAnalyticsForCampaignReducer';
@@ -27,7 +26,6 @@ export default combineReducers({
   campaignCtaStats,
   campaignContent,
   campaignReferrals,
-  campaignReferralOrder,
   campaignSort,
   latestAnalytics,
   latestAnalyticsForCampaign,

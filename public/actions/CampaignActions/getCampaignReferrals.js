@@ -27,7 +27,7 @@ function errorReceivingCampaignReferrals(error) {
 
 function toggleOrder(field) {
     return {
-        type:       'REFERRALS_ORDER',
+        type:       'REFERRALS_TOGGLE_ORDER',
         field,
         receivedAt: Date.now()
     };
