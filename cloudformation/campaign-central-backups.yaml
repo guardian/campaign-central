@@ -30,6 +30,18 @@ Resources:
               Key: "default"
               StringValue: "0.2"
         -
+          Id: "myDDBWriteThroughputRatio"
+          Attributes:
+            -
+              Key: "description"
+              StringValue: "DynamoDB write throughput ratio"
+            -
+              Key: "type"
+              StringValue: "Double"
+            -
+              Key: "default"
+              StringValue: "1.0"
+        -
           Id: "mySourceTableName"
           Attributes:
             -
@@ -89,6 +101,9 @@ Resources:
             -
               Key: "readThroughputPercent"
               StringValue: "#{myDDBReadThroughputRatio}"
+            -
+              Key: "writeThroughputPercent"
+              StringValue: "#{myDDBWriteThroughputRatio}"
 
         -
           Id: "DDBExportFormat"
@@ -157,7 +172,7 @@ Resources:
           Fields:
             -
               Key: "terminateAfter"
-              StringValue: "2 Hours"
+              StringValue: "5 Hours"
             -
               Key: "amiVersion"
               StringValue: "3.3.2"
