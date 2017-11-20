@@ -148,6 +148,32 @@ Resources:
           - latest
     DeletionPolicy: Retain
 
+  CampaignLocationAnalyticsLatestDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: territory
+        AttributeType: S
+      - AttributeName: campaignId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: territory
+        KeyType: HASH
+      - AttributeName: campaignId
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
+      TableName:
+        Fn::Join:
+        - "-"
+        - - campaign-central
+          - Ref: Stage
+          - location
+          - analytics
+          - latest
+    DeletionPolicy: Retain
+
   CampaignMediaDBTable:
     Type: AWS::DynamoDB::Table
     DependsOn: CampaignAnalyticsLatestDBTable
