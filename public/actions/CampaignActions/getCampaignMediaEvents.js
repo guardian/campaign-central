@@ -29,7 +29,11 @@ export function getCampaignMediaEvents(id) {
     return dispatch => {
       dispatch(requestCampaignMediaEvents(id));
       return fetchCampaignMediaEvents(id)
-        .catch(error => dispatch(errorRecievingCampaignMediaEvents(error)))
+        .catch(error => {
+            if (error.status !== 404) {
+                dispatch(errorRecievingCampaignMediaEvents(error))
+            }
+        })
         .then(res => {
           dispatch(receiveCampaignMediaEvents(res));
         });

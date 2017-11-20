@@ -7,7 +7,7 @@ export default class CampaignMediaEvents extends React.Component {
   }
 
   render () {
-    if (!this.props.mediaEventsData) {
+    if (!this.props.mediaEventsData || !this.props.mediaEventsData.pages  ) {
         return null;
     }
     return (
