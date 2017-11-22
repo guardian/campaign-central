@@ -7,11 +7,11 @@ class CampaignPerformanceBreakdownTable extends React.Component {
 
     const analytics = Object.entries(this.props.analyticsBreakdown || {});
 
-    const sum = ( acc, cur ) => acc + cur
-    const percentageOfTotal = (amount, total) => ((amount / total) * 100).toFixed(2)
-    const totalUniques = analytics.map( ([key, values]) => values.uniques).reduce(sum, 0)
-    const totalPageviews = analytics.map( ([key, values]) => values.pageviews).reduce(sum, 0)
-    const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0)
+    const sum = ( acc, cur ) => acc + cur;
+    const percentageOfTotal = (amount, total) => ((amount / total) * 100).toFixed(2);
+    const totalUniques = analytics.map( ([key, values]) => values.uniques).reduce(sum, 0);
+    const totalPageviews = analytics.map( ([key, values]) => values.pageviews).reduce(sum, 0);
+    const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0);
     const dataUnavailable = 'Unavailable';
 
     return (
