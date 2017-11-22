@@ -1,4 +1,5 @@
 import {AuthedReqwest} from '../util/pandaReqwest';
+import Reqwest from 'reqwest';
 
 export function fetchCampaigns() {
   return AuthedReqwest({
@@ -38,11 +39,52 @@ export function fetchLatestAnalytics() {
   });
 }
 
+function fetchShareCounts(analytics) {
+  const paths = Object.entries(analytics.analyticsByPath || {});
+  const shares = [];
+  paths.forEach( ([key, values]) => {
+    const req = {
+      url: `https://graph.facebook.com/?id=https://theguardian.com${key}`,
+      method: 'get'
+    };
+    shares.push(
+      new Promise(function(resolve) {
+        Reqwest(req)
+          .then(res => {
+            values.facebookShares = res.share ? res.share.share_count : 0;
+            resolve();
+          })
+          .fail(resolve);
+      })
+    );
+  });
+  paths.forEach( ([key, values]) => {
+    const req = {
+      url: `https://www.linkedin.com/countserv/count/share?url=https://theguardian.com${key}`,
+      type: 'jsonp'
+    };
+    shares.push(
+      new Promise(function(resolve) {
+        Reqwest(req)
+          .then(res => {
+            values.linkedInShares = res.count;
+            resolve();
+          })
+          .fail(resolve);
+      })
+    );
+  });
+  return Promise.all(shares)
+    .then(() => analytics)
+    .catch(() => analytics);
+}
+
 export function fetchLatestAnalyticsForCampaign(id) {
-  return AuthedReqwest({
+  const req = AuthedReqwest({
     url: '/api/v2/campaigns/' + id + '/latestAnalytics',
     method: 'get'
   });
+  return req.then(fetchShareCounts);
 }
 
 export function fetchCampaignPageViews(id) {
