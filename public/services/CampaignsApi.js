@@ -42,6 +42,7 @@ export function fetchLatestAnalytics() {
 async function fetchShareCounts(analytics) {
   const paths = Object.entries(analytics.analyticsByPath || {});
   const shares = [];
+  // Facebook shares should be fetched sequentially to avoid rate-limit.
   for (const [key, values] of paths) {
     const req = {
       url: `https://graph.facebook.com/?id=https://theguardian.com${key}`,
@@ -57,6 +58,7 @@ async function fetchShareCounts(analytics) {
     });
     await fbRateLimit;
   }
+  // LinkedIn shares should be fetched in parallel.
   paths.forEach( ([key, values]) => {
     const req = {
       url: `https://www.linkedin.com/countserv/count/share?url=https://theguardian.com${key}`,
