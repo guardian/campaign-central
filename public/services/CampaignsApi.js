@@ -39,25 +39,24 @@ export function fetchLatestAnalytics() {
   });
 }
 
-function fetchShareCounts(analytics) {
+async function fetchShareCounts(analytics) {
   const paths = Object.entries(analytics.analyticsByPath || {});
   const shares = [];
-  paths.forEach( ([key, values]) => {
+  for (const [key, values] of paths) {
     const req = {
       url: `https://graph.facebook.com/?id=https://theguardian.com${key}`,
       method: 'get'
     };
-    shares.push(
-      new Promise(function(resolve) {
-        Reqwest(req)
-          .then(res => {
-            values.facebookShares = res.share ? res.share.share_count : 0;
-            resolve();
-          })
-          .fail(resolve);
-      })
-    );
-  });
+    const fbRateLimit = new Promise(function(resolve) {
+      Reqwest(req)
+        .then(res => {
+          values.facebookShares = res.share ? res.share.share_count : 0;
+          resolve();
+        })
+        .fail(resolve);
+    });
+    await fbRateLimit;
+  }
   paths.forEach( ([key, values]) => {
     const req = {
       url: `https://www.linkedin.com/countserv/count/share?url=https://theguardian.com${key}`,
