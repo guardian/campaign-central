@@ -1,5 +1,5 @@
 import Reqwest from 'reqwest';
-import {reEstablishSession} from 'babel?presets[]=es2015!panda-session';
+import {reEstablishSession} from 'panda-session';
 
 export function AuthedReqwest(reqwestBody) {
   return new Promise(function(resolve, reject) {
