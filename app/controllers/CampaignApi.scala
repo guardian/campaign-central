@@ -1,11 +1,15 @@
 package controllers
 
+import java.time.LocalDate
+
 import com.gu.googleauth.AuthAction
 import model._
 import play.api.mvc._
 import repositories._
 import services.CampaignService
 import play.api.libs.json.Json
+
+import scala.util.Try
 
 class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyContent])
   extends AbstractController(components) {
@@ -105,8 +109,15 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     }
   }
 
-  def getCampaignReferrals(campaignId: String) = authAction { _ =>
-    CampaignReferralRepository.getCampaignReferrals(campaignId) match {
+  def getCampaignReferrals(campaignId: String, start: Option[String], end: Option[String]) = authAction { _ =>
+    def toDate(o: Option[String]): Option[LocalDate] = o flatMap { s =>
+      Try(LocalDate.parse(s)).toOption
+    }
+    val dateRange = for {
+      from <- toDate(start)
+      to   <- toDate(end)
+    } yield DateRange(from, to)
+    CampaignReferralRepository.getCampaignReferrals(campaignId, dateRange) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError
       case Right(referrals)              => Ok(Json.toJson(referrals))
