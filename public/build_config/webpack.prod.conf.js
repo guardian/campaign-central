@@ -4,28 +4,67 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
   module: {
-    loaders: [
+    rules: [
       {
         test:    /\.js$/,
         exclude: /node_modules/,
-        loaders: ['babel?presets[]=es2015&presets[]=react&plugins[]=transform-object-assign&plugins[]=transform-class-properties']
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [[
+              'env',
+              {
+                targets: {
+                  uglify: true
+                }
+              }], 'react'],
+            plugins: ['transform-object-assign','transform-class-properties']
+          }
+        }
       },
       {
         test: /\.scss$/,
-        loader: ExtractTextPlugin.extract('style-loader', 'css-loader!sass-loader')
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader']
+        })
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract('style-loader', 'css-loader')
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader'
+        })
       },
       {
         test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
-        loader: "url-loader?mimetype=application/font-woff"
+        use: {
+          loader: 'url-loader',
+          options: {
+            mimetype: 'application/font-woff'
+          }
+        }
       },
       {
         test: /\.(ttf|eot|svg|gif)(\?v=[0-9].[0-9].[0-9])?$/,
-        loader: "file-loader?name=[name].[ext]"
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]'
+          }
+        }
       }
+    ]
+  },
+  resolveLoader: {
+    modules: [
+      "node_modules"
+    ]
+  },
+  resolve: {
+    extensions: ['.js'],
+    modules: [
+      path.join('..', "node_modules")
     ]
   },
   plugins: [
@@ -35,20 +74,7 @@ module.exports = {
         'NODE_ENV': '"production"'
       }
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.OccurenceOrderPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      }
-    })
-  ],
-  resolveLoader: {
-    root: path.join(__dirname, '..', 'node_modules')
-  },
-
-  resolve: {
-    extensions: ['', '.js', '.jsx', '.json']
-  }
+    new webpack.optimize.OccurrenceOrderPlugin(),
+    new webpack.optimize.UglifyJsPlugin()
+  ]
 };
