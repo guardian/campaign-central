@@ -18,19 +18,20 @@ general:
 dependencies:
   # Cache the resolution-cache and build streams to speed things up
   cache_directories:
-    - "~/.ivy2/cache"
-    - "~/.sbt"
-    - "~/.coursier"
-    - "target/resolution-cache"
-    - "target/streams"
-    - "project/target/resolution-cache"
-    - "project/target/streams"
-    - "node_modules"
+    - ~/.ivy2/cache
+    - ~/.sbt
+    - ~/.coursier
+    - target/resolution-cache
+    - target/streams
+    - project/target/resolution-cache
+    - project/target/streams
+    - node_modules
+    - ~/.cache/yarn
   # Compile all sources
   override:
-    - npm install
-    - npm run build
-    - npm run build-icons
+    - yarn install
+    - yarn run build
+    - yarn run build-icons
     - sbt test:compile
   pre:
     - wget --output-document=$HOME/bin/sbt-launch.jar http://central.maven.org/maven2/org/scala-sbt/sbt-launch/"$SBT_VERSION"/sbt-launch-"$SBT_VERSION".jar
