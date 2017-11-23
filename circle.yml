@@ -21,12 +21,12 @@ dependencies:
     - ~/.ivy2/cache
     - ~/.sbt
     - ~/.coursier
+    - ~/.cache/yarn
     - target/resolution-cache
     - target/streams
     - project/target/resolution-cache
     - project/target/streams
     - node_modules
-    - ~/.cache/yarn
   # Compile all sources
   override:
     - yarn install
