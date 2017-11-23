@@ -25,23 +25,49 @@ module.exports = {
         test: /\.scss$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: 'css-loader?sourceMap!sass-loader?sourceMap'
+          use: [{
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true
+            }
+          }]
         })
       },
       {
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: 'css-loader?sourceMap'
+          use: {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          }
         })
       },
       {
         test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
-        use: 'url-loader?mimetype=application/font-woff'
+        use: {
+          loader: 'url-loader',
+          options: {
+            mimetype: 'application/font-woff'
+          }
+        }
       },
       {
         test: /\.(ttf|eot|svg|gif)(\?v=[0-9].[0-9].[0-9])?$/,
-        use: 'file-loader?name=[name].[ext]'
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]'
+          }
+        }
       }
     ]
   },
@@ -52,7 +78,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.js', '.jsx', '.json', '.scss'],
+    extensions: ['.js', '.scss'],
     modules: [
       path.join('..', "node_modules")
     ]
