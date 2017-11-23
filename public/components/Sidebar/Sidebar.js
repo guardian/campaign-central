@@ -23,8 +23,8 @@ class Sidebar extends React.Component {
         <div className="sidebar__link-group__header">Select a territory:</div>
 
           <form className="pure-form pure-form-stacked">
-            <div className="pure-u-1 pure-u-md-1-5" style={{padding: '10px'}}>
-              <select id="territory" style={{width: '100%'}} onChange={(e) => this.onTerritoryChange(e)} value={this.props.territory}>
+            <div className="pure-u-1 pure-u-md-1-5 territory-container">
+              <select id="territoryDropdown" className="territory-dropdown" onChange={(e) => this.onTerritoryChange(e)} value={this.props.territory}>
                   <option value="GB">uk</option>
                   <option value="US">us</option>
                   <option value="AU">au</option>

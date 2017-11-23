@@ -32,8 +32,9 @@ object Averages {
     Averages(
       uniques = Ops.sumOrZero[Long](latestAnalytics.map(_.uniques).sum / noOfAnalytics)(0),
       pageviews = Ops.sumOrZero[Long](latestAnalytics.map(_.pageviews).sum / noOfAnalytics)(0),
-      timeSpentOnPage =
-        Ops.sumOrZero[Double](latestAnalytics.flatMap(_.weightedAverageDwellTimeForCampaign).sum / noOfAnalytics)(0.0).to2Dp
+      timeSpentOnPage = Ops
+        .sumOrZero[Double](latestAnalytics.flatMap(_.weightedAverageDwellTimeForCampaign).sum / noOfAnalytics)(0.0)
+        .to2Dp
     )
   }
 }
