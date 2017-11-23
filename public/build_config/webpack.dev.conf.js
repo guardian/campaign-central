@@ -12,11 +12,13 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [["env", {
-              "targets": {
-                "browsers": ["last 2 Chrome versions"]
-              }
-            }], 'react'],
+            presets: [[
+              'env',
+              {
+                targets: {
+                  uglify: true
+                }
+              }], 'react'],
             plugins: ['transform-object-assign','transform-class-properties']
           }
         }
@@ -71,6 +73,7 @@ module.exports = {
       }
     ]
   },
+
   resolveLoader: {
     modules: [
       "node_modules"
@@ -78,7 +81,7 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.js', '.scss'],
+    extensions: ['.js'],
     modules: [
       path.join('..', "node_modules")
     ]
