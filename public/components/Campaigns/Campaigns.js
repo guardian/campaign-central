@@ -60,15 +60,22 @@ class Campaigns extends Component {
   }
 
   componentDidMount() {
-    this.props.campaignActions.getCampaigns();
-    this.props.analyticsActions.getLatestAnalytics();
+    this.props.campaignActions.getCampaigns(this.props.territory);
+    this.props.analyticsActions.getLatestAnalytics(this.props.territory);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.territory !== this.props.territory) {
+      this.props.analyticsActions.getLatestAnalytics(nextProps.territory);
+      this.props.campaignActions.getCampaigns(nextProps.territory);
+    }
   }
 
   render() {
 
     return (
       <div className="campaigns">
-        <h2 className="campaigns__header">Campaigns</h2>
+        <h2 className="campaigns__header">Campaigns ({this.props.territory === 'global' ? 'global' : this.props.territory + ' only'})</h2>
         <CampaignList campaigns={this.filterCampaigns(this.sortCampaigns(this.props.campaigns))} latestAnalytics={this.props.latestAnalytics} />
       </div>
     );
@@ -86,7 +93,8 @@ function mapStateToProps(state) {
     campaigns: state.campaigns,
     latestAnalytics: state.latestAnalytics,
     campaignSortColumn: state.campaignSort.campaignSortColumn,
-    campaignSortOrder: state.campaignSort.campaignSortOrder
+    campaignSortOrder: state.campaignSort.campaignSortOrder,
+    territory: state.territory
   };
 }
 

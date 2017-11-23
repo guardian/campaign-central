@@ -43,13 +43,17 @@ object LatestCampaignAnalytics {
     }
 
     val metricsByCountryCode: Map[String, LatestAnalyticsBreakdownItem] =
-      latestCampaignAnalyticsItem.uniquesByCountryCode.flatMap {
-        case (key, uniques) =>
-          val maybePageviews = latestCampaignAnalyticsItem.pageviewsByCountryCode.get(key)
-          maybePageviews.map { pageviews =>
-            key -> LatestAnalyticsBreakdownItem(uniques, pageviews)
+      latestCampaignAnalyticsItem.uniquesByCountryCode
+        .map { uniquesByCountryCode =>
+          uniquesByCountryCode.flatMap {
+            case (key, uniques) =>
+              val maybePageviews = latestCampaignAnalyticsItem.pageviewsByCountryCode.flatMap(_.get(key))
+              maybePageviews.map { pageviews =>
+                key -> LatestAnalyticsBreakdownItem(uniques, pageviews)
+              }
           }
-      }
+        }
+        .getOrElse(Map.empty)
 
     val top20PlusSumOfOtherMetricsByCountryCode: Map[String, LatestAnalyticsBreakdownItem] = {
       val sortedMetricsByCountryCode = ListMap(metricsByCountryCode.toSeq.sortWith(sortByUniques): _*)

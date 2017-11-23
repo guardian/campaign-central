@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import {Link} from 'react-router';
+import {browserHistory} from 'react-router';
 import {shortFormatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignListItem extends React.Component {
@@ -12,7 +13,7 @@ class CampaignListItem extends React.Component {
   };
 
   redirectToCampaign = () => {
-    window.document.location = "/campaign/" + this.props.campaign.id;
+    browserHistory.push(`/campaign/${this.props.campaign.id}`)
   };
 
   daysBetween = (date1, date2) => {

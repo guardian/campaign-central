@@ -15,13 +15,15 @@ class Campaign extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign && (!this.props.campaign || nextProps.campaign.id !== this.props.campaign.id)) {
+    const isTerritoryDifferent = this.props.territory !== nextProps.territory;
+
+    if (nextProps.campaign && (!this.props.campaign || nextProps.campaign.id !== this.props.campaign.id || isTerritoryDifferent)) {
       this.props.analyticsActions.clearCampaignAnalytics();
       if (this.isAnalysisAvailable(nextProps.campaign)) {
         this.props.analyticsActions.getCampaignPageViews(nextProps.campaign.id);
         this.props.analyticsActions.getCampaignUniques(nextProps.campaign.id);
         this.props.analyticsActions.getCampaignMediaEvents(nextProps.campaign.id);
-        this.props.analyticsActions.getLatestAnalyticsForCampaign(nextProps.campaign.id);
+        this.props.analyticsActions.getLatestAnalyticsForCampaign(nextProps.campaign.id, nextProps.territory);
       }
     }
   }
@@ -40,6 +42,18 @@ class Campaign extends React.Component {
       return (
         Math.round(100*actual/target) +"% of target"
       );
+    } else { return (null); }
+  }
+
+  renderReferralsIfGlobal(campaign) {
+    if ("global" === this.props.territory) {
+      return(<CampaignReferrals campaign={campaign} />);
+    } else { return (null); }
+  }
+
+  renderMediaEventsIfGlobal(campaign) {
+    if ("global" === this.props.territory) {
+      return(<CampaignMediaEvents campaign={campaign} mediaEventsData={this.props.campaignMediaEvents} />);
     } else { return (null); }
   }
 
@@ -62,17 +76,18 @@ class Campaign extends React.Component {
                         latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign} />
 
           <CampaignPerformanceBreakdown campaign={campaign}
-                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign} />
+                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
+                        territory={this.props.territory} />
 
           <CampaignEdit campaign={campaign}
                         updateCampaign={this.props.campaignActions.updateCampaign}
                         saveCampaign={this.props.campaignActions.saveCampaign}/>
-          <CampaignAnalytics campaign={campaign} />
+          {/*}<CampaignAnalytics campaign={campaign} /> */}
           <CampaignAssets campaign={campaign}
                           getCampaign={this.props.campaignActions.getCampaign}
                           getCampaignContent={this.props.campaignActions.getCampaignContent} />
-          <CampaignReferrals campaign={campaign} />
-          <CampaignMediaEvents campaign={campaign} mediaEventsData={this.props.campaignMediaEvents} />
+          {this.renderReferralsIfGlobal(campaign)}
+          {this.renderMediaEventsIfGlobal(campaign)}
         </div>
       </div>
     );
@@ -97,7 +112,8 @@ function mapStateToProps(state) {
   return {
     campaign: state.campaign,
     latestAnalyticsForCampaign: state.latestAnalyticsForCampaign,
-    campaignMediaEvents: state.campaignMediaEvents
+    campaignMediaEvents: state.campaignMediaEvents,
+    territory: state.territory
   };
 }
 
