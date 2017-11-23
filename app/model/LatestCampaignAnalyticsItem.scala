@@ -6,12 +6,13 @@ import cats.syntax.either._
 import play.api.libs.json.{Format, JsValue, Json}
 
 case class LatestCampaignAnalyticsItem(
+  territory: String,
   campaignId: String,
   uniques: Long,
   pageviews: Long,
   reportExecutionTimestamp: String,
-  pageviewsByCountryCode: Map[String, Long],
-  uniquesByCountryCode: Map[String, Long],
+  pageviewsByCountryCode: Option[Map[String, Long]],
+  uniquesByCountryCode: Option[Map[String, Long]],
   pageviewsByDevice: Option[Map[String, Long]],
   uniquesByDevice: Option[Map[String, Long]],
   medianAttentionTimeSeconds: Option[Long],

@@ -1,8 +1,8 @@
 import {AuthedReqwest} from '../util/pandaReqwest';
 
-export function fetchCampaigns() {
+export function fetchCampaigns(territory) {
   return AuthedReqwest({
-    url: '/api/campaigns',
+    url: '/api/campaigns?territory=' + territory,
     method: 'get'
   });
 }
@@ -31,16 +31,16 @@ export function deleteCampaign(id) {
   });
 }
 
-export function fetchLatestAnalytics() {
+export function fetchLatestAnalytics(territory) {
   return AuthedReqwest({
-    url: '/api/v2/campaigns/latestAnalytics',
+    url: '/api/v2/campaigns/latestAnalytics?territory=' + territory,
     method: 'get'
   });
 }
 
-export function fetchLatestAnalyticsForCampaign(id) {
+export function fetchLatestAnalyticsForCampaign(id, territory) {
   return AuthedReqwest({
-    url: '/api/v2/campaigns/' + id + '/latestAnalytics',
+    url: '/api/v2/campaigns/' + id + '/latestAnalytics?territory=' + territory,
     method: 'get'
   });
 }
@@ -87,9 +87,9 @@ export function refreshCampaignFromCAPI(id) {
   });
 }
 
-export function getCampaignBenchmarks() {
+export function getCampaignBenchmarks(territory) {
   return AuthedReqwest({
-    url: '/api/v2/campaigns/benchmarks',
+    url: '/api/v2/campaigns/benchmarks?territory=' + territory,
     method: 'get'
   });
 }

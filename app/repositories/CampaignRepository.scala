@@ -42,10 +42,13 @@ object CampaignRepository {
       Left(CampaignNotFound(s"Campaign could not be found by tag id $tagId"))
   }
 
-  def getAllCampaigns(): Either[CampaignCentralApiError, List[Campaign]] =
-    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(table.scan)).leftMap { e =>
+  def getAllCampaigns(territory: Territory): Either[CampaignCentralApiError, List[Campaign]] = {
+    val tableOp = territory.associatedProductionOfficeValue.map(prodOffice =>
+      table.filter('productionOffice -> prodOffice).scan) getOrElse table.scan
+    getResultsOrFirstFailure(Scanamo.exec(DynamoClient)(tableOp)).leftMap { e =>
       JsonParsingError(e.show)
     }
+  }
 
   def getCampaignWithSubItems(campaignId: String): Either[CampaignCentralApiError, CampaignWithSubItems] =
     for {

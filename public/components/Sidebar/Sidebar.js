@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 import {Link} from 'react-router';
 
-export default class Sidebar extends React.Component {
+class Sidebar extends React.Component {
 
   filterLink = (changeValue, displayName) => {
     var query = Object.assign({}, this.props.query, changeValue);
@@ -11,10 +11,28 @@ export default class Sidebar extends React.Component {
     )
   };
 
+  onTerritoryChange = (e) => {
+    let territory = e.target.value;
+    this.props.uiActions.setTerritory(territory);
+  }
+
   render () {
     return (
       <div className="sidebar">
         <div className="sidebar__link-group">
+        <div className="sidebar__link-group__header">Select a territory:</div>
+
+          <form className="pure-form pure-form-stacked">
+            <div className="pure-u-1 pure-u-md-1-5" style={{padding: '10px'}}>
+              <select id="territory" style={{width: '100%'}} onChange={(e) => this.onTerritoryChange(e)} value={this.props.territory}>
+                  <option value="GB">uk</option>
+                  <option value="US">us</option>
+                  <option value="AU">au</option>
+                  <option value="global">global</option>
+              </select>
+            </div>
+          </form>
+
           <div className="sidebar__link-group__header">Campaigns</div>
           <SidebarLink to="/benchmarks">Benchmarks</SidebarLink>
           <SidebarLink to="/campaigns">All Campaigns</SidebarLink>
@@ -50,3 +68,22 @@ class SidebarLink extends React.Component {
     </Link>;
   }
 }
+
+//REDUX CONNECTIONS
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as setTerritory from '../../actions/UIActions/setTerritory';
+
+function mapStateToProps(state) {
+  return {
+    territory: state.territory
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    uiActions: bindActionCreators(Object.assign({}, setTerritory), dispatch)
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);

@@ -24,10 +24,10 @@ function errorRecievingBenchmarks(error) {
     };
 }
 
-export function getBenchmarks() {
+export function getBenchmarks(territory) {
     return dispatch => {
       dispatch(requestBenchmarks());
-      return getCampaignBenchmarks()
+      return getCampaignBenchmarks(territory)
         .catch(error => dispatch(errorRecievingBenchmarks(error)))
         .then(res => {
           dispatch(receiveBenchmarks(res));

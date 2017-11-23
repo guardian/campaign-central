@@ -1,9 +1,8 @@
 import {fetchLatestAnalytics} from '../../services/CampaignsApi';
 
-function requestLatestAnalytics(id) {
+function requestLatestAnalytics() {
     return {
         type:       'LATEST_ANALYTICS_GET_REQUEST',
-        id:         id,
         receivedAt: Date.now()
     };
 }
@@ -25,10 +24,10 @@ function errorRecievingLatestAnalytics(error) {
     };
 }
 
-export function getLatestAnalytics() {
+export function getLatestAnalytics(territory) {
     return dispatch => {
       dispatch(requestLatestAnalytics());
-      return fetchLatestAnalytics()
+      return fetchLatestAnalytics(territory)
         .catch(error => dispatch(errorRecievingLatestAnalytics(error)))
         .then(res => {
           dispatch(receiveLatestAnalytics(res));

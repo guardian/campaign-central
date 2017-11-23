@@ -4,6 +4,8 @@ import ai.x.play.json.Jsonx
 import play.api.libs.json.Format
 import util.DoubleUtils._
 
+import scala.util.Try
+
 case class Totals(uniques: Long, pageviews: Long, timeSpentOnPage: Double)
 object Totals {
   implicit val totalsFormat: Format[Totals] = Jsonx.formatCaseClass[Totals]
@@ -24,9 +26,11 @@ object Averages {
   def apply(latestAnalytics: Seq[LatestCampaignAnalytics]): Averages = {
     val noOfAnalytics = latestAnalytics.size.toLong
     Averages(
-      uniques = latestAnalytics.map(_.uniques).sum / noOfAnalytics,
-      pageviews = latestAnalytics.map(_.pageviews).sum / noOfAnalytics,
-      timeSpentOnPage = (latestAnalytics.flatMap(_.weightedAverageDwellTimeForCampaign).sum / noOfAnalytics).to2Dp
+      uniques = Try(latestAnalytics.map(_.uniques).sum / noOfAnalytics).toOption.getOrElse(0),
+      pageviews = Try(latestAnalytics.map(_.pageviews).sum / noOfAnalytics).toOption.getOrElse(0),
+      timeSpentOnPage =
+        Try((latestAnalytics.flatMap(_.weightedAverageDwellTimeForCampaign).sum / noOfAnalytics).to2Dp).toOption
+          .getOrElse(0.0)
     )
   }
 }

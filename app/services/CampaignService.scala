@@ -41,22 +41,24 @@ object CampaignService {
     CampaignUniquesRepository.getCampaignUniques(campaignId)
   }
 
-  def getLatestAnalyticsForCampaign(campaignId: String): Either[CampaignCentralApiError, LatestCampaignAnalytics] = {
+  def getLatestAnalyticsForCampaign(campaignId: String,
+                                    territory: Territory): Either[CampaignCentralApiError, LatestCampaignAnalytics] = {
     for {
       campaign <- CampaignRepository.getCampaign(campaignId)
-      latest   <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(campaignId)
+      latest   <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(campaignId, territory)
     } yield {
       val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
       LatestCampaignAnalytics(latest, uniquesTarget)
     }
   }
 
-  def getLatestCampaignAnalytics(): Either[CampaignCentralApiError, Map[String, LatestCampaignAnalytics]] = {
+  def getLatestCampaignAnalytics(
+    territory: Territory): Either[CampaignCentralApiError, Map[String, LatestCampaignAnalytics]] = {
 
     for {
-      latestCampaignAnalytics <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics()
+      latestCampaignAnalytics <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(territory)
       campaignsWeHaveUniquesFor <- CampaignRepository
-        .getAllCampaigns()
+        .getAllCampaigns(territory)
         .map(campaigns => campaigns.filter(c => latestCampaignAnalytics.map(_.campaignId).contains(c.id)))
     } yield {
       val results = campaignsWeHaveUniquesFor flatMap { campaign =>
@@ -72,10 +74,10 @@ object CampaignService {
     }
   }
 
-  def getBenchmarksAcrossCampaigns(): Either[CampaignCentralApiError, Benchmarks] = {
+  def getBenchmarksAcrossCampaigns(territory: Territory): Either[CampaignCentralApiError, Benchmarks] = {
     for {
-      latestCampaignAnalytics <- getLatestCampaignAnalytics()
-      campaigns               <- CampaignRepository.getAllCampaigns()
+      latestCampaignAnalytics <- getLatestCampaignAnalytics(territory)
+      campaigns               <- CampaignRepository.getAllCampaigns(territory)
     } yield {
 
       val paidForCampaignsIds = campaigns.filter(_.`type`.toLowerCase == "paidcontent").map(_.id)
@@ -163,7 +165,7 @@ object CampaignService {
 
     val sectionsToCreateOrUpdate: Seq[(Option[CapiSection], Option[Campaign])] = {
       val currentCampaigns = CampaignRepository
-        .getAllCampaigns()
+        .getAllCampaigns(Global)
         .toOption
         .getOrElse(Nil)
         .map { campaign =>
