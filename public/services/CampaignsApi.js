@@ -41,7 +41,7 @@ export function fetchLatestAnalytics() {
 
 async function fetchShareCounts(analytics) {
   const paths = Object.entries(analytics.analyticsByPath || {});
-  const shares = [];
+
   // Facebook shares should be fetched sequentially to avoid rate-limit.
   for (const [key, values] of paths) {
     const req = {
@@ -59,23 +59,21 @@ async function fetchShareCounts(analytics) {
     await fbRateLimit;
   }
   // LinkedIn shares should be fetched in parallel.
-  paths.forEach( ([key, values]) => {
+  const linkedInShares = paths.map( ([key, values]) => {
     const req = {
       url: `https://www.linkedin.com/countserv/count/share?url=https://theguardian.com${key}`,
       type: 'jsonp'
     };
-    shares.push(
-      new Promise(function(resolve) {
-        Reqwest(req)
-          .then(res => {
-            values.linkedInShares = res.count;
-            resolve();
-          })
-          .fail(resolve);
-      })
-    );
+    return new Promise(function(resolve) {
+      Reqwest(req)
+        .then(res => {
+          values.linkedInShares = res.count;
+          resolve();
+        })
+        .fail(resolve);
+    });
   });
-  return Promise.all(shares)
+  return Promise.all(linkedInShares)
     .then(() => analytics)
     .catch(() => analytics);
 }
