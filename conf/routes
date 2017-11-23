@@ -28,7 +28,7 @@ GET /api/v2/campaigns/:id/pageViews         controllers.CampaignApi.getCampaignP
 GET /api/v2/campaigns/:id/uniques           controllers.CampaignApi.getCampaignUniquesFromDatalake(id: String)
 GET /api/campaigns/:id/content              controllers.CampaignApi.getCampaignContent(id: String)
 POST /api/campaigns/:id/refreshFromCAPI     controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
-GET /api/v2/campaigns/:id/referrals         controllers.CampaignApi.getCampaignReferrals(id: String)
+GET /api/v2/campaigns/:id/referrals         controllers.CampaignApi.getCampaignReferrals(id: String, start: Option[String], end: Option[String])
 GET /api/campaigns/:id/mediaEvents          controllers.CampaignApi.getCampaignMediaEvents(id: String)
 
 #Management Api

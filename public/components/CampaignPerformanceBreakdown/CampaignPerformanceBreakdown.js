@@ -65,7 +65,7 @@ export default class CampaignPerformanceBreakdown extends React.Component {
     super(props);
 
     this.state = {
-      currentView: this.view.LOCATION
+      currentView: this.view.DEVICE
     }
   }
 
@@ -88,7 +88,15 @@ export default class CampaignPerformanceBreakdown extends React.Component {
       case this.view.PATH:
         return(<CampaignPerformanceBreakdownTable breakdownLabel="Path" analyticsBreakdown={analyticsByPath}/>);
       default:
-        return(<CampaignPerformanceBreakdownTable breakdownLabel="Country" analyticsBreakdown={analyticsByCountryCode}/>);
+        return(null);
+    }
+  }
+
+  renderLocationNavItemIfGlobal() {
+    if (this.props.territory === 'global') {
+      return(<button className={this.state.currentView === this.view.LOCATION ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.LOCATION)}>Location</button>);
+    } else {
+      return(null);
     }
   }
 
@@ -100,9 +108,9 @@ export default class CampaignPerformanceBreakdown extends React.Component {
         <div className="campaign-box__body">
 
         <div id ="performance-breakdown-nav" className="pure-button-group" role="group" aria-label="...">
-          <button className={this.state.currentView === this.view.LOCATION ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.LOCATION)}>Location</button>
           <button className={this.state.currentView === this.view.DEVICE ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.DEVICE)}>Device</button>
           <button className={this.state.currentView === this.view.PATH ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.PATH)}>Path</button>
+          {this.renderLocationNavItemIfGlobal()}
         </div>
 
         {this.renderBreakdownTable()}

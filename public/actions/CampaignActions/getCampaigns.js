@@ -24,10 +24,10 @@ function errorRecievingCampaigns(error) {
     };
 }
 
-export function getCampaigns() {
+export function getCampaigns(territory) {
     return dispatch => {
       dispatch(requestCampaigns());
-      return fetchCampaigns()
+      return fetchCampaigns(territory)
         .catch(error => dispatch(errorRecievingCampaigns(error)))
         .then(res => {
           dispatch(receiveCampaigns(res));

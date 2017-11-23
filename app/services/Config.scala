@@ -38,7 +38,7 @@ sealed trait Config {
   def campaignMediaEventsTableName     = s"campaign-central-$stage-media"
   def campaignPageviewsTableName       = s"campaign-central-$stage-campaign-page-views"
   def campaignUniquesTableName         = s"campaign-central-$stage-campaign-uniques"
-  def latestCampaignAnalyticsTableName = s"campaign-central-$stage-analytics-latest"
+  def latestCampaignAnalyticsTableName = s"campaign-central-$stage-location-analytics-latest"
   def campaignReferralTableName        = s"campaign-central-$stage-referrals"
 
   def tagManagerApiUrl: String

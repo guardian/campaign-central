@@ -25,10 +25,10 @@ function errorReceivingLatestlAnalyticsForCampaign(error) {
   };
 }
 
-export function getLatestAnalyticsForCampaign(id) {
+export function getLatestAnalyticsForCampaign(id, territory) {
   return dispatch => {
     dispatch(requestlatestAnalyticsForCampaign(id));
-    return fetchLatestAnalyticsForCampaign(id)
+    return fetchLatestAnalyticsForCampaign(id, territory)
       .catch(error => dispatch(errorReceivingLatestlAnalyticsForCampaign(error)))
       .then(res => dispatch(receiveLatestAnalyticsForCampaign(res)));
   };
