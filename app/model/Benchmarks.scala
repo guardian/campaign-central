@@ -6,6 +6,10 @@ import util.DoubleUtils._
 
 import scala.util.Try
 
+object Ops {
+  def sumOrZero[T](op: => T)(default: T): T = Try(op).toOption.getOrElse(default)
+}
+
 case class Totals(uniques: Long, pageviews: Long, timeSpentOnPage: Double)
 object Totals {
   implicit val totalsFormat: Format[Totals] = Jsonx.formatCaseClass[Totals]
@@ -26,11 +30,10 @@ object Averages {
   def apply(latestAnalytics: Seq[LatestCampaignAnalytics]): Averages = {
     val noOfAnalytics = latestAnalytics.size.toLong
     Averages(
-      uniques = Try(latestAnalytics.map(_.uniques).sum / noOfAnalytics).toOption.getOrElse(0),
-      pageviews = Try(latestAnalytics.map(_.pageviews).sum / noOfAnalytics).toOption.getOrElse(0),
+      uniques = Ops.sumOrZero[Long](latestAnalytics.map(_.uniques).sum / noOfAnalytics)(0),
+      pageviews = Ops.sumOrZero[Long](latestAnalytics.map(_.pageviews).sum / noOfAnalytics)(0),
       timeSpentOnPage =
-        Try((latestAnalytics.flatMap(_.weightedAverageDwellTimeForCampaign).sum / noOfAnalytics).to2Dp).toOption
-          .getOrElse(0.0)
+        Ops.sumOrZero[Double](latestAnalytics.flatMap(_.weightedAverageDwellTimeForCampaign).sum / noOfAnalytics)(0.0).to2Dp
     )
   }
 }
