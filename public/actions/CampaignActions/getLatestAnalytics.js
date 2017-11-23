@@ -9,9 +9,9 @@ function requestLatestAnalytics() {
 
 function receiveLatestAnalytics(latestAnalytics) {
     return {
-        type:        'LATEST_ANALYTICS_GET_RECEIVE',
-      latestAnalytics:    latestAnalytics,
-        receivedAt:  Date.now()
+        type:               'LATEST_ANALYTICS_GET_RECEIVE',
+        latestAnalytics:    latestAnalytics,
+        receivedAt:         Date.now()
     };
 }
 

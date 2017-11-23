@@ -1,4 +1,5 @@
 import {AuthedReqwest} from '../util/pandaReqwest';
+import Reqwest from 'reqwest';
 
 export function fetchCampaigns(territory) {
   return AuthedReqwest({
@@ -38,11 +39,51 @@ export function fetchLatestAnalytics(territory) {
   });
 }
 
+async function fetchShareCounts(analytics) {
+  const paths = Object.entries(analytics.analyticsByPath || {});
+
+  // Facebook shares should be fetched sequentially to avoid rate-limit.
+  for (const [key, values] of paths) {
+    const req = {
+      url: `https://graph.facebook.com/?id=https://theguardian.com${key}`,
+      method: 'get'
+    };
+    const fbRateLimit = new Promise(function(resolve) {
+      Reqwest(req)
+        .then(res => {
+          values.facebookShares = res.share ? res.share.share_count : 0;
+          resolve();
+        })
+        .fail(resolve);
+    });
+    await fbRateLimit;
+  }
+  // LinkedIn shares should be fetched in parallel.
+  const linkedInShares = paths.map( ([key, values]) => {
+    const req = {
+      url: `https://www.linkedin.com/countserv/count/share?url=https://theguardian.com${key}`,
+      type: 'jsonp'
+    };
+    return new Promise(function(resolve) {
+      Reqwest(req)
+        .then(res => {
+          values.linkedInShares = res.count;
+          resolve();
+        })
+        .fail(resolve);
+    });
+  });
+  return Promise.all(linkedInShares)
+    .then(() => analytics)
+    .catch(() => analytics);
+}
+
 export function fetchLatestAnalyticsForCampaign(id, territory) {
-  return AuthedReqwest({
+  const req = AuthedReqwest({
     url: `/api/v2/campaigns/${id}/latestAnalytics?territory=${territory}`,
     method: 'get'
   });
+  return req.then(fetchShareCounts);
 }
 
 export function fetchCampaignPageViews(id) {

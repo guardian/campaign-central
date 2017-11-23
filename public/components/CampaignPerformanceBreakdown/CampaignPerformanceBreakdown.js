@@ -1,4 +1,4 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import {formatToMinutes} from '../../util/minutesFormatter';
 
 class CampaignPerformanceBreakdownTable extends React.Component {
@@ -7,73 +7,49 @@ class CampaignPerformanceBreakdownTable extends React.Component {
 
     const analytics = Object.entries(this.props.analyticsBreakdown || {});
 
-    const sum = ( acc, cur ) => acc + cur
-    const percentageOfTotal = (amount, total) => ((amount / total) * 100).toFixed(2)
-    const totalUniques = analytics.map( ([key, values]) => values.uniques).reduce(sum, 0)
-    const totalPageviews = analytics.map( ([key, values]) => values.pageviews).reduce(sum, 0)
-    const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0)
+    const sum = ( acc, cur ) => acc + cur;
+    const percentageOfTotal = (amount, total) => ((amount / total) * 100).toFixed(2);
+    const totalUniques = analytics.map( ([key, values]) => values.uniques).reduce(sum, 0);
+    const totalPageviews = analytics.map( ([key, values]) => values.pageviews).reduce(sum, 0);
+    const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0);
     const dataUnavailable = 'Unavailable';
 
-    if(this.props.breakdownLabel=='Path'){
-
-      return (
-        <table className="pure-table">
-          <thead>
-          <tr>
-            <th>{this.props.breakdownLabel}</th>
-            <th>Unique Users</th>
-            <th>Total Page Views</th>
-            <th>Average Time on Page (minutes)</th>
+    return (
+      <table className="pure-table">
+        <thead>
+        <tr>
+          <th>{this.props.breakdownLabel}</th>
+          <th>Unique Users</th>
+          <th>Total Page Views</th>
+          <th>Average Time on Page (minutes)</th>
+          { this.props.breakdownLabel === 'Path' &&
             <th>FB Shares</th>
+          }
+          { this.props.breakdownLabel === 'Path' &&
             <th>LinkedIn Shares</th>
-          </tr>
-          </thead>
-          <tbody>
-          {analytics.map(([breakdownKey, values]) => {
-            return(
-              <tr key={breakdownKey}>
-                <td>{breakdownKey}</td>
-                <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
-                <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
-                <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
+          }
+        </tr>
+        </thead>
+        <tbody>
+        {analytics.map(([breakdownKey, values]) => {
+          return(
+            <tr key={breakdownKey}>
+              <td>{breakdownKey}</td>
+              <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
+              <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
+              <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
+              { this.props.breakdownLabel === 'Path' &&
                 <td>{values.facebookShares}</td>
+              }
+              { this.props.breakdownLabel === 'Path' &&
                 <td>{values.linkedInShares}</td>
-              </tr>
-            );
-          })}
-          </tbody>
-        </table>
-      );
-
-    }else{
-
-      return (
-        <table className="pure-table">
-          <thead>
-          <tr>
-            <th>{this.props.breakdownLabel}</th>
-            <th>Unique Users</th>
-            <th>Total Page Views</th>
-            <th>Average Time on Page (minutes)</th>
-          </tr>
-          </thead>
-          <tbody>
-          {analytics.map(([breakdownKey, values]) => {
-            return(
-              <tr key={breakdownKey}>
-                <td>{breakdownKey}</td>
-                <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
-                <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
-                <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
-              </tr>
-            );
-          })}
-          </tbody>
-        </table>
-      );
-
-    }
-
+              }
+            </tr>
+          );
+        })}
+        </tbody>
+      </table>
+    );
   }
 }
 
