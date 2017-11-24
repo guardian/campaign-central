@@ -39,7 +39,10 @@ export function fetchLatestAnalytics(territory) {
   });
 }
 
-async function fetchShareCounts(analytics) {
+async function fetchShareCounts(analytics, territory) {
+  if (territory !== 'global') {
+    return analytics;
+  }
   const paths = Object.entries(analytics.analyticsByPath || {});
 
   // Facebook shares should be fetched sequentially to avoid rate-limit.
@@ -83,7 +86,7 @@ export function fetchLatestAnalyticsForCampaign(id, territory) {
     url: `/api/v2/campaigns/${id}/latestAnalytics?territory=${territory}`,
     method: 'get'
   });
-  return req.then(fetchShareCounts);
+  return req.then( (analytics) => fetchShareCounts(analytics, territory));
 }
 
 export function fetchCampaignPageViews(id) {

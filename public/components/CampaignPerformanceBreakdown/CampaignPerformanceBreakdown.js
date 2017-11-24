@@ -13,6 +13,7 @@ class CampaignPerformanceBreakdownTable extends React.Component {
     const totalPageviews = analytics.map( ([key, values]) => values.pageviews).reduce(sum, 0);
     const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0);
     const dataUnavailable = 'Unavailable';
+    const showSocialShares= this.props.breakdownLabel === 'Path' && this.props.territory === 'global';
 
     return (
       <table className="pure-table">
@@ -22,10 +23,10 @@ class CampaignPerformanceBreakdownTable extends React.Component {
           <th>Unique Users</th>
           <th>Total Page Views</th>
           <th>Average Time on Page (minutes)</th>
-          { this.props.breakdownLabel === 'Path' &&
+          { showSocialShares &&
             <th>FB Shares</th>
           }
-          { this.props.breakdownLabel === 'Path' &&
+          { showSocialShares &&
             <th>LinkedIn Shares</th>
           }
         </tr>
@@ -38,10 +39,10 @@ class CampaignPerformanceBreakdownTable extends React.Component {
               <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
               <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
               <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
-              { this.props.breakdownLabel === 'Path' &&
+              { showSocialShares &&
                 <td>{values.facebookShares}</td>
               }
-              { this.props.breakdownLabel === 'Path' &&
+              { showSocialShares &&
                 <td>{values.linkedInShares}</td>
               }
             </tr>
@@ -82,11 +83,11 @@ export default class CampaignPerformanceBreakdown extends React.Component {
 
     switch(this.state.currentView) {
       case this.view.LOCATION:
-        return(<CampaignPerformanceBreakdownTable breakdownLabel="Country" analyticsBreakdown={analyticsByCountryCode}/>);
+        return(<CampaignPerformanceBreakdownTable breakdownLabel="Country" analyticsBreakdown={analyticsByCountryCode} territory={this.props.territory}/>);
       case this.view.DEVICE:
-        return(<CampaignPerformanceBreakdownTable breakdownLabel="Device" analyticsBreakdown={analyticsByDevice}/>);
+        return(<CampaignPerformanceBreakdownTable breakdownLabel="Device" analyticsBreakdown={analyticsByDevice} territory={this.props.territory}/>);
       case this.view.PATH:
-        return(<CampaignPerformanceBreakdownTable breakdownLabel="Path" analyticsBreakdown={analyticsByPath}/>);
+        return(<CampaignPerformanceBreakdownTable breakdownLabel="Path" analyticsBreakdown={analyticsByPath} territory={this.props.territory}/>);
       default:
         return(null);
     }
