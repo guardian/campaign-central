@@ -48,10 +48,10 @@ export function setToggleOrder(field) {
     return dispatch => dispatch(toggleOrder(field));
 }
 
-export function getCampaignReferrals(id) {
+export function getCampaignReferrals(id, startDate, endDate) {
     return dispatch => {
       dispatch(requestCampaignReferrals(id));
-      return fetchCampaignReferrals(id)
+      return fetchCampaignReferrals(id, startDate, endDate)
         .catch(error => dispatch(errorReceivingCampaignReferrals(error)))
         .then(res => {
           dispatch(receiveCampaignReferrals(res));

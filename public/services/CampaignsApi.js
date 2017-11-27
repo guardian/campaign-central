@@ -117,9 +117,9 @@ export function fetchCampaignContent(id) {
   });
 }
 
-export function fetchCampaignReferrals(id) {
+export function fetchCampaignReferrals(id, dateRange) {
   return AuthedReqwest({
-    url: `/api/v2/campaigns/${id}/referrals`,
+    url: `/api/v2/campaigns/${id}/referrals?start=${dateRange.startDate}&end=${dateRange.endDate}`,
     method: 'get'
   });
 }
