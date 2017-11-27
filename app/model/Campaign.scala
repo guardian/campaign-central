@@ -15,8 +15,6 @@ case class Campaign(
   lastModifiedBy: User,
   campaignLogo: Option[String] = None,
   pathPrefix: String,
-  nominalValue: Option[Long] = None,
-  actualValue: Option[Long] = None,
   startDate: Option[DateTime] = None,
   endDate: DateTime,
   targets: Map[String, Long] = Map.empty,
