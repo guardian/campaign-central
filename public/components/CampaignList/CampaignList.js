@@ -50,12 +50,12 @@ class CampaignList extends React.Component {
             {this.sortableColumnHead('name', 'Name')}
             {this.sortableColumnHead('type', 'Type')}
             {this.sortableColumnHead('status', 'Status')}
-            {this.sortableColumnHead('actualValue', 'Value')}
             {this.sortableColumnHead('startDate', 'Start date')}
             {this.sortableColumnHead('endDate', 'Finish date')}
             <th className="campaign-list__header">Days left</th>
             <th className="campaign-list__header">Target</th>
             <th className="campaign-list__header">Uniques</th>
+            <th className="campaign-list__header">Pageviews</th>
             <th className="campaign-list__header">Production Office</th>
           </tr>
         </thead>
