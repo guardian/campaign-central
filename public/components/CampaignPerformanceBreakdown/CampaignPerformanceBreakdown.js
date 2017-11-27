@@ -11,7 +11,7 @@ class CampaignPerformanceBreakdownTable extends React.Component {
     const percentageOfTotal = (amount, total) => ((amount / total) * 100).toFixed(2);
     const totalUniques = analytics.map( ([key, values]) => values.uniques).reduce(sum, 0);
     const totalPageviews = analytics.map( ([key, values]) => values.pageviews).reduce(sum, 0);
-    const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage).reduce(sum, 0);
+    const totalTimeSpentOnPage = analytics.map( ([key, values]) => values.timeSpentOnPage ? values.timeSpentOnPage : 0).reduce(sum, 0);
     const dataUnavailable = 'Unavailable';
     const showSocialShares= this.props.breakdownLabel === 'Path' && this.props.territory === 'global';
 
@@ -36,9 +36,9 @@ class CampaignPerformanceBreakdownTable extends React.Component {
           return(
             <tr key={breakdownKey}>
               <td>{breakdownKey}</td>
-              <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : dataUnavailable}</td>
-              <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : dataUnavailable}</td>
-              <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : dataUnavailable}</td>
+              <td>{values.uniques ? `${values.uniques.toLocaleString()} (${percentageOfTotal(values.uniques, totalUniques)}\%)` : 0}</td>
+              <td>{values.pageviews ? `${values.pageviews.toLocaleString()} (${percentageOfTotal(values.pageviews, totalPageviews)}\%)` : 0}</td>
+              <td>{values.timeSpentOnPage ? `${formatToMinutes(values.timeSpentOnPage)} (${percentageOfTotal(values.timeSpentOnPage, totalTimeSpentOnPage)}\%)` : 0}</td>
               { showSocialShares &&
                 <td>{values.facebookShares}</td>
               }
