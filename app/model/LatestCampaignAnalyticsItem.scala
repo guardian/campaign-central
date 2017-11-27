@@ -19,6 +19,8 @@ case class LatestCampaignAnalyticsItem(
   medianAttentionTimeByDevice: Option[Map[String, Long]],
   weightedAverageDwellTimeForCampaign: Option[Double],
   averageDwellTimePerPathSeconds: Option[Map[String, Double]],
+  averageDwellTimePerDeviceSeconds: Option[Map[String, Double]],
+  averageDwellTimePerCountryCodeSeconds: Option[Map[String, Double]],
   pageviewsByPath: Option[Map[String, Long]],
   uniquesByPath: Option[Map[String, Long]]
 ) {
