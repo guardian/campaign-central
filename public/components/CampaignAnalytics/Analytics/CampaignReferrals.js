@@ -24,7 +24,7 @@ class CampaignReferrals extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.campaign.id !== this.props.campaign.id || nextState !== this.state) {
+    if (nextState.dateRange !== this.state.dateRange) {
       this.props.campaignReferralActions.getCampaignReferrals(nextProps.campaign.id, nextState.dateRange);
     }
   }
