@@ -48,7 +48,7 @@ object CampaignReferral {
       }
 
     def referralsByContainer(containerRows: Seq[CampaignReferralRow]): Seq[CampaignReferral] =
-      childReferrals(containerRows)(_.containerName) {
+      childReferrals(containerRows)(_.formattedContainerName) {
         case Some(containerName) => s"Container: $containerName"
         case None                => ""
       } { cardRows =>
