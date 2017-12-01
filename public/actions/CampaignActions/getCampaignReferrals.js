@@ -25,10 +25,33 @@ function errorReceivingCampaignReferrals(error) {
     };
 }
 
-export function getCampaignReferrals(id) {
+function toggleOrder(field) {
+    return {
+        type:       'REFERRALS_TOGGLE_ORDER',
+        field,
+        receivedAt: Date.now()
+    };
+}
+
+export function toggleNode() {
+    return {
+        type:       'REFERRALS_TOGGLE_NODE',
+        receivedAt: Date.now()
+    }
+}
+
+export function setToggleNode() {
+    return dispatch => dispatch(toggleNode());
+}
+
+export function setToggleOrder(field) {
+    return dispatch => dispatch(toggleOrder(field));
+}
+
+export function getCampaignReferrals(id, startDate, endDate) {
     return dispatch => {
       dispatch(requestCampaignReferrals(id));
-      return fetchCampaignReferrals(id)
+      return fetchCampaignReferrals(id, startDate, endDate)
         .catch(error => dispatch(errorReceivingCampaignReferrals(error)))
         .then(res => {
           dispatch(receiveCampaignReferrals(res));

@@ -31,30 +31,6 @@ Resources:
           - campaigns
     DeletionPolicy: Retain
 
-  CampaignNotesDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: campaignId
-        AttributeType: S
-      - AttributeName: created
-        AttributeType: N
-      KeySchema:
-      - AttributeName: campaignId
-        KeyType: HASH
-      - AttributeName: created
-        KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: '10'
-        WriteCapacityUnits: '10'
-      TableName:
-        Fn::Join:
-        - "-"
-        - - campaign-central
-          - Ref: Stage
-          - campaign-notes
-    DeletionPolicy: Retain
-
   CampaignContentDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -77,50 +53,6 @@ Resources:
         - - campaign-central
           - Ref: Stage
           - campaign-content
-    DeletionPolicy: Retain
-
-  ClientDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: id
-        AttributeType: S
-      KeySchema:
-      - AttributeName: id
-        KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: '10'
-        WriteCapacityUnits: '10'
-      TableName:
-        Fn::Join:
-        - "-"
-        - - campaign-central
-          - Ref: Stage
-          - clients
-    DeletionPolicy: Retain
-
-  CampaignAnalyticsDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: key
-        AttributeType: S
-      - AttributeName: dataType
-        AttributeType: S
-      KeySchema:
-      - AttributeName: key
-        KeyType: HASH
-      - AttributeName: dataType
-        KeyType: RANGE
-      ProvisionedThroughput:
-        ReadCapacityUnits: '10'
-        WriteCapacityUnits: '10'
-      TableName:
-        Fn::Join:
-        - "-"
-        - - campaign-central
-          - Ref: Stage
-          - analytics
     DeletionPolicy: Retain
 
   CampaignUniquesDBTable:
@@ -185,8 +117,8 @@ Resources:
       - AttributeName: hash
         KeyType: RANGE
       ProvisionedThroughput:
-        ReadCapacityUnits: '5'
-        WriteCapacityUnits: '5'
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
       TableName:
         Fn::Join:
         - "-"
@@ -195,47 +127,28 @@ Resources:
           - referrals
     DeletionPolicy: Retain
 
-  CampaignReferralsV2DBTable:
+  CampaignLocationAnalyticsLatestDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: campaignId
+      - AttributeName: territory
         AttributeType: S
-      - AttributeName: hash
+      - AttributeName: campaignId
         AttributeType: S
       KeySchema:
-      - AttributeName: campaignId
+      - AttributeName: territory
         KeyType: HASH
-      - AttributeName: hash
+      - AttributeName: campaignId
         KeyType: RANGE
       ProvisionedThroughput:
-        ReadCapacityUnits: '5'
-        WriteCapacityUnits: '5'
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
       TableName:
         Fn::Join:
         - "-"
         - - campaign-central
           - Ref: Stage
-          - referralsv2
-    DeletionPolicy: Retain
-
-  CampaignAnalyticsLatestDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: campaignId
-        AttributeType: S
-      KeySchema:
-      - AttributeName: campaignId
-        KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: '5'
-        WriteCapacityUnits: '5'
-      TableName:
-        Fn::Join:
-        - "-"
-        - - campaign-central
-          - Ref: Stage
+          - location
           - analytics
           - latest
     DeletionPolicy: Retain
@@ -251,8 +164,8 @@ Resources:
       - AttributeName: campaignId
         KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: '5'
-        WriteCapacityUnits: '5'
+        ReadCapacityUnits: '10'
+        WriteCapacityUnits: '10'
       TableName:
         Fn::Join:
         - "-"

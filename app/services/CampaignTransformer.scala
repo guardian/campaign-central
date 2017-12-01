@@ -32,8 +32,6 @@ object CampaignTransformer {
         createdBy = user,
         lastModified = now,
         lastModifiedBy = user,
-        nominalValue = None, // these will be set in the UI manually
-        actualValue = None, // these will be set in the UI manually
         campaignLogo = logo,
         startDate = startDate,
         endDate = endDate,

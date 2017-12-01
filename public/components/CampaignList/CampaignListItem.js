@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import {Link} from 'react-router';
+import {browserHistory} from 'react-router';
 import {shortFormatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignListItem extends React.Component {
@@ -12,13 +13,21 @@ class CampaignListItem extends React.Component {
   };
 
   redirectToCampaign = () => {
-    window.document.location = "/campaign/" + this.props.campaign.id;
+    browserHistory.push(`/campaign/${this.props.campaign.id}`)
   };
 
   daysBetween = (date1, date2) => {
     const oneDayMillis = 24 * 60 * 60 * 1000;
     return Math.ceil((date2 - date1) / oneDayMillis);
   };
+
+  renderPageviews = () => {
+    if (!this.props.latestAnalytics) {
+      return <td className="campaign-list__item">-</td>;
+    }
+
+    return(<td className="campaign-list__item">{this.props.latestAnalytics.pageviews}</td>);
+  }
 
   renderProgressSummary = () => {
     if (!this.props.latestAnalytics) {
@@ -77,12 +86,12 @@ class CampaignListItem extends React.Component {
         <td className="campaign-list__item">{this.props.campaign.name}{image}</td>
         <td className="campaign-list__item">{this.props.campaign.type}</td>
         <td className="campaign-list__item">{this.props.campaign.status}</td>
-        <td className="campaign-list__item">{this.props.campaign.actualValue}</td>
         <td className="campaign-list__item">{startDate}</td>
         <td className="campaign-list__item">{endDate}</td>
         <td className="campaign-list__item">{daysLeft}</td>
         <td className="campaign-list__item">{this.props.campaign.targets && this.props.campaign.targets.uniques}</td>
         {this.renderProgressSummary()}
+        {this.renderPageviews()}
         <td className="campaign-list__item">{productionOffice}</td>
       </tr>
     );

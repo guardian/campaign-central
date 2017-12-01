@@ -46,7 +46,13 @@ class BenchmarkSet extends Component {
 class Benchmarks extends Component {
 
   componentDidMount() {
-    this.props.benchmarkActions.getBenchmarks();
+    this.props.benchmarkActions.getBenchmarks(this.props.territory);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.benchmarks !== this.props.benchmarks || this.props.territory !== nextProps.territory) {
+      this.props.benchmarkActions.getBenchmarks(this.props.territory);
+    }
   }
 
   render() {
@@ -56,7 +62,7 @@ class Benchmarks extends Component {
 
     return (
       <div>
-        <h1>Benchmarks</h1>
+        <h1>Benchmarks ({this.props.territory === 'global' ? 'global' : this.props.territory + ' only'})</h1>
 
         <p style={{lineHeight: 1.5}}>
           Benchmarks provides an aggregate of the metrics we provide per campaign across all campaigns, including the subsets by campaign type.
@@ -79,7 +85,8 @@ import * as getAllCampaignBenchmarks from '../../actions/CampaignActions/getAllC
 
 function mapStateToProps(state) {
   return {
-    benchmarks: state.benchmarks
+    benchmarks: state.benchmarks,
+    territory: state.territory
   };
 }
 

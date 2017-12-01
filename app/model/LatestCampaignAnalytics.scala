@@ -26,6 +26,8 @@ case class LatestCampaignAnalytics(campaignId: String,
                                    medianAttentionTimeByDevice: Option[Map[String, Long]],
                                    weightedAverageDwellTimeForCampaign: Option[Double],
                                    averageDwellTimePerPathSeconds: Option[Map[String, Double]],
+                                   averageDwellTimePerDeviceSeconds: Option[Map[String, Double]],
+                                   averageDwellTimePerCountryCodeSeconds: Option[Map[String, Double]],
                                    analyticsByCountryCode: Map[String, LatestAnalyticsBreakdownItem],
                                    analyticsByDevice: Map[String, LatestAnalyticsBreakdownItem],
                                    analyticsByPath: Map[String, LatestAnalyticsBreakdownItem])
@@ -43,13 +45,19 @@ object LatestCampaignAnalytics {
     }
 
     val metricsByCountryCode: Map[String, LatestAnalyticsBreakdownItem] =
-      latestCampaignAnalyticsItem.uniquesByCountryCode.flatMap {
-        case (key, uniques) =>
-          val maybePageviews = latestCampaignAnalyticsItem.pageviewsByCountryCode.get(key)
-          maybePageviews.map { pageviews =>
-            key -> LatestAnalyticsBreakdownItem(uniques, pageviews)
+      latestCampaignAnalyticsItem.uniquesByCountryCode
+        .map { uniquesByCountryCode =>
+          uniquesByCountryCode.flatMap {
+            case (key, uniques) =>
+              val maybePageviews = latestCampaignAnalyticsItem.pageviewsByCountryCode.flatMap(_.get(key))
+              val maybeTimeSpentOnPage =
+                latestCampaignAnalyticsItem.averageDwellTimePerCountryCodeSeconds.flatMap(_.get(key))
+              maybePageviews.map { pageviews =>
+                key -> LatestAnalyticsBreakdownItem(uniques, pageviews, maybeTimeSpentOnPage)
+              }
           }
-      }
+        }
+        .getOrElse(Map.empty)
 
     val top20PlusSumOfOtherMetricsByCountryCode: Map[String, LatestAnalyticsBreakdownItem] = {
       val sortedMetricsByCountryCode = ListMap(metricsByCountryCode.toSeq.sortWith(sortByUniques): _*)
@@ -66,9 +74,10 @@ object LatestCampaignAnalytics {
     val metricsByDevice: Map[String, LatestAnalyticsBreakdownItem] =
       latestCampaignAnalyticsItem.uniquesByDevice.getOrElse(Map.empty).flatMap {
         case (key, uniques) =>
-          val maybePageviews = latestCampaignAnalyticsItem.pageviewsByDevice.flatMap(_.get(key))
+          val maybePageviews       = latestCampaignAnalyticsItem.pageviewsByDevice.flatMap(_.get(key))
+          val maybeTimeSpentOnPage = latestCampaignAnalyticsItem.averageDwellTimePerDeviceSeconds.flatMap(_.get(key))
           maybePageviews.map { pageviews =>
-            key -> LatestAnalyticsBreakdownItem(uniques, pageviews)
+            key -> LatestAnalyticsBreakdownItem(uniques, pageviews, maybeTimeSpentOnPage)
           }
       }
 
@@ -92,6 +101,8 @@ object LatestCampaignAnalytics {
       latestCampaignAnalyticsItem.medianAttentionTimeByDevice.map(normaliseDeviceData),
       latestCampaignAnalyticsItem.weightedAverageDwellTimeForCampaign.map(_.to2Dp),
       latestCampaignAnalyticsItem.averageDwellTimePerPathSeconds.map(_.mapValues(_.to2Dp)),
+      latestCampaignAnalyticsItem.averageDwellTimePerDeviceSeconds.map(_.mapValues(_.to2Dp)),
+      latestCampaignAnalyticsItem.averageDwellTimePerCountryCodeSeconds.map(_.mapValues(_.to2Dp)),
       top20PlusSumOfOtherMetricsByCountryCode,
       ListMap(metricsByDevice.toSeq.sortWith(sortByUniques): _*),
       ListMap(metricsByPath.toSeq.sortWith(sortByUniques): _*)

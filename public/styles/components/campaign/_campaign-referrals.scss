@@ -32,13 +32,6 @@
   overflow: auto;
   border-bottom: none;
   font: inherit;
-
-  &--header {
-    @extend %table__cell;
-    background-color: $c-grey-200;
-    font-weight: bold;
-    white-space: normal;
-  }
 }
 
 .campaign-referral-list__impressions,
@@ -51,11 +44,57 @@
   border-bottom: none;
   text-align: right;
   font: inherit;
+}
 
-  &--header {
-    @extend %table__cell;
-    background-color: $c-grey-200;
-    font-weight: bold;
-    white-space: normal;
-  }
+.campaign-referral-list__header {
+  @extend %table__cell;
+  background-color: $c-grey-200;
+  font-weight: bold;
+  white-space: normal;
+}
+
+.campaign-referral-list__header--toggle {
+  cursor: pointer;
+}
+
+.campaign-referral-list__header--asc::before {
+  content: "";
+  position: relative;
+  top: -10px;
+  right: 6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid $c-grey-600;
+}
+
+.campaign-referral-list__header--desc::before {
+  content: "";
+  position: relative;
+  top: 10px;
+  right: 6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid $c-grey-600;
+}
+
+.campaign-referral-box-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.campaign-referral-daterange {
+  text-transform: none;
+  font-size: smaller;
+}
+
+.campaign-referral-daterange label {
+  margin: 10px;
+}
+
+.campaign-referral-daterange label input {
+  color: initial;
 }

@@ -19,7 +19,8 @@ case class CampaignReferralRow(
   impressionCount: Long,
   unparsedComponent: Option[String]
 ) {
-  val formattedPath: String = CampaignReferralRow.formatPath(path)
+  val formattedPath: String                  = CampaignReferralRow.formatPath(path)
+  val formattedContainerName: Option[String] = CampaignReferralRow.formatContainerName(platform, containerName)
 }
 
 object CampaignReferralRow {
@@ -42,5 +43,13 @@ object CampaignReferralRow {
       case Some(p)                         => s"/${p.stripPrefix("/").toLowerCase}"
       case _                               => "unknown"
     }
+  }
+
+  def formatContainerName(platform: String, containerName: Option[String]): Option[String] = {
+
+    def cleanAndroidContainer(name: Option[String]): Option[String] = name.map(_.replace('-', ' '))
+
+    if (platform == "ANDROID_NATIVE_APP") cleanAndroidContainer(containerName)
+    else containerName
   }
 }

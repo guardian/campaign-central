@@ -27,26 +27,6 @@ class CampaignInformationEdit extends React.Component {
     }));
   }
 
-  updateCampaignValue = (e) => {
-    const fieldValue = e.target.value;
-    const value = fieldValue[0] === '£' ? fieldValue.substr(1, fieldValue.length) : fieldValue; //Strip out £
-    const numValue = parseInt(value);
-
-    if (isNaN(numValue) || numValue != value) {
-        this.setState({
-            error: 'Campaign value has to be a number!'
-        });
-    } else {
-        this.setState({
-            error: ''
-        });
-    }
-
-    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
-      actualValue: numValue
-    }));
-  }
-
   render () {
 
     var startDate = 'Not yet started';
@@ -83,8 +63,8 @@ class CampaignInformationEdit extends React.Component {
             <span className="campaign-info__field__value">{this.props.campaign.type}</span>
           </div>
           <div className="campaign-info__field">
-            <label>Value</label>
-            <EditableText value={this.props.campaign.actualValue ? "£" + this.props.campaign.actualValue : ""} onChange={this.updateCampaignValue} error={this.state.error}/>
+            <label>Production Office</label>
+            <span className="campaign-info__field__value">{this.props.campaign.productionOffice}</span>
           </div>
           <div className="campaign-info__field">
             <label>Status</label>
