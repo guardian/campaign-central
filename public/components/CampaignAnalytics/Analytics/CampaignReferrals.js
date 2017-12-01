@@ -5,16 +5,27 @@ import {getCampaignReferrals, setToggleNode} from "../../../actions/CampaignActi
 import CampaignReferralHeader from "./CampaignReferralHeader";
 import InfinityMenu from "react-infinity-menu";
 import ProgressSpinner from "../../utils/ProgressSpinner";
+import DateRangeEditor from "./DateRangeEditor";
 
 class CampaignReferrals extends React.Component {
 
-  componentWillMount() {
-    this.props.campaignReferralActions.getCampaignReferrals(this.props.campaign.id);
+  constructor(props) {
+    super(props);
+    this.state = {
+      dateRange: {
+        startDate: DateRangeEditor.toDate(this.props.campaign.startDate),
+        endDate: DateRangeEditor.toDate(this.props.campaign.endDate)
+      }
+    };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.campaign.id !== this.props.campaign.id) {
-      this.props.campaignReferralActions.getCampaignReferrals(nextProps.campaign.id);
+  componentWillMount() {
+    this.props.campaignReferralActions.getCampaignReferrals(this.props.campaign.id, this.state.dateRange);
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextState.dateRange !== this.state.dateRange) {
+      this.props.campaignReferralActions.getCampaignReferrals(nextProps.campaign.id, nextState.dateRange);
     }
   }
 
@@ -22,43 +33,49 @@ class CampaignReferrals extends React.Component {
     this.props.campaignReferralActions.setToggleNode();
   }
 
-  render() {
+  onDateRangeChange = (dateRange) => {
+    this.setState({
+      dateRange: dateRange
+    });
+  };
+
+  renderBody() {
 
     if (this.props.campaignReferrals &&
-        this.props.campaignReferrals.tree &&
-        this.props.campaignReferrals.tree.length === 0) {
+      this.props.campaignReferrals.tree &&
+      this.props.campaignReferrals.tree.length === 0) {
       return (
-        <div className="campaign-info campaign-box">
-          <div className="campaign-box__header">Referrals from on-platform</div>
-          <div className="campaign-box__body">There are currently no on-platform referrals recorded for this campaign.
-          </div>
-        </div>
+        <div>There are no on-platform referrals recorded for this campaign and date range.</div>
       )
     }
 
     if (this.props.campaignReferrals && this.props.campaignReferrals.tree) {
       return (
-        <div className="campaign-info campaign-box">
-          <div className="campaign-box__header">Referrals from on-platform</div>
-          <div className="campaign-box__body">
-            <div className="campaign-referral-list campaign-assets__field__value">
-              <InfinityMenu
-                tree={this.props.campaignReferrals.tree}
-                disableDefaultHeaderContent={true}
-                headerContent={CampaignReferralHeader}
-                onNodeMouseClick={this.onNodeMouseClick.bind(this)}
-              />
-            </div>
-          </div>
+        <div className="campaign-referral-list campaign-assets__field__value">
+          <InfinityMenu
+            tree={this.props.campaignReferrals.tree}
+            disableDefaultHeaderContent={true}
+            headerContent={CampaignReferralHeader}
+            onNodeMouseClick={this.onNodeMouseClick.bind(this)}
+          />
         </div>
       );
     }
 
     return (
+      <ProgressSpinner/>
+    );
+  }
+
+  render() {
+    return (
       <div className="campaign-info campaign-box">
-        <div className="campaign-box__header">Referrals from on-platform</div>
+        <div className="campaign-box__header campaign-referral-box-header">
+          Referrals from on-platform
+          <DateRangeEditor campaign={this.props.campaign} onChange={this.onDateRangeChange}/>
+        </div>
         <div className="campaign-box__body">
-          <ProgressSpinner/>
+          {this.renderBody()}
         </div>
       </div>
     );

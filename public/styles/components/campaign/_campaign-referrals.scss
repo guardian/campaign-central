@@ -80,3 +80,21 @@
   border-right: 6px solid transparent;
   border-top: 6px solid $c-grey-600;
 }
+
+.campaign-referral-box-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.campaign-referral-daterange {
+  text-transform: none;
+  font-size: smaller;
+}
+
+.campaign-referral-daterange label {
+  margin: 10px;
+}
+
+.campaign-referral-daterange label input {
+  color: initial;
+}
