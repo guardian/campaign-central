@@ -66,7 +66,7 @@ export default class CampaignPerformanceBreakdown extends React.Component {
     super(props);
 
     this.state = {
-      currentView: this.view.DEVICE
+      currentView: this.view.PATH
     }
   }
 
@@ -109,8 +109,8 @@ export default class CampaignPerformanceBreakdown extends React.Component {
         <div className="campaign-box__body">
 
         <div id ="performance-breakdown-nav" className="pure-button-group" role="group" aria-label="...">
-          <button className={this.state.currentView === this.view.DEVICE ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.DEVICE)}>Device</button>
           <button className={this.state.currentView === this.view.PATH ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.PATH)}>Path</button>
+          <button className={this.state.currentView === this.view.DEVICE ? 'pure-button pure-button-active' : 'pure-button'} onClick={(e) => this.onViewChange(e, this.view.DEVICE)}>Device</button>
           {this.renderLocationNavItemIfGlobal()}
         </div>
 
