@@ -202,6 +202,7 @@ Resources:
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-referrals
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-analytics-latest
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-location-analytics-latest
+          - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-media
       Roles:
       - Ref: OphanExcavatorCrossAccountRole
 
