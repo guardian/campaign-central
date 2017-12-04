@@ -194,6 +194,7 @@ Resources:
           - dynamodb:UpdateItem
           - dynamodb:BatchWriteItem
           - dynamodb:Scan
+          - dynamodb:query
           Resource:
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-page-views
           - !Sub arn:aws:dynamodb:*:${AWS::AccountId}:table/campaign-central-${Stage}-campaign-uniques
