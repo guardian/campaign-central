@@ -34,7 +34,7 @@ class CampaignTargetsEdit extends React.Component {
   renderTargetsList = () => {
 
     const keys = Object.keys(this.props.campaign.targets).sort();
-
+    
     return (
       <ul>
         {keys.map((k) =>
@@ -49,7 +49,7 @@ class CampaignTargetsEdit extends React.Component {
       </ul>
     );
   }
-  
+
   render () {
     return (
       <div className="campaign-info campaign-box-section">

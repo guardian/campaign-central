@@ -33,12 +33,14 @@ object CampaignService {
     "mq-mental-health-matters"
   )
 
-  def getPageViews(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignPageViewsItem]] = {
-    CampaignPageViewsRepository.getCampaignPageViews(campaignId)
+  def getPageViews(campaignId: String,
+                   territory: Territory): Either[CampaignCentralApiError, Seq[CampaignPageViewsItem]] = {
+    CampaignPageViewsRepository.getCampaignPageViews(campaignId, territory)
   }
 
-  def getUniques(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignUniquesItem]] = {
-    CampaignUniquesRepository.getCampaignUniques(campaignId)
+  def getUniques(campaignId: String,
+                 territory: Territory): Either[CampaignCentralApiError, Seq[CampaignUniquesItem]] = {
+    CampaignUniquesRepository.getCampaignUniques(campaignId, territory)
   }
 
   def getLatestAnalyticsForCampaign(campaignId: String,
@@ -105,10 +107,11 @@ object CampaignService {
     }
   }
 
-  def getUniquesDataForGraph(campaignId: String): Either[CampaignCentralApiError, Option[Seq[GraphDataPoint]]] = {
+  def getUniquesDataForGraph(campaignId: String,
+                             territory: Territory): Either[CampaignCentralApiError, Option[Seq[GraphDataPoint]]] = {
 
     for {
-      campaignUniques <- CampaignUniquesRepository.getCampaignUniques(campaignId)
+      campaignUniques <- CampaignUniquesRepository.getCampaignUniques(campaignId, territory)
       campaign        <- CampaignRepository.getCampaign(campaignId)
     } yield {
       val initialDataPoint = campaignUniques.headOption.map { item =>

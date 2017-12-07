@@ -96,9 +96,9 @@ export function fetchCampaignPageViews(id) {
   });
 }
 
-export function fetchCampaignUniques(id) {
+export function fetchCampaignUniques(id, territory) {
   return AuthedReqwest({
-    url: `/api/v2/campaigns/${id}/uniques`,
+    url: `/api/v2/campaigns/${id}/uniques?territory=${territory}`,
     method: 'get'
   });
 }
@@ -117,9 +117,13 @@ export function fetchCampaignContent(id) {
   });
 }
 
-export function fetchCampaignReferrals(id, dateRange) {
+export function fetchCampaignReferrals(id) {
   return AuthedReqwest({
+<<<<<<< HEAD
     url: `/api/v2/campaigns/${id}/platform-referrals?start=${dateRange.startDate}&end=${dateRange.endDate}`,
+=======
+    url: `/api/v2/campaigns/${id}/referrals`,
+>>>>>>> Make uniques graph contextual to territory selection.
     method: 'get'
   });
 }

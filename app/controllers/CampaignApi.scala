@@ -87,8 +87,10 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     result getOrElse InternalServerError
   }
 
-  def getCampaignPageViewsFromDatalake(id: String) = authAction { _ =>
-    CampaignService.getPageViews(id) match {
+  def getCampaignPageViewsFromDatalake(id: String) = authAction { implicit request =>
+    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+
+    CampaignService.getPageViews(id, territory) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError
       case Right(pageViews)              => Ok(Json.toJson(pageViews))
@@ -96,8 +98,11 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   // TODO - fix return types
-  def getCampaignUniquesFromDatalake(id: String) = authAction { _ =>
-    CampaignService.getUniquesDataForGraph(id).map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound
+  def getCampaignUniquesFromDatalake(id: String) = authAction { implicit request =>
+    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+    CampaignService
+      .getUniquesDataForGraph(id, territory)
+      .map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound
   }
 
   def getCampaignContent(id: String) = authAction { _ =>

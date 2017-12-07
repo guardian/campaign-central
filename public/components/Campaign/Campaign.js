@@ -2,7 +2,7 @@ import React from 'react';
 import {Link} from 'react-router';
 import CampaignEdit from '../CampaignInformationEdit/CampaignEdit';
 import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
-import CampaignAnalytics from '../CampaignAnalytics/CampaignAnalytics';
+import CampaignUniquesChart from '../CampaignAnalytics/Analytics/CampaignUniquesChart';
 import CampaignReferrals from '../CampaignAnalytics/Analytics/CampaignReferrals';
 import CampaignPerformanceOverview from '../CampaignPerformanceOverview/CampaignPerformanceOverview';
 import CampaignPerformanceBreakdown from '../CampaignPerformanceBreakdown/CampaignPerformanceBreakdown';
@@ -21,7 +21,7 @@ class Campaign extends React.Component {
       this.props.analyticsActions.clearCampaignAnalytics();
       if (this.isAnalysisAvailable(nextProps.campaign)) {
         this.props.analyticsActions.getCampaignPageViews(nextProps.campaign.id);
-        this.props.analyticsActions.getCampaignUniques(nextProps.campaign.id);
+        this.props.analyticsActions.getCampaignUniques(nextProps.campaign.id, nextProps.territory);
         this.props.analyticsActions.getCampaignMediaEvents(nextProps.campaign.id);
         this.props.analyticsActions.getLatestAnalyticsForCampaign(nextProps.campaign.id, nextProps.territory);
       }
@@ -57,6 +57,14 @@ class Campaign extends React.Component {
     } else { return (null); }
   }
 
+  renderCampaignUniquesChart() {
+    if (!this.props.campaignUniques || !this.props.campaignUniques.length > 0) return null;
+
+    return (
+      <CampaignUniquesChart data={this.props.campaignUniques}/>
+    );
+  }
+
   render () {
     const campaign = this.props.campaign && this.props.params.id === this.props.campaign.id ? this.props.campaign : undefined;
 
@@ -82,7 +90,7 @@ class Campaign extends React.Component {
           <CampaignEdit campaign={campaign}
                         updateCampaign={this.props.campaignActions.updateCampaign}
                         saveCampaign={this.props.campaignActions.saveCampaign}/>
-          {/*}<CampaignAnalytics campaign={campaign} /> */}
+          {this.renderCampaignUniquesChart()}
           <CampaignAssets campaign={campaign}
                           getCampaign={this.props.campaignActions.getCampaign}
                           getCampaignContent={this.props.campaignActions.getCampaignContent} />
@@ -113,7 +121,8 @@ function mapStateToProps(state) {
     campaign: state.campaign,
     latestAnalyticsForCampaign: state.latestAnalyticsForCampaign,
     campaignMediaEvents: state.campaignMediaEvents,
-    territory: state.territory
+    territory: state.territory,
+    campaignUniques: state.campaignUniques
   };
 }
 
