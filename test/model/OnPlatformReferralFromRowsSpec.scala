@@ -3,9 +3,9 @@ package model
 import org.scalacheck.Prop.{BooleanOperators, forAll}
 import org.scalacheck._
 
-object CampaignReferralFromRowsSpec extends Properties("CampaignReferral.fromRows") {
+object OnPlatformReferralFromRowsSpec extends Properties("OnPlatformReferral.fromRows") {
 
-  private implicit lazy val arbRow: Arbitrary[CampaignReferralRow] = Arbitrary(
+  private implicit lazy val arbRow: Arbitrary[OnPlatformReferralRow] = Arbitrary(
     for {
       referralDate    <- Gen.alphaNumStr
       platform        <- Gen.alphaStr
@@ -17,7 +17,7 @@ object CampaignReferralFromRowsSpec extends Properties("CampaignReferral.fromRow
       clickCount      <- Gen.choose[Long](0, 1000000000)
       impressionCount <- Gen.choose[Long](0, 1000000000)
     } yield {
-      CampaignReferralRow(
+      OnPlatformReferralRow(
         campaignId = "campaignId",
         hash = "hash",
         referralDate = referralDate,
@@ -35,24 +35,24 @@ object CampaignReferralFromRowsSpec extends Properties("CampaignReferral.fromRow
     }
   )
 
-  property("Tree root is singular") = forAll { rows: Seq[CampaignReferralRow] =>
-    rows.forall(_.path.isEmpty) ==> CampaignReferral.fromRows(rows).isEmpty
-    rows.exists(_.path.nonEmpty) ==> { CampaignReferral.fromRows(rows).size == 1 }
+  property("Tree root is singular") = forAll { rows: Seq[OnPlatformReferralRow] =>
+    rows.forall(_.path.isEmpty) ==> OnPlatformReferral.fromRows(rows).isEmpty
+    rows.exists(_.path.nonEmpty) ==> { OnPlatformReferral.fromRows(rows).lengthCompare(1) == 0 }
   }
 
-  property("Tree root contains stats from all rows with non-empty paths") = forAll { rows: Seq[CampaignReferralRow] =>
+  property("Tree root contains stats from all rows with non-empty paths") = forAll { rows: Seq[OnPlatformReferralRow] =>
     rows.exists(_.path.nonEmpty) ==> {
       val rowsWithPaths = rows.filter(_.path.nonEmpty)
-      CampaignReferral.fromRows(rowsWithPaths).head.stats == ReferralStats(
+      OnPlatformReferral.fromRows(rowsWithPaths).head.stats == ReferralStats(
         impressionCount = rowsWithPaths.map(_.impressionCount).sum.toInt,
         clickCount = rowsWithPaths.map(_.clickCount).sum.toInt
       )
     }
   }
 
-  property("Stats at any arbitrary level sum to stats of parent") = forAll { rows: Seq[CampaignReferralRow] =>
+  property("Stats at any arbitrary level sum to stats of parent") = forAll { rows: Seq[OnPlatformReferralRow] =>
     val statsMatch = for {
-      grandparent <- CampaignReferral.fromRows(rows).headOption
+      grandparent <- OnPlatformReferral.fromRows(rows).headOption
       parent      <- grandparent.children.flatMap(_.headOption)
       children    <- parent.children
     } yield {

@@ -2,25 +2,26 @@ package model
 
 import play.api.libs.json._
 
-case class CampaignReferral(
+case class OnPlatformReferral(
   sourceDescription: String,
   stats: ReferralStats,
-  children: Option[Seq[CampaignReferral]]
+  children: Option[Seq[OnPlatformReferral]]
 )
 
-object CampaignReferral {
-  implicit lazy val writes: Writes[CampaignReferral] = Json.writes[CampaignReferral]
+object OnPlatformReferral {
+  implicit lazy val writes: Writes[OnPlatformReferral] = Json.writes[OnPlatformReferral]
 
-  def fromRows(rows: Seq[CampaignReferralRow]): Seq[CampaignReferral] = {
+  def fromRows(rows: Seq[OnPlatformReferralRow]): Seq[OnPlatformReferral] = {
 
-    def childReferrals[A](rows: Seq[CampaignReferralRow])(group: CampaignReferralRow => A)(description: A => String)(
-      children: Seq[CampaignReferralRow] => Option[Seq[CampaignReferral]]): List[CampaignReferral] =
+    def childReferrals[A](rows: Seq[OnPlatformReferralRow])(group: OnPlatformReferralRow => A)(
+      description: A => String)(
+      children: Seq[OnPlatformReferralRow] => Option[Seq[OnPlatformReferral]]): List[OnPlatformReferral] =
       rows
         .groupBy(group)
         .flatMap {
           case (a, subRows) =>
             Some(
-              CampaignReferral(
+              OnPlatformReferral(
                 sourceDescription = description(a),
                 stats = ReferralStats.fromRows(subRows),
                 children = children(subRows)
@@ -42,12 +43,12 @@ object CampaignReferral {
         row.path.nonEmpty && row.impressionCount > 0
       }
 
-    def referralsByPath(pathRows: Seq[CampaignReferralRow]): Seq[CampaignReferral] =
+    def referralsByPath(pathRows: Seq[OnPlatformReferralRow]): Seq[OnPlatformReferral] =
       childReferrals(pathRows)(_.formattedPath)(identity) { containerRows =>
         Some(referralsByContainer(containerRows))
       }
 
-    def referralsByContainer(containerRows: Seq[CampaignReferralRow]): Seq[CampaignReferral] =
+    def referralsByContainer(containerRows: Seq[OnPlatformReferralRow]): Seq[OnPlatformReferral] =
       childReferrals(containerRows)(_.formattedContainerName) {
         case Some(containerName) => s"Container: $containerName"
         case None                => ""
@@ -55,7 +56,7 @@ object CampaignReferral {
         Some(referralsByCard(cardRows))
       }
 
-    def referralsByCard(cardRows: Seq[CampaignReferralRow]): Seq[CampaignReferral] =
+    def referralsByCard(cardRows: Seq[OnPlatformReferralRow]): Seq[OnPlatformReferral] =
       childReferrals(cardRows) { row =>
         (row.cardIndex, row.cardName)
       } {
@@ -65,10 +66,10 @@ object CampaignReferral {
         Some(referralsByPlatform(platformRows))
       }
 
-    def referralsByPlatform(platformRows: Seq[CampaignReferralRow]): Seq[CampaignReferral] =
+    def referralsByPlatform(platformRows: Seq[OnPlatformReferralRow]): Seq[OnPlatformReferral] =
       childReferrals(platformRows)(_.platform)(formatPlatform)(dateRows => Some(referralsByDate(dateRows)))
 
-    def referralsByDate(dateRows: Seq[CampaignReferralRow]): Seq[CampaignReferral] =
+    def referralsByDate(dateRows: Seq[OnPlatformReferralRow]): Seq[OnPlatformReferral] =
       childReferrals(dateRows)(_.referralDate)(identity)(_ => None)
 
     val treeRoot = childReferrals(filtered)(_ => 1)(_ => "All fronts") { pathRows =>

@@ -14,7 +14,7 @@ object ReferralStats {
     Json.writes[ReferralStats].writes(stats) + ("ctr" -> JsNumber(stats.ctr))
   }
 
-  def fromRows(rows: Seq[CampaignReferralRow]): ReferralStats =
+  def fromRows(rows: Seq[OnPlatformReferralRow]): ReferralStats =
     ReferralStats(
       impressionCount = rows.map(_.impressionCount).sum.toInt,
       clickCount = rows.map(_.clickCount).sum.toInt

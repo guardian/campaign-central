@@ -7,7 +7,7 @@ import model._
 import play.api.mvc._
 import repositories._
 import services.CampaignService
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 import scala.util.Try
 
@@ -117,7 +117,12 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     }
   }
 
-  def getCampaignReferrals(campaignId: String, start: Option[String], end: Option[String]) = authAction { _ =>
+  private def getReferrals[R](campaignId: String,
+                              start: Option[String],
+                              end: Option[String],
+                              territory: Option[String])(
+    fetch: (String, Option[DateRange], Option[Territory]) => Either[CampaignCentralApiError, Seq[R]])(
+    toJson: Seq[R] => JsValue) = authAction { _ =>
     def toDate(o: Option[String]): Option[LocalDate] = o flatMap { s =>
       Try(LocalDate.parse(s)).toOption
     }
@@ -125,12 +130,24 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
       from <- toDate(start)
       to   <- toDate(end)
     } yield DateRange(from, to)
-    CampaignReferralRepository.getCampaignReferrals(campaignId, dateRange) match {
+    fetch(campaignId, dateRange, territory.map(Territory(_))) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError
-      case Right(referrals)              => Ok(Json.toJson(referrals))
+      case Right(referrals)              => Ok(toJson(referrals))
     }
   }
+
+  def getOnPlatformReferrals(campaignId: String,
+                             start: Option[String],
+                             end: Option[String],
+                             territory: Option[String]): Action[AnyContent] =
+    getReferrals(campaignId, start, end, territory)(CampaignReferralRepository.getOnPlatformReferrals)(Json.toJson(_))
+
+  def getSocialReferrals(campaignId: String,
+                         start: Option[String],
+                         end: Option[String],
+                         territory: Option[String]): Action[AnyContent] =
+    getReferrals(campaignId, start, end, territory)(CampaignReferralRepository.getSocialReferrals)(Json.toJson(_))
 
   def getCampaignMediaEvents(campaignId: String) = authAction { _ =>
     CampaignMediaEventsRepository.getCampaignMediaEvents(campaignId) match {
