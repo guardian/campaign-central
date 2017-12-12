@@ -55,7 +55,9 @@ object CampaignTransformer {
       campaignLogo = CapiSectionTransformer.deriveSponsorshipLogo(section) orElse campaign.campaignLogo,
       startDate = startDate,
       endDate = endDate,
-      campaignTargets = campaign.targets.get("uniques").map(value => Map("uniques" -> Map("global" -> value))) orElse Some(Map.empty),
+      campaignTargets = campaign.targets
+        .get("uniques")
+        .map(value => Map("uniques" -> Map("global" -> value))) orElse Some(Map.empty),
       lastModified = DateTime.now,
       lastModifiedBy = user
     )
@@ -65,7 +67,9 @@ object CampaignTransformer {
   def updateExistingCampaignThatsFinished(campaign: Campaign): Campaign = {
     campaign.copy(
       status = "dead",
-      campaignTargets = campaign.targets.get("uniques").map(value => Map("uniques" -> Map("global" -> value))) orElse Some(Map.empty)
+      campaignTargets = campaign.targets
+        .get("uniques")
+        .map(value => Map("uniques" -> Map("global" -> value))) orElse Some(Map.empty)
     )
   }
 

@@ -4,8 +4,8 @@ import play.api.libs.json.{Json, Writes}
 
 case class SocialReferral(
   referringPlatform: SocialPlatform,
-  paid: Boolean,
-  clickCount: Int
+  organicClickCount: Int,
+  paidClickCount: Int
 )
 
 object SocialReferral {
@@ -13,15 +13,15 @@ object SocialReferral {
 
   def fromRows(rows: Seq[SocialReferralRow]): Seq[SocialReferral] =
     rows
-      .groupBy(row => (row.referringDomain, row.paid))
+      .groupBy(_.referringDomain)
       .map {
-        case ((referringDomain, paid), currRows) =>
+        case (referringDomain, currRows) =>
           SocialReferral(
             referringPlatform = SocialPlatform.fromDomain(referringDomain),
-            paid = paid,
-            clickCount = currRows.map(_.clickCount).sum.toInt
+            organicClickCount = currRows.filterNot(_.paid).map(_.clickCount).sum.toInt,
+            paidClickCount = currRows.filter(_.paid).map(_.clickCount).sum.toInt
           )
       }
       .toSeq
-      .sortBy(-_.clickCount)
+      .sortBy(r => (-r.organicClickCount, -r.paidClickCount))
 }
