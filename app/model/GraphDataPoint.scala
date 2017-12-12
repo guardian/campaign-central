@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.Item
 import cats.syntax.either._
 import play.api.libs.json.{Format, JsValue, Json}
 
-case class GraphDataPoint(name: String, dataPoint: Long, target: Long) {
+case class GraphDataPoint(name: String, dataPoint: Long, target: Option[Long]) {
   def toItem: Either[CampaignCentralApiError, Item] =
     Option(Item.fromJSON(Json.toJson(this).toString())).map(Right(_)) getOrElse Left(JsonParsingError(""))
 

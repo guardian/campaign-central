@@ -16,7 +16,7 @@ export default class CampaignPerformanceOverview extends React.Component {
 
     const totalPageviews = this.props.latestAnalyticsForCampaign.pageviews;
     const totalUniques = this.props.latestAnalyticsForCampaign.uniques;
-    const uniquesTarget = this.props.campaign.targets && this.props.campaign.targets.uniques;
+    const uniquesTarget = this.props.latestAnalyticsForCampaign && this.props.latestAnalyticsForCampaign.uniquesTarget;
     const medianAttentionTime = this.props.latestAnalyticsForCampaign.medianAttentionTimeSeconds;
     const weightedAverageDwellTimeInSeconds = this.props.latestAnalyticsForCampaign.weightedAverageDwellTimeForCampaign;
 

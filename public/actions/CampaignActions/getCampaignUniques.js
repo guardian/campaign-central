@@ -25,10 +25,10 @@ function errorReceivingCampaignUniques(error) {
     };
 }
 
-export function getCampaignUniques(id) {
+export function getCampaignUniques(id, territory) {
     return dispatch => {
       dispatch(requestCampaignUniques(id));
-      return fetchCampaignUniques(id)
+      return fetchCampaignUniques(id, territory)
         .catch(error => dispatch(errorReceivingCampaignUniques(error)))
         .then(res => {
           dispatch(receiveCampaignUniques(res));

@@ -5,7 +5,11 @@ import com.amazonaws.services.dynamodbv2.document.Item
 import cats.syntax.either._
 import play.api.libs.json.{Format, JsValue, Json}
 
-case class CampaignUniquesItem(campaignId: String, reportExecutionTimestamp: String, uniques: Long) {
+case class CampaignUniquesItem(campaignId: String,
+                               sortKey: String,
+                               uniques: Long,
+                               reportExecutionTimestamp: String,
+                               territory: String) {
   def toItem: Either[CampaignCentralApiError, Item] =
     Option(Item.fromJSON(Json.toJson(this).toString())).map(Right(_)) getOrElse Left(JsonParsingError(""))
 }

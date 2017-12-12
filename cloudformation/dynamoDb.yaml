@@ -61,12 +61,12 @@ Resources:
       AttributeDefinitions:
       - AttributeName: campaignId
         AttributeType: S
-      - AttributeName: reportExecutionTimestamp
+      - AttributeName: sortKey
         AttributeType: S
       KeySchema:
       - AttributeName: campaignId
         KeyType: HASH
-      - AttributeName: reportExecutionTimestamp
+      - AttributeName: sortKey
         KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: '10'
@@ -85,12 +85,12 @@ Resources:
       AttributeDefinitions:
       - AttributeName: campaignId
         AttributeType: S
-      - AttributeName: reportExecutionTimestamp
+      - AttributeName: sortKey
         AttributeType: S
       KeySchema:
       - AttributeName: campaignId
         KeyType: HASH
-      - AttributeName: reportExecutionTimestamp
+      - AttributeName: sortKey
         KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: '10'
@@ -102,6 +102,7 @@ Resources:
           - Ref: Stage
           - campaign-page-views
     DeletionPolicy: Retain
+
 
   CampaignReferralsDBTable:
     Type: AWS::DynamoDB::Table

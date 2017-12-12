@@ -46,7 +46,7 @@ class CampaignEdit extends React.Component {
               campaign={this.props.campaign}
               updateCampaign={this.triggerUpdate} />
           </div>
-          <div className="campaign__column">
+          <div className="campaign__column--fourty-percent">
             <CampaignTargetsEdit campaign={this.props.campaign} updateCampaign={this.triggerUpdate} />
           </div>
         </div>
