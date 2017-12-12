@@ -1,41 +1,42 @@
 #Client Side Routes
-GET /                             controllers.App.index(id = "")
-GET /campaigns                    controllers.App.index(id = "")
-GET /campaigns/:id                controllers.App.index(id)
-GET /campaign/:id                 controllers.App.index(id)
-GET /capiImport                   controllers.App.index(id = "")
-GET /management/analytics         controllers.App.index(id = "")
-GET /glossary                     controllers.App.index(id = "")
-GET /benchmarks                   controllers.App.index(id = "")
+GET           /                                               controllers.App.index(id = "")
+GET           /campaigns                                      controllers.App.index(id = "")
+GET           /campaigns/:id                                  controllers.App.index(id)
+GET           /campaign/:id                                   controllers.App.index(id)
+GET           /capiImport                                     controllers.App.index(id = "")
+GET           /management/analytics                           controllers.App.index(id = "")
+GET           /glossary                                       controllers.App.index(id = "")
+GET           /benchmarks                                     controllers.App.index(id = "")
 
 
-GET /login            controllers.LogIn.logIn()
-GET /logout           controllers.LogIn.logOut()
-GET /oauth2callback   controllers.LogIn.oauth2Callback()
+GET           /login                                          controllers.LogIn.logIn()
+GET           /logout                                         controllers.LogIn.logOut()
+GET           /oauth2callback                                 controllers.LogIn.oauth2Callback()
 
 
 #Campaign Api
 
-GET /api/campaigns                         controllers.CampaignApi.getAllCampaigns
-GET /api/v2/campaigns/benchmarks           controllers.CampaignApi.getBenchmarksAcrossCampaigns
-GET /api/v2/campaigns/latestAnalytics      controllers.CampaignApi.getLatestCampaignAnalytics
-GET /api/v2/campaigns/:id/latestAnalytics  controllers.CampaignApi.getLatestAnalyticsForCampaign(id: String)
+GET           /api/campaigns                                  controllers.CampaignApi.getAllCampaigns
+GET           /api/v2/campaigns/benchmarks                    controllers.CampaignApi.getBenchmarksAcrossCampaigns
+GET           /api/v2/campaigns/latestAnalytics               controllers.CampaignApi.getLatestCampaignAnalytics
+GET           /api/v2/campaigns/:id/latestAnalytics           controllers.CampaignApi.getLatestAnalyticsForCampaign(id: String)
 
-GET /api/campaigns/:id                      controllers.CampaignApi.getCampaign(id: String)
-PUT /api/campaigns/:id                      controllers.CampaignApi.updateCampaign(id: String)
-DELETE /api/campaigns/:id                   controllers.CampaignApi.deleteCampaign(id: String)
-GET /api/v2/campaigns/:id/pageViews         controllers.CampaignApi.getCampaignPageViewsFromDatalake(id: String)
-GET /api/v2/campaigns/:id/uniques           controllers.CampaignApi.getCampaignUniquesFromDatalake(id: String)
-GET /api/campaigns/:id/content              controllers.CampaignApi.getCampaignContent(id: String)
-POST /api/campaigns/:id/refreshFromCAPI     controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
-GET /api/v2/campaigns/:id/referrals         controllers.CampaignApi.getCampaignReferrals(id: String, start: Option[String], end: Option[String])
-GET /api/campaigns/:id/mediaEvents          controllers.CampaignApi.getCampaignMediaEvents(id: String)
+GET           /api/campaigns/:id                              controllers.CampaignApi.getCampaign(id: String)
+PUT           /api/campaigns/:id                              controllers.CampaignApi.updateCampaign(id: String)
+DELETE        /api/campaigns/:id                              controllers.CampaignApi.deleteCampaign(id: String)
+GET           /api/v2/campaigns/:id/pageViews                 controllers.CampaignApi.getCampaignPageViewsFromDatalake(id: String)
+GET           /api/v2/campaigns/:id/uniques                   controllers.CampaignApi.getCampaignUniquesFromDatalake(id: String)
+GET           /api/campaigns/:id/content                      controllers.CampaignApi.getCampaignContent(id: String)
+POST          /api/campaigns/:id/refreshFromCAPI              controllers.CampaignApi.refreshCampaignFromCAPI(id: String)
+GET           /api/v2/campaigns/:id/platform-referrals        controllers.CampaignApi.getOnPlatformReferrals(id: String, start: Option[String], end: Option[String], territory: Option[String])
+GET           /api/v2/campaigns/:id/social-referrals          controllers.CampaignApi.getSocialReferrals(id: String, start: Option[String], end: Option[String], territory: Option[String])
+GET           /api/campaigns/:id/mediaEvents                  controllers.CampaignApi.getCampaignMediaEvents(id: String)
 
 #Management Api
-POST   /management/api/refreshExpiringCampaigns         controllers.ManagementApi.refreshCampaigns
+POST          /management/api/refreshExpiringCampaigns        controllers.ManagementApi.refreshCampaigns
 
-GET /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
+GET           /assets/*file                                   controllers.Assets.versioned(path="/public", file: Asset)
 
 
 # Management
-GET /management/healthcheck       controllers.Healthcheck.ok
+GET           /management/healthcheck                         controllers.Healthcheck.ok

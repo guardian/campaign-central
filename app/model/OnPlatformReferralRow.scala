@@ -4,7 +4,7 @@ import cats.syntax.either._
 import com.amazonaws.services.dynamodbv2.document.Item
 import play.api.libs.json.{Json, Reads}
 
-case class CampaignReferralRow(
+case class OnPlatformReferralRow(
   campaignId: String,
   hash: String,
   referralDate: String,
@@ -19,18 +19,18 @@ case class CampaignReferralRow(
   impressionCount: Long,
   unparsedComponent: Option[String]
 ) {
-  val formattedPath: String                  = CampaignReferralRow.formatPath(path)
-  val formattedContainerName: Option[String] = CampaignReferralRow.formatContainerName(platform, containerName)
+  val formattedPath: String                  = OnPlatformReferralRow.formatPath(path)
+  val formattedContainerName: Option[String] = OnPlatformReferralRow.formatContainerName(platform, containerName)
 }
 
-object CampaignReferralRow {
+object OnPlatformReferralRow {
 
-  implicit val itemReads: Reads[CampaignReferralRow] = Json.reads[CampaignReferralRow]
+  implicit val itemReads: Reads[OnPlatformReferralRow] = Json.reads[OnPlatformReferralRow]
 
   private val editionIds = Set("uk", "us", "au", "international")
 
-  def fromItem(item: Item): Either[CampaignCentralApiError, CampaignReferralRow] =
-    Either.catchNonFatal(Json.parse(item.toJSON).as[CampaignReferralRow]).leftMap(e => JsonParsingError(e.getMessage))
+  def fromItem(item: Item): Either[CampaignCentralApiError, OnPlatformReferralRow] =
+    Either.catchNonFatal(Json.parse(item.toJSON).as[OnPlatformReferralRow]).leftMap(e => JsonParsingError(e.getMessage))
 
   def formatPath(maybePath: Option[String]): String = {
 
