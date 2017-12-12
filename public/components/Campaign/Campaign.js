@@ -81,7 +81,8 @@ class Campaign extends React.Component {
 
         <div className="campaign__row">
           <CampaignPerformanceOverview campaign={campaign}
-                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign} />
+                        latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}
+                        territory={this.props.territory} />
 
           <CampaignPerformanceBreakdown campaign={campaign}
                         latestAnalyticsForCampaign={this.props.latestAnalyticsForCampaign}

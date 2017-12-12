@@ -23,20 +23,20 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     }
   }
 
-  def getAllCampaigns() = authAction { implicit request =>
-    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+  def getAllCampaigns(territory: Option[String]) = authAction { implicit request =>
+    val campaignTerritory = Territory(territory getOrElse "global")
 
-    CampaignRepository.getAllCampaigns(territory) match {
+    CampaignRepository.getAllCampaigns(campaignTerritory) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError
       case Right(campaigns)              => Ok(Json.toJson(campaigns))
     }
   }
 
-  def getBenchmarksAcrossCampaigns() = authAction { implicit request =>
-    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+  def getBenchmarksAcrossCampaigns(territory: Option[String]) = authAction { implicit request =>
+    val campaignTerritory = Territory(territory getOrElse "global")
 
-    CampaignService.getBenchmarksAcrossCampaigns(territory) match {
+    CampaignService.getBenchmarksAcrossCampaigns(campaignTerritory) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError
       case Right(benchmarks)             => Ok(Json.toJson(benchmarks))
@@ -44,20 +44,20 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
 
   }
 
-  def getLatestCampaignAnalytics() = authAction { implicit request =>
-    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+  def getLatestCampaignAnalytics(territory: Option[String]) = authAction { implicit request =>
+    val campaignTerritory = Territory(territory getOrElse "global")
 
-    CampaignService.getLatestCampaignAnalytics(territory) match {
+    CampaignService.getLatestCampaignAnalytics(campaignTerritory) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError
       case Right(analytics)              => Ok(Json.toJson(analytics))
     }
   }
 
-  def getLatestAnalyticsForCampaign(campaignId: String) = authAction { implicit request =>
-    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+  def getLatestAnalyticsForCampaign(campaignId: String, territory: Option[String]) = authAction { implicit request =>
+    val campaignTerritory = Territory(territory getOrElse "global")
 
-    CampaignService.getLatestAnalyticsForCampaign(campaignId, territory) match {
+    CampaignService.getLatestAnalyticsForCampaign(campaignId, campaignTerritory) match {
       case Left(LatestCampaignAnalyticsItemNotFound(error)) => NotFound(error)
       case Left(CampaignNotFound(error))                    => NotFound(error)
       case Left(JsonParsingError(error))                    => InternalServerError(error)
@@ -87,10 +87,10 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
     result getOrElse InternalServerError
   }
 
-  def getCampaignPageViewsFromDatalake(id: String) = authAction { implicit request =>
-    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+  def getCampaignPageViewsFromDatalake(id: String, territory: Option[String]) = authAction { implicit request =>
+    val campaignTerritory = Territory(territory getOrElse "global")
 
-    CampaignService.getPageViews(id, territory) match {
+    CampaignService.getPageViews(id, campaignTerritory) match {
       case Left(JsonParsingError(error)) => InternalServerError(error)
       case Left(_)                       => InternalServerError
       case Right(pageViews)              => Ok(Json.toJson(pageViews))
@@ -98,10 +98,10 @@ class CampaignApi(components: ControllerComponents, authAction: AuthAction[AnyCo
   }
 
   // TODO - fix return types
-  def getCampaignUniquesFromDatalake(id: String) = authAction { implicit request =>
-    val territory = Territory(request.getQueryString("territory") getOrElse "global")
+  def getCampaignUniquesFromDatalake(id: String, territory: Option[String]) = authAction { implicit request =>
+    val campaignTerritory = Territory(territory getOrElse "global")
     CampaignService
-      .getUniquesDataForGraph(id, territory)
+      .getUniquesDataForGraph(id, campaignTerritory)
       .map(uniquesData => Ok(Json.toJson(uniquesData))) getOrElse NotFound
   }
 

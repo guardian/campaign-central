@@ -10,19 +10,20 @@ class CampaignTargetsEdit extends React.Component {
     updateCampaign: PropTypes.func.isRequired
   };
 
-  updateTargetValue = (target, number) => {
-    const updatedTargets = Object.assign({}, this.props.campaign.targets, { [target]: number })
+  updateTargetValue = (metricTarget, territory, number) => {
+    const updated = Object.assign({}, this.props.campaign.campaignTargets[metricTarget], { [territory]: number })
+    const updatedTargets = Object.assign({}, this.props.campaign.campaignTargets, { [metricTarget]: updated })
 
     this.props.updateCampaign(Object.assign({}, this.props.campaign, {
-      targets: updatedTargets
+      campaignTargets: updatedTargets
     }));
   }
 
-  deleteTarget = (target) => {
-    const updatedTargets = R.omit(target, this.props.campaign.targets);
+  deleteTarget = (metricTarget, target) => {
+    const updatedTargets = R.omit(target, this.props.campaign.campaignTargets[metricTarget]);
 
     this.props.updateCampaign(Object.assign({}, this.props.campaign, {
-      targets: updatedTargets
+      campaignTargets: updatedTargets
     }));
   }
 
@@ -33,17 +34,23 @@ class CampaignTargetsEdit extends React.Component {
 
   renderTargetsList = () => {
 
-    const keys = Object.keys(this.props.campaign.targets).sort();
-    
+    const keys = Object.keys(this.props.campaign.campaignTargets).sort();
+    Object.entries(this.props.analyticsBreakdown || {});
+
     return (
       <ul>
         {keys.map((k) =>
           <div className="campaign-info__field" key={k} >
             <label>{ this.formatTargetName(k) }</label>
-            <EditableNumber value={this.props.campaign.targets[k]} onNumberChange={ (n) => this.updateTargetValue(k, n)} />
-            <div className="editable-text__button" onClick={ () => this.deleteTarget(k) } >
-              <i className="i-delete"/>
-            </div>
+              {Object.entries(this.props.campaign.campaignTargets[k]).map( ([territory, value]) =>
+                <div key={territory}>
+                  <label style={{textIndent: '10px'}}>{territory}</label>
+                  <EditableNumber value={value} onNumberChange={ (n) => this.updateTargetValue(k, territory, n)} />
+                  <div className="editable-text__button" onClick={ () => this.deleteTarget(k, territory) } >
+                    <i className="i-delete"/>
+                  </div>
+                </div>
+              )}
           </div>
         )}
       </ul>
@@ -60,7 +67,7 @@ class CampaignTargetsEdit extends React.Component {
           <div>
             {this.renderTargetsList()}
           </div>
-          <AddTargetControl existingTargets={Object.keys(this.props.campaign.targets)} onTargetAdded={this.updateTargetValue} />
+          <AddTargetControl existingTargets={this.props.campaign.campaignTargets} onTargetAdded={this.updateTargetValue} />
         </div>
       </div>
     );

@@ -117,13 +117,9 @@ export function fetchCampaignContent(id) {
   });
 }
 
-export function fetchCampaignReferrals(id) {
+export function fetchCampaignReferrals(id, dateRange) {
   return AuthedReqwest({
-<<<<<<< HEAD
     url: `/api/v2/campaigns/${id}/platform-referrals?start=${dateRange.startDate}&end=${dateRange.endDate}`,
-=======
-    url: `/api/v2/campaigns/${id}/referrals`,
->>>>>>> Make uniques graph contextual to territory selection.
     method: 'get'
   });
 }
