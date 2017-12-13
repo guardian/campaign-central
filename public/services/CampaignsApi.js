@@ -117,9 +117,16 @@ export function fetchCampaignContent(id) {
   });
 }
 
-export function fetchCampaignReferrals(id, dateRange) {
+export function fetchOnPlatformReferrals(id, dateRange) {
   return AuthedReqwest({
     url: `/api/v2/campaigns/${id}/platform-referrals?start=${dateRange.startDate}&end=${dateRange.endDate}`,
+    method: 'get'
+  });
+}
+
+export function fetchSocialReferrals(id, dateRange, territory) {
+  return AuthedReqwest({
+    url: `/api/v2/campaigns/${id}/social-referrals?start=${dateRange.startDate}&end=${dateRange.endDate}&territory=${territory}`,
     method: 'get'
   });
 }

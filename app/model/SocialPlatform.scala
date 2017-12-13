@@ -12,12 +12,22 @@ case object Facebook extends SocialPlatform {
   val name: String   = "Facebook"
 }
 
+case object Twitter extends SocialPlatform {
+  val domain: String = "twitter.com"
+  val name: String   = "Twitter"
+}
+
+case object Unknown extends SocialPlatform {
+  val domain: String = ""
+  val name: String   = "Unknown"
+}
+
 object SocialPlatform {
   implicit lazy val writes: Writes[SocialPlatform] = platform => JsString(platform.name)
 
-  def fromDomain(domain: String): SocialPlatform = {
-    domain match {
-      case Facebook.domain => Facebook
-    }
+  def fromDomain(domain: String): SocialPlatform = domain match {
+    case Facebook.domain => Facebook
+    case Twitter.domain  => Twitter
+    case _               => Unknown
   }
 }

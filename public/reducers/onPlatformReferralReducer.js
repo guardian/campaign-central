@@ -69,13 +69,13 @@ const initialState = {
   }
 };
 
-export default function campaignReferrals(state = initialState, action) {
+export default function onPlatformReferrals(state = initialState, action) {
 
   switch (action.type) {
-    case 'REFERRALS_GET_RECEIVE': {
+    case 'PLATFORM_REFERRALS_GET_RECEIVE': {
       // Deep copy, don't use Object.assign().
       const newState = cloneDeep(state);
-      const tree = buildTree(action.campaignReferrals || []);
+      const tree = buildTree(action.onPlatformReferrals || []);
       newState.tree = tree;
       sortTree(newState.tree, newState.ordering);
       return newState;

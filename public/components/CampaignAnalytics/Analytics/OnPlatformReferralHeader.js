@@ -1,9 +1,9 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {setToggleOrder} from "../../../actions/CampaignActions/getCampaignReferrals";
+import {setToggleOrder} from "../../../actions/CampaignActions/getOnPlatformReferrals";
 
-class CampaignReferralHeader extends React.Component {
+class OnPlatformReferralHeader extends React.Component {
 
     onHeaderClick(fieldName){
         this.props.campaignToggleOrderAction.setToggleOrder(fieldName);
@@ -15,7 +15,7 @@ class CampaignReferralHeader extends React.Component {
             clicks: '',
             ctr: ''
         };
-        orderingArrow[this.props.campaignReferrals.ordering.field] = `campaign-referral-list__header--${this.props.campaignReferrals.ordering.order}`;
+      orderingArrow[this.props.onPlatformReferrals.ordering.field] = `campaign-referral-list__header--${this.props.onPlatformReferrals.ordering.order}`;
         return (
             <div className="pure-g campaign-referral-list__row">
               <div className="pure-u-15-24 campaign-referral-list__header">From</div>
@@ -29,7 +29,7 @@ class CampaignReferralHeader extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    campaignReferrals: state.campaignReferrals
+    onPlatformReferrals: state.onPlatformReferrals
   };
 }
 
@@ -41,4 +41,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CampaignReferralHeader)
+export default connect(mapStateToProps, mapDispatchToProps)(OnPlatformReferralHeader)

@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux';
+import {combineReducers} from 'redux';
 import error from './errorReducer';
 import config from './configReducer';
 import campaigns from './campaignsReducer';
@@ -8,7 +8,8 @@ import campaignUniques from './campaignUniquesReducer';
 import campaignTargetsReport from './campaignTargetsReportReducer';
 import campaignCtaStats from './campaignCtaStatsReducer';
 import campaignContent from './campaignContentReducer';
-import campaignReferrals from './campaignReferralReducer';
+import onPlatformReferrals from './onPlatformReferralReducer';
+import socialReferrals from './socialReferralReducer';
 import campaignSort from './campaignSortReducer';
 import latestAnalytics from './latestAnalyticsReducer';
 import latestAnalyticsForCampaign from './latestAnalyticsForCampaignReducer';
@@ -26,7 +27,8 @@ export default combineReducers({
   campaignTargetsReport,
   campaignCtaStats,
   campaignContent,
-  campaignReferrals,
+  onPlatformReferrals,
+  socialReferrals,
   campaignSort,
   latestAnalytics,
   latestAnalyticsForCampaign,

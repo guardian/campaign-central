@@ -1,11 +1,11 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {getCampaignReferrals, setToggleNode} from "../../../actions/CampaignActions/getCampaignReferrals";
-import CampaignReferralHeader from "./CampaignReferralHeader";
-import InfinityMenu from "react-infinity-menu";
-import ProgressSpinner from "../../utils/ProgressSpinner";
+import {getOnPlatformReferrals, setToggleNode} from "../../../actions/CampaignActions/getOnPlatformReferrals";
+import {getSocialReferrals} from "../../../actions/CampaignActions/getSocialReferrals";
 import DateRangeEditor from "./DateRangeEditor";
+import SocialReferrals from "./SocialReferrals";
+import OnPlatformReferrals from "./OnPlatformReferrals";
 
 class CampaignReferrals extends React.Component {
 
@@ -20,13 +20,18 @@ class CampaignReferrals extends React.Component {
   }
 
   componentWillMount() {
-    this.props.campaignReferralActions.getCampaignReferrals(this.props.campaign.id, this.state.dateRange);
+    this.refresh(this.props, this.state);
   }
 
   componentWillUpdate(nextProps, nextState) {
     if (nextState.dateRange !== this.state.dateRange) {
-      this.props.campaignReferralActions.getCampaignReferrals(nextProps.campaign.id, nextState.dateRange);
+      this.refresh(nextProps, nextState);
     }
+  }
+
+  refresh(props, state) {
+    this.props.campaignReferralActions.getOnPlatformReferrals(props.campaign.id, state.dateRange);
+    this.props.campaignReferralActions.getSocialReferrals(props.campaign.id, state.dateRange, props.territory);
   }
 
   onNodeMouseClick() {
@@ -39,43 +44,17 @@ class CampaignReferrals extends React.Component {
     });
   };
 
-  renderBody() {
-
-    if (this.props.campaignReferrals &&
-      this.props.campaignReferrals.tree &&
-      this.props.campaignReferrals.tree.length === 0) {
-      return (
-        <div>There are no on-platform referrals recorded for this campaign and date range.</div>
-      )
-    }
-
-    if (this.props.campaignReferrals && this.props.campaignReferrals.tree) {
-      return (
-        <div className="campaign-referral-list campaign-assets__field__value">
-          <InfinityMenu
-            tree={this.props.campaignReferrals.tree}
-            disableDefaultHeaderContent={true}
-            headerContent={CampaignReferralHeader}
-            onNodeMouseClick={this.onNodeMouseClick.bind(this)}
-          />
-        </div>
-      );
-    }
-
-    return (
-      <ProgressSpinner/>
-    );
-  }
-
   render() {
     return (
       <div className="campaign-info campaign-box">
         <div className="campaign-box__header campaign-referral-box-header">
-          Referrals from on-platform
+          Referrals
           <DateRangeEditor campaign={this.props.campaign} onChange={this.onDateRangeChange}/>
         </div>
-        <div className="campaign-box__body">
-          {this.renderBody()}
+        <div id="campaign-referrals-body" className="campaign-box__body">
+          <OnPlatformReferrals referrals={this.props.onPlatformReferrals}
+                               onNodeMouseClick={this.onNodeMouseClick.bind(this)}/>
+          <SocialReferrals referrals={this.props.socialReferrals}/>
         </div>
       </div>
     );
@@ -84,15 +63,17 @@ class CampaignReferrals extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    campaignReferrals: state.campaignReferrals
+    onPlatformReferrals: state.onPlatformReferrals,
+    socialReferrals: state.socialReferrals
   };
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     campaignReferralActions: bindActionCreators(Object.assign({}, {
-      getCampaignReferrals: getCampaignReferrals,
-      setToggleNode: setToggleNode
+      getOnPlatformReferrals: getOnPlatformReferrals,
+      setToggleNode: setToggleNode,
+      getSocialReferrals: getSocialReferrals
     }), dispatch)
   };
 }

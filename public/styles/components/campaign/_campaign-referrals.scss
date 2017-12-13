@@ -98,3 +98,20 @@
 .campaign-referral-daterange label input {
   color: initial;
 }
+
+.campaign-assets__field__value h3 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#campaign-referrals-body > :not(last-child) {
+  margin-bottom: 40px;
+}
+
+#campaign-referrals-body > :last-child {
+  margin-bottom: 5px;
+}
+
+.numeric-value {
+  text-align: right;
+}
