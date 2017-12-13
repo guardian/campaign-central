@@ -96,9 +96,9 @@ export function fetchCampaignPageViews(id) {
   });
 }
 
-export function fetchCampaignUniques(id) {
+export function fetchCampaignUniques(id, territory) {
   return AuthedReqwest({
-    url: `/api/v2/campaigns/${id}/uniques`,
+    url: `/api/v2/campaigns/${id}/uniques?territory=${territory}`,
     method: 'get'
   });
 }

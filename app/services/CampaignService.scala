@@ -33,12 +33,14 @@ object CampaignService {
     "mq-mental-health-matters"
   )
 
-  def getPageViews(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignPageViewsItem]] = {
-    CampaignPageViewsRepository.getCampaignPageViews(campaignId)
+  def getPageViews(campaignId: String,
+                   territory: Territory): Either[CampaignCentralApiError, Seq[CampaignPageViewsItem]] = {
+    CampaignPageViewsRepository.getCampaignPageViews(campaignId, territory)
   }
 
-  def getUniques(campaignId: String): Either[CampaignCentralApiError, Seq[CampaignUniquesItem]] = {
-    CampaignUniquesRepository.getCampaignUniques(campaignId)
+  def getUniques(campaignId: String,
+                 territory: Territory): Either[CampaignCentralApiError, Seq[CampaignUniquesItem]] = {
+    CampaignUniquesRepository.getCampaignUniques(campaignId, territory)
   }
 
   def getLatestAnalyticsForCampaign(campaignId: String,
@@ -47,7 +49,12 @@ object CampaignService {
       campaign <- CampaignRepository.getCampaign(campaignId)
       latest   <- LatestCampaignAnalyticsRepository.getLatestCampaignAnalytics(campaignId, territory)
     } yield {
-      val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
+      val uniquesTarget: Long =
+        campaign.campaignTargets
+          .getOrElse(Map.empty)
+          .get("uniques")
+          .flatMap(_.get(territory.databaseKeyValue))
+          .getOrElse(0)
       LatestCampaignAnalytics(latest, uniquesTarget)
     }
   }
@@ -65,7 +72,12 @@ object CampaignService {
         for {
           latest <- latestCampaignAnalytics.find(_.campaignId == campaign.id)
         } yield {
-          val uniquesTarget: Long = campaign.targets.getOrElse("uniques", 0)
+          val uniquesTarget: Long =
+            campaign.campaignTargets
+              .getOrElse(Map.empty)
+              .get("uniques")
+              .flatMap(_.get(territory.databaseKeyValue))
+              .getOrElse(0)
           campaign.id -> LatestCampaignAnalytics(latest, uniquesTarget)
         }
       }
@@ -105,10 +117,11 @@ object CampaignService {
     }
   }
 
-  def getUniquesDataForGraph(campaignId: String): Either[CampaignCentralApiError, Option[Seq[GraphDataPoint]]] = {
+  def getUniquesDataForGraph(campaignId: String,
+                             territory: Territory): Either[CampaignCentralApiError, Option[Seq[GraphDataPoint]]] = {
 
     for {
-      campaignUniques <- CampaignUniquesRepository.getCampaignUniques(campaignId)
+      campaignUniques <- CampaignUniquesRepository.getCampaignUniques(campaignId, territory)
       campaign        <- CampaignRepository.getCampaign(campaignId)
     } yield {
       val initialDataPoint = campaignUniques.headOption.map { item =>
@@ -117,24 +130,45 @@ object CampaignService {
       }
 
       val uniqueItems = initialDataPoint ++ campaignUniques
-      val maybeTarget = campaign.targets.get("uniques")
 
-      maybeTarget map { target =>
-        val runRateStep = {
-          val numItems = uniqueItems.size.toLong
-          if (numItems == 0) 1
-          else target / numItems
+      val maybeTarget = campaign.campaignTargets
+        .getOrElse(Map.empty)
+        .getOrElse("uniques", Map.empty)
+        .find { case (key, _) => key == territory.databaseKeyValue }
+        .map(_._2)
+
+      val numItems = uniqueItems.size.toLong
+
+      maybeTarget match {
+        case Some(target) => {
+          val runRateStep = if (numItems == 0) 1 else target / numItems
+          val runRate     = Seq.range[Long](0, target + runRateStep, runRateStep)
+
+          Some(
+            (uniqueItems zip runRate).map {
+              case (unique, rate) =>
+                GraphDataPoint(
+                  name = unique.reportExecutionTimestamp,
+                  dataPoint = unique.uniques,
+                  target = Some(rate)
+                )
+            }.toSeq
+          )
+
         }
 
-        val runRate = Seq.range[Long](0, target + runRateStep, runRateStep)
-        (uniqueItems zip runRate).map {
-          case (unique, rate) =>
-            GraphDataPoint(
-              name = unique.reportExecutionTimestamp,
-              dataPoint = unique.uniques,
-              target = rate
-            )
-        }.toSeq
+        case None => {
+          val runRateStep = if (numItems == 0) 1 else numItems
+          val runRate     = Seq.range[Long](0, runRateStep, 1)
+
+          Some(
+            (uniqueItems zip runRate).map {
+              case (unique, _) =>
+                GraphDataPoint(name = unique.reportExecutionTimestamp, dataPoint = unique.uniques, target = None)
+            }.toSeq
+          )
+
+        }
       }
     }
   }

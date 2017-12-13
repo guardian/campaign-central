@@ -10,6 +10,11 @@
 
 }
 
+.campaign__column--fourty-percent {
+  @extend %campaign__column;
+  width: 40%;
+}
+
 .campaign__column--double-width {
   @extend %campaign__column;
   width: 66%;
@@ -83,4 +88,3 @@
 
   border: 1px solid $c-grey-300;;
 }
-

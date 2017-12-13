@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
 import EditableNumber from '../utils/EditableNumber';
 import EditableText from '../utils/EditableText';
-
-import { defaultTargets } from '../../constants/defaultTargets'
+import { defaultTargets } from '../../constants/defaultTargets';
+import R from 'ramda';
 
 class AddTargetControl extends React.Component {
 
   static propTypes = {
-    existingTargets: PropTypes.arrayOf(PropTypes.string).isRequired,
+    existingTargets: PropTypes.object.isRequired,
     onTargetAdded: PropTypes.func.isRequired
   };
 
@@ -19,22 +19,18 @@ class AddTargetControl extends React.Component {
   state = {};
 
   triggerAdd = () => {
-    this.props.onTargetAdded(this.state.target, this.state.value);
+    this.props.onTargetAdded(this.state.target, this.state.territory, this.state.value);
     this.setState({
       selectedTarget: undefined,
       target: undefined,
+      territory: undefined,
       value: null
     });
   }
 
   updateSelectedMetric = (e) => {
     const selected = e.target.value;
-
-    if (selected === 'custom') {
-      this.setState({selectedTarget: selected, target: undefined});
-    } else {
-      this.setState({selectedTarget: selected, target: selected});
-    }
+    this.setState({selectedTarget: selected, target: selected});
   }
 
   updateTarget = (e) => {
@@ -43,6 +39,11 @@ class AddTargetControl extends React.Component {
 
   updateTargetValue = (v) => {
     this.setState({value: v});
+  }
+
+  updateTerritory = (e) => {
+    const selected = e.target.value;
+    this.setState({territory: selected});
   }
 
   renderAddButton = () => {
@@ -59,32 +60,26 @@ class AddTargetControl extends React.Component {
 
   render () {
 
-    const availbleTargets = defaultTargets.filter(t => !this.props.existingTargets.includes(t.value) );
+    const targetsToExclude = Object.entries(this.props.existingTargets).filter(([key, value]) =>
+      R.equals(['AU', 'GB', 'US', 'global'], Array.sort(Object.keys(value)))
+    ).map(([key, value]) => key);
 
-    if (this.state.selectedTarget === 'custom') {
-      return (
-        <div>
-          <select value={this.state.selectedTarget} onChange={this.updateSelectedMetric}>
-            <option value=""></option>
-            { availbleTargets.map((t) => <option key={t.value} value={t.value}>{t.name}</option>) }
-            <option value="custom">Custom</option>
-          </select>
-          <br/>
-          Target: <EditableText value={this.state.target} onChange={this.updateTarget} />
-          Count: <EditableNumber value={this.state.value} onNumberChange={this.updateTargetValue} />
-          {this.renderAddButton()}
-        </div>
-      )
-    }
+    const targetsToRender = defaultTargets.filter(t => !targetsToExclude.includes(t.value));
 
     return (
       <div>
-        <select value={this.state.selectedTarget} onChange={this.updateSelectedMetric}>
+        Target: <select value={this.state.selectedTarget} onChange={this.updateSelectedMetric} style={{marginRight: '10px'}}>
           <option value=""></option>
-          { availbleTargets.map((t) => <option key={t.value} value={t.value}>{t.name}</option>) }
-          <option value="custom">Custom</option>
+          { targetsToRender.map((t) => <option key={t.value} value={t.value}>{t.name}</option>) }
         </select>
-        &nbsp;Count: <EditableNumber value={this.state.value} onNumberChange={this.updateTargetValue} />
+        Territory: <select id="territoryDropdown" style={{marginRight: '10px'}} onChange={this.updateTerritory}>
+                          <option value=""></option>
+                          <option value="global">global</option>
+                          <option value="GB">uk</option>
+                          <option value="US">us</option>
+                          <option value="AU">au</option>
+                        </select>
+        Count: <EditableNumber value={this.state.value} onNumberChange={this.updateTargetValue} />
         {this.renderAddButton()}
       </div>
     );
