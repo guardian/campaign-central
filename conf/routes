@@ -21,6 +21,8 @@ GET           /api/v2/campaigns/benchmarks                    controllers.Campai
 GET           /api/v2/campaigns/latestAnalytics               controllers.CampaignApi.getLatestCampaignAnalytics(territory: Option[String])
 GET           /api/v2/campaigns/:id/latestAnalytics           controllers.CampaignApi.getLatestAnalyticsForCampaign(id: String, territory: Option[String])
 
+GET           /api/reportExecution/lastExecuted               controllers.ReportExecutionApi.getLastUpdatedTime(territory: Option[String])
+
 GET           /api/campaigns/:id                              controllers.CampaignApi.getCampaign(id: String)
 PUT           /api/campaigns/:id                              controllers.CampaignApi.updateCampaign(id: String)
 DELETE        /api/campaigns/:id                              controllers.CampaignApi.deleteCampaign(id: String)

@@ -75,7 +75,7 @@ class Campaigns extends Component {
 
     return (
       <div className="campaigns">
-        <h2 className="campaigns__header">Campaigns ({this.props.territory === 'global' ? 'global' : this.props.territory + ' only'})</h2>
+        <h2 className="campaigns__header">Campaigns ({this.props.territory === `global` ? 'global' : this.props.territory + ` only`})</h2>
         <CampaignList campaigns={this.filterCampaigns(this.sortCampaigns(this.props.campaigns))} latestAnalytics={this.props.latestAnalytics} />
       </div>
     );
@@ -87,6 +87,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as getCampaigns from '../../actions/CampaignActions/getCampaigns';
 import * as getLatestAnalytics from '../../actions/CampaignActions/getLatestAnalytics';
+import * as getLastExecuted from '../../actions/ReportExecutionActions/getLastExecuted';
 
 function mapStateToProps(state) {
   return {

@@ -16,6 +16,7 @@ import latestAnalyticsForCampaign from './latestAnalyticsForCampaignReducer';
 import benchmarks from './allCampaignBenchmarksReducer';
 import campaignMediaEvents from './campaignMediaEventsReducer';
 import territory from './setTerritoryReducer';
+import lastExecuted from './lastExecutedReducer';
 
 export default combineReducers({
   error,
@@ -34,5 +35,6 @@ export default combineReducers({
   latestAnalyticsForCampaign,
   benchmarks,
   campaignMediaEvents,
-  territory
+  territory,
+  lastExecuted
 });

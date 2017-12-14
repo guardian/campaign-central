@@ -47,18 +47,20 @@ class AppComponents(context: Context)
     controllerComponents.parsers.default
   )(executionContext)
 
-  val appController           = new App(controllerComponents, authAction)
-  val campaignApiController   = new CampaignApi(controllerComponents, authAction)
-  val managementApiController = new ManagementApi(controllerComponents)
-  val healthcheckController   = new Healthcheck(controllerComponents)
-  val assetsController        = new Assets(httpErrorHandler, assetsMetadata)
-  val logInController         = new LogIn(wsClient, controllerComponents, googleAuthConfig)
+  val appController             = new App(controllerComponents, authAction)
+  val campaignApiController     = new CampaignApi(controllerComponents, authAction)
+  val reportExecutionController = new ReportExecutionApi(controllerComponents, authAction)
+  val managementApiController   = new ManagementApi(controllerComponents)
+  val healthcheckController     = new Healthcheck(controllerComponents)
+  val assetsController          = new Assets(httpErrorHandler, assetsMetadata)
+  val logInController           = new LogIn(wsClient, controllerComponents, googleAuthConfig)
 
   def router: Router = new Routes(
     httpErrorHandler,
     appController,
     logInController,
     campaignApiController,
+    reportExecutionController,
     managementApiController,
     assetsController,
     healthcheckController
