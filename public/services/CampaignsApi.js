@@ -151,3 +151,10 @@ export function fetchCampaignMediaEvents(id) {
     method: 'get'
   });
 }
+
+export function fetchLastExecuted(territory) {
+  return AuthedReqwest({
+    url: `/api/reportExecution/lastExecuted?territory=${territory}`,
+    method: 'get'
+  });
+}

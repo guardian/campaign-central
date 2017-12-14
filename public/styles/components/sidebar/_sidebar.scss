@@ -38,6 +38,20 @@
 
   padding: 10px;
 }
+
+.sidebar__data__last__updated {
+
+  text-decoration: underline;
+
+  font-weight: bold;
+
+  font-size: 15px;
+
+  color: $c-grey-200;
+
+  padding: 10px;
+}
+
 .sidebar__link {
 
   display: block;
@@ -125,4 +139,3 @@
 .territory-container {
   padding: 10px;
 }
-
