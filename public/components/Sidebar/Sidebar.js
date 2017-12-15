@@ -10,7 +10,7 @@ class Sidebar extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.territory !== this.props.territory) {
-      this.props.reportExecutionActions.getLastExecuted(this.props.territory);
+      this.props.reportExecutionActions.getLastExecuted(nextProps.territory);
     }
   }
 
@@ -27,9 +27,21 @@ class Sidebar extends React.Component {
     this.props.uiActions.setTerritory(territory);
   }
 
-  render () {
+  renderDataLastRetrievedLabel = () => {
+    if (!this.props.lastExecutedDateTime) return null;
 
-    const dataLastRetrievedLabel = this.props.lastExecutedDateTime && `Data last updated ${Moment(this.props.lastExecutedDateTime.lastExecuted).fromNow()}`;
+    const offset = new Date(this.props.lastExecutedDateTime.lastExecuted);
+
+    if (offset === 0) {
+      return ( `Data last updated ${Moment(this.props.lastExecutedDateTime.lastExecuted).fromNow()}` );
+    } else if (Math.sign(offset) === 1) {
+      return ( `Data last updated ${Moment(this.props.lastExecutedDateTime.lastExecuted).subtract(offset, 'minutes').fromNow()}` );
+    } else {
+      return ( `Data last updated ${Moment(this.props.lastExecutedDateTime.lastExecuted).add(offset, 'minutes').fromNow()}` );
+    }
+  }
+
+  render () {
 
     return (
       <div className="sidebar">
@@ -67,7 +79,7 @@ class Sidebar extends React.Component {
           <SidebarLink to="/glossary">Glossary</SidebarLink>
         </div>
         <div className="sidebar__link-group">
-          <div className="sidebar__data__last__updated">{dataLastRetrievedLabel}</div>
+          <div className="sidebar__data__last__updated">{this.renderDataLastRetrievedLabel}</div>
         </div>
       </div>
     );
