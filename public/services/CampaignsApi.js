@@ -48,7 +48,7 @@ async function fetchShareCounts(analytics, territory) {
   // Facebook shares should be fetched sequentially to avoid rate-limit.
   for (const [key, values] of paths) {
     const req = {
-      url: `https://graph.facebook.com/?id=https://theguardian.com${key}`,
+      url: `https://graph.facebook.com/?id=http://www.theguardian.com${key}`,
       method: 'get'
     };
     const fbRateLimit = new Promise(function(resolve) {
