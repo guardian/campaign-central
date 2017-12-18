@@ -5,7 +5,7 @@ case class SocialReferralRow(
   hash: String,
   referralDate: String,
   referringDomain: String,
-  territory: String,
+  territory: Option[String],
   paid: Boolean,
   clickCount: Long,
 )
