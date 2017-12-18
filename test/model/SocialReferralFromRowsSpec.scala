@@ -17,7 +17,7 @@ object SocialReferralFromRowsSpec extends Properties("SocialReferral.fromRows") 
         hash = "hash",
         referralDate = referralDate,
         referringDomain = referringDomain,
-        territory = "territory",
+        territory = None,
         paid = paid,
         clickCount = clickCount
       )
