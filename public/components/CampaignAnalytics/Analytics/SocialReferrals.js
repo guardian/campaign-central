@@ -47,6 +47,7 @@ class SocialReferrals extends React.Component {
     return (
       <section className="campaign-assets__field__value">
         <h3>Social</h3>
+        <p><i className="i-warning"/>Beware! Only partial data at present.</p>
         {this.renderBody()}
       </section>
     )

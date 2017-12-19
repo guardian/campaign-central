@@ -5,10 +5,20 @@ import org.scalacheck._
 
 object SocialReferralFromRowsSpec extends Properties("SocialReferral.fromRows") {
 
+  private val socialDomains = Seq(
+    "facebook.com",
+    "getpocket.com",
+    "instagram.com",
+    "linkedin.com",
+    "reddit.com",
+    "twitter.com",
+    "youtube.com"
+  )
+
   private implicit lazy val arbRow: Arbitrary[SocialReferralRow] = Arbitrary(
     for {
       referralDate    <- Gen.alphaNumStr
-      referringDomain <- Gen.oneOf("facebook.com", "twitter.com")
+      referringDomain <- Gen.oneOf(socialDomains)
       clickCount      <- Gen.choose[Long](0, 1000000000)
       paid            <- Gen.oneOf(true, false)
     } yield {
