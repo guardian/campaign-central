@@ -79,7 +79,7 @@ class Sidebar extends React.Component {
           <SidebarLink to="/glossary">Glossary</SidebarLink>
         </div>
         <div className="sidebar__link-group">
-          <div className="sidebar__data__last__updated">{this.renderDataLastRetrievedLabel}</div>
+          <div className="sidebar__data__last__updated">{this.renderDataLastRetrievedLabel()}</div>
         </div>
       </div>
     );
