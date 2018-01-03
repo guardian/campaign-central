@@ -5,7 +5,7 @@ class SocialReferrals extends React.Component {
 
   static renderRow(referral, index) {
     return (
-      <tr key={index}>
+      <tr key={index} className="campaign-referral-list__item">
         <td>{referral.referringPlatform}</td>
         <td className="numeric-value">{referral.organicClickCount.toLocaleString()}</td>
         <td className="numeric-value">{referral.paidClickCount.toLocaleString()}</td>
@@ -47,7 +47,6 @@ class SocialReferrals extends React.Component {
     return (
       <section className="campaign-assets__field__value">
         <h3>Social</h3>
-        <p><i className="i-warning"/>Beware! Only partial data at present.</p>
         {this.renderBody()}
       </section>
     )
