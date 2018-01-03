@@ -33,18 +33,30 @@ class DateRangeEditor extends React.Component {
   }
 
   render() {
+    let dataThreshold = 1504220400000; // 1 Sep 2017
+    let today = Date.now();
+    let startDate = DateRangeEditor.toDate(Math.max(dataThreshold, Date.parse(this.state.startDate)));
+    let endDate = DateRangeEditor.toDate(Math.min(today, Date.parse(this.state.endDate)));
+    let minDate = DateRangeEditor.toDate(Math.max(dataThreshold, this.props.campaign.startDate));
+    let maxDate = DateRangeEditor.toDate(Math.min(today, this.props.campaign.endDate));
     return (
       <div className="campaign-referral-daterange">
         <label>From&nbsp;
-          <input type="date" name="startDate" defaultValue={this.state.startDate} onChange={this.handleChange}
-                 min={DateRangeEditor.toDate(this.props.campaign.startDate)}
-                 max={DateRangeEditor.toDate(this.props.campaign.endDate)}
+          <input type="date"
+                 name="startDate"
+                 defaultValue={startDate}
+                 onChange={this.handleChange}
+                 min={minDate}
+                 max={maxDate}
                  className="campaign-referral-daterange-field"/>
         </label>
         <label>To&nbsp;
-          <input type="date" name="endDate" defaultValue={this.state.endDate} onChange={this.handleChange}
-                 min={DateRangeEditor.toDate(this.props.campaign.startDate)}
-                 max={DateRangeEditor.toDate(this.props.campaign.endDate)}
+          <input type="date"
+                 name="endDate"
+                 defaultValue={endDate}
+                 onChange={this.handleChange}
+                 min={minDate}
+                 max={maxDate}
                  className="campaign-referral-daterange-field"/>
         </label>
       </div>
