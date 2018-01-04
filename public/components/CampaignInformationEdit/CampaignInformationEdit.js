@@ -1,7 +1,5 @@
 import React, { PropTypes } from 'react';
-import {campaignStatuses} from '../../constants/campaignStatuses';
 import EditableText from '../utils/EditableText';
-import EditableDropdown from '../utils/EditableDropdown';
 
 import {formatMillisecondDate} from '../../util/dateFormatter';
 
@@ -18,12 +16,6 @@ class CampaignInformationEdit extends React.Component {
   updateCampaignName = (e) => {
     this.props.updateCampaign(Object.assign({}, this.props.campaign, {
       name: e.target.value
-    }));
-  }
-
-  updateCampaignStatus = (e) => {
-    this.props.updateCampaign(Object.assign({}, this.props.campaign, {
-      status: e.target.value
     }));
   }
 
@@ -68,7 +60,7 @@ class CampaignInformationEdit extends React.Component {
           </div>
           <div className="campaign-info__field">
             <label>Status</label>
-            <EditableDropdown values={campaignStatuses} name="status" selectedValue={this.props.campaign.status} onChange={this.updateCampaignStatus} />
+            <span className="campaign-info__field__value">{this.props.campaign.status}</span>
           </div>
           <div className="campaign-info__field">
             <label>Start date</label>
