@@ -125,8 +125,7 @@ object CampaignService {
       campaign        <- CampaignRepository.getCampaign(campaignId)
     } yield {
       val initialDataPoint = campaignUniques.headOption.map { item =>
-        item.copy(reportExecutionTimestamp = new DateTime(item.reportExecutionTimestamp).minusDays(1).toString,
-                  uniques = 0L)
+        item.copy(queryEndDate = new DateTime(item.queryEndDate).minusDays(1).toString, uniques = 0L)
       }
 
       val uniqueItems = initialDataPoint ++ campaignUniques
@@ -148,7 +147,7 @@ object CampaignService {
             (uniqueItems zip runRate).map {
               case (unique, rate) =>
                 GraphDataPoint(
-                  name = unique.reportExecutionTimestamp,
+                  name = unique.queryEndDate,
                   dataPoint = unique.uniques,
                   target = Some(rate)
                 )
@@ -164,7 +163,7 @@ object CampaignService {
           Some(
             (uniqueItems zip runRate).map {
               case (unique, _) =>
-                GraphDataPoint(name = unique.reportExecutionTimestamp, dataPoint = unique.uniques, target = None)
+                GraphDataPoint(name = unique.queryEndDate, dataPoint = unique.uniques, target = None)
             }.toSeq
           )
 
