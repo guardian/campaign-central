@@ -1,6 +1,6 @@
-import React, { PropTypes } from 'react';
-import {Link} from 'react-router';
-import {browserHistory} from 'react-router';
+import React from 'react';
+import PropTypes from 'prop-types';
+import {browserHistory} from '../../util/browserHistory';
 import {shortFormatMillisecondDate} from '../../util/dateFormatter';
 
 class CampaignListItem extends React.Component {

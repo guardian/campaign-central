@@ -1,12 +1,15 @@
 import React from 'react';
+import { Route } from 'react-router-dom';
+
 import Header from './Header/Header';
 import Sidebar from './Sidebar/Sidebar';
+import Campaigns from './Campaigns/Campaigns';
+import Benchmarks from './Campaigns/Benchmarks';
+import Campaign from './Campaign/Campaign';
+import { Glossary } from './Glossary/Glossary';
+
 
 class Main extends React.Component {
-
-  static propTypes = {
-    children: React.PropTypes.element.isRequired
-  }
 
   clearError = () => {
     this.props.uiActions.clearError();
@@ -34,10 +37,16 @@ class Main extends React.Component {
         {this.renderErrorBar()}
         <div className="main__flex-container">
           <div className="main__sidebar">
-            <Sidebar query={this.props.location.query}/>
+            <Sidebar search={this.props.location.search}/>
           </div>
           <div className="main__content">
-            {this.props.children}
+            <div>
+              <Route path="/campaigns" component={Campaigns} />
+              <Route path="/benchmarks" component={Benchmarks} />
+              <Route path="/campaigns/:filterName" component={Campaigns} />
+              <Route path="/campaign/:id" component={Campaign} />
+              <Route path="/glossary" component={Glossary} />
+            </div>
           </div>
         </div>
       </div>

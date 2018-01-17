@@ -1,11 +1,12 @@
-import React, {Component, PropTypes} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import CampaignList from '../CampaignList/CampaignList';
 
 class Campaigns extends Component {
 
   static propTypes = {
     campaigns: PropTypes.array.isRequired,
-  }
+  };
 
   static defaultProps = {
     campaignSortColumn: 'endDate',
@@ -15,8 +16,9 @@ class Campaigns extends Component {
   filterCampaigns = (campaigns) => {
     var filtered = campaigns;
 
-    var stateFilter = this.props.location.query.state || 'live';
-    var typeFilter = this.props.location.query.type;
+    const searchParams = new URLSearchParams(this.props.location.search);
+    const stateFilter = searchParams.get('state') || 'live';
+    const typeFilter = searchParams.get('type');
 
     if (stateFilter && stateFilter !== 'all') {
       filtered = filtered.filter((c) => c.status === stateFilter);

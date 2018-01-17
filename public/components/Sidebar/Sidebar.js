@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Link} from 'react-router';
+import {NavLink} from 'react-router-dom';
 import Moment from 'moment';
 
 class Sidebar extends React.Component {
@@ -14,11 +14,46 @@ class Sidebar extends React.Component {
     }
   }
 
-  filterLink = (changeValue, displayName) => {
-    var query = Object.assign({}, this.props.query, changeValue);
+  filterLink = (searchValues, displayName) => {
+    const highlightLink = () => {
+      const currentSearchParams = new URLSearchParams(this.props.search);
+
+      for (let key of currentSearchParams.keys()) {
+        if (searchValues[key] === currentSearchParams.get(key)) {
+          return true;
+        }
+      }
+
+      for (let key in searchValues) {
+        if (searchValues.hasOwnProperty(key)) {
+          if (searchValues[key] === undefined && !currentSearchParams.has(key)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
+
+    const searchParams = new URLSearchParams(this.props.search);
+
+    for (let param in searchValues) {
+      if (searchValues.hasOwnProperty(param)) {
+        if (searchValues[param]) {
+          searchParams.set(param, searchValues[param]);
+        } else {
+          searchParams.delete(param);
+        }
+      }
+    }
 
     return(
-      <Link to={{pathname: "/campaigns", query: query}} className="sidebar__filter-group__link" activeClassName="sidebar__filter-group__link--active">{displayName}</Link>
+      <NavLink to={{pathname: "/campaigns", search: `?${searchParams.toString()}`}}
+               className="sidebar__filter-group__link"
+               isActive={highlightLink}
+               activeClassName="sidebar__filter-group__link--active">
+        {displayName}
+      </NavLink>
     )
   };
 
@@ -88,12 +123,12 @@ class Sidebar extends React.Component {
 
 class SidebarLink extends React.Component {
   render () {
-    return <Link
+    return <NavLink
       to={this.props.to}
       className="sidebar__link"
       activeClassName="sidebar__link--active">
         {this.props.children}
-    </Link>;
+    </NavLink>;
   }
 }
 

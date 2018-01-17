@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link} from 'react-router';
+import {Link} from 'react-router-dom';
 import CampaignEdit from '../CampaignInformationEdit/CampaignEdit';
 import CampaignAssets from '../CampaignInformationEdit/CampaignAssets';
 import CampaignUniquesChart from '../CampaignAnalytics/Analytics/CampaignUniquesChart';
@@ -11,7 +11,7 @@ import CampaignMediaEvents from '../CampaignMediaEvents/CampaignMediaEvents';
 class Campaign extends React.Component {
 
   componentWillMount() {
-    this.props.campaignActions.getCampaign(this.props.params.id);
+    this.props.campaignActions.getCampaign(this.props.match.params.id);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -66,7 +66,7 @@ class Campaign extends React.Component {
   }
 
   render () {
-    const campaign = this.props.campaign && this.props.params.id === this.props.campaign.id ? this.props.campaign : undefined;
+    const campaign = this.props.campaign && this.props.match.params.id === this.props.campaign.id ? this.props.campaign : undefined;
 
     if (!campaign) {
       return <div>Loading... </div>;

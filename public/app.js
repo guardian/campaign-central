@@ -7,7 +7,7 @@ import configureStore from './util/configureStore';
 import {setStore} from './util/storeAccessor';
 import {router} from './router';
 import ReactGA from 'react-ga';
-import {browserHistory} from 'react-router';
+import { browserHistory } from './util/browserHistory'
 
 import './styles/main.scss';
 
