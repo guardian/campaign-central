@@ -50,7 +50,7 @@ class Benchmarks extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.benchmarks !== this.props.benchmarks || this.props.territory !== nextProps.territory) {
+    if (JSON.stringify(nextProps.benchmarks) !== JSON.stringify(this.props.benchmarks) || this.props.territory !== nextProps.territory) {
       this.props.benchmarkActions.getBenchmarks(this.props.territory);
     }
   }
