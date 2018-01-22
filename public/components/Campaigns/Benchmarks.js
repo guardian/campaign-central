@@ -1,6 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import BigCardMetric from '../CampaignPerformanceOverview/BigCardMetric';
 import {formatToMinutes} from '../../util/minutesFormatter';
+import isEqual from 'lodash';
 
 
 class BenchmarkSet extends Component {
@@ -50,7 +51,7 @@ class Benchmarks extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (JSON.stringify(nextProps.benchmarks) !== JSON.stringify(this.props.benchmarks) || this.props.territory !== nextProps.territory) {
+    if (!isEqual(nextProps.benchmarks, this.props.benchmarks) || this.props.territory !== nextProps.territory) {
       this.props.benchmarkActions.getBenchmarks(this.props.territory);
     }
   }
