@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
 import {NavLink} from 'react-router-dom';
 import Moment from 'moment';
+import { withRouter } from 'react-router-dom';
 
 class Sidebar extends React.Component {
 
@@ -152,4 +153,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Sidebar));
