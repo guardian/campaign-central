@@ -1,13 +1,18 @@
 package repositories.contentapi
 
 import java.io.IOException
+import java.net.URI
 import java.util.concurrent.Executors
-import com.gu.contentapi.client.ContentApiClientLogic
+
+import com.amazonaws.auth.{AWSCredentialsProviderChain, STSAssumeRoleSessionCredentialsProvider}
+import com.amazonaws.auth.profile.ProfileCredentialsProvider
+import com.gu.contentapi.client.{ContentApiClientLogic, IAMSigner}
 import com.gu.contentapi.client.model._
 import com.gu.contentapi.client.model.v1.{Content, Section}
 import okhttp3._
 import play.api.Logger
-import services.Config
+import services.{AWS, Config}
+
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 import scala.concurrent.duration._
@@ -66,14 +71,27 @@ class DraftContentApiClass(override val apiKey: String) extends ContentApiClient
 
   private val client: OkHttpClient = new OkHttpClient
 
-  private val authHeaders = Map(
-    "Authorization" -> Credentials.basic(Config().capiPreviewUser, Config().capiPreviewPassword))
+  private val previewSigner = {
+    val capiPreviewCredentials = new AWSCredentialsProviderChain(
+      new ProfileCredentialsProvider("capi"),
+      new STSAssumeRoleSessionCredentialsProvider.Builder(Config().capiPreviewRole, "capi").build()
+    )
+
+    new IAMSigner(
+      credentialsProvider = capiPreviewCredentials,
+      awsRegion = AWS.region.getName
+    )
+  }
+
+  private def addAuthHeaders(headers: Map[String, String], url: String): Map[String, String] =
+    previewSigner.addIAMHeaders(headers, URI.create(url))
 
   override protected def get(url: String, headers: Map[String, String])(
     implicit context: ExecutionContext): Future[HttpResponse] = {
 
     val promise          = Promise[HttpResponse]()
-    val request: Request = new Request.Builder().url(url).headers(Headers.of((headers ++ authHeaders).asJava)) build ()
+    val headersWithAuth  = addAuthHeaders(headers, url)
+    val request: Request = new Request.Builder().url(url).headers(Headers.of(headersWithAuth.asJava)) build ()
 
     client
       .newCall(request)
