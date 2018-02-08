@@ -61,10 +61,9 @@ sealed trait Config {
   lazy val googleAnalyticsViewId: String      = getRequiredRemoteStringProperty("googleAnalytivsViewId")
   lazy val googleAnalyticsGlabsViewId: String = getRequiredRemoteStringProperty("googleAnalytivsGlabsViewId")
 
-  lazy val capiKey: String             = getRequiredRemoteStringProperty("capi.key")
-  lazy val capiPreviewUrl: String      = getRequiredRemoteStringProperty("capi.preview.url")
-  lazy val capiPreviewUser: String     = getRequiredRemoteStringProperty("capi.preview.username")
-  lazy val capiPreviewPassword: String = getRequiredRemoteStringProperty("capi.preview.password")
+  lazy val capiKey: String         = getRequiredRemoteStringProperty("capi.key")
+  lazy val capiPreviewUrl: String  = getRequiredRemoteStringProperty("capi.preview.iam-url")
+  lazy val capiPreviewRole: String = getRequiredRemoteStringProperty("capi.preview.role")
 
   def googleServiceAccountJsonInputStream: InputStream = {
     val jsonLocation    = getRequiredRemoteStringProperty("googleServiceAccountCredentialsLocation")

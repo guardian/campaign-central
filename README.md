@@ -25,7 +25,7 @@ You will then need to create a local configuration file. The easiest way to do t
 cp conf/example-local.conf conf/local.conf
 ```
 
-The campaign-central is a standard play app, so to run it's `sbt run`.  You will need to have developer credentials configured in an AWS composer profile to be able to run it.  To test that the play app is running independently of nginx, try [hitting http://localhost:2267](hitting http://localhost:2267).
+The campaign-central is a standard play app, so to run it's `sbt run`.  You will need to have developer credentials configured in an AWS composer profile to be able to run it, and also CAPI apiGatewayInvoke credentials.  To test that the play app is running independently of nginx, try [hitting http://localhost:2267](hitting http://localhost:2267).
 
 After running this, campaign central
 will be available at [https://campaign-central.local.dev-gutools.co.uk](https://campaign-central.local.dev-gutools.co.uk).

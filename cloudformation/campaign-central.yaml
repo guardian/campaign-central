@@ -47,6 +47,10 @@ Parameters:
     Description: 'Account number for the Ophan team to permit them to write to our dynamodb tables.'
     Type: String
 
+  CapiPreviewRole:
+    Type: String
+    Description: ARN of the CAPI preview role
+
 Mappings:
   Config:
     CODE:
@@ -230,6 +234,18 @@ Resources:
       Path: "/"
       Roles:
       - Ref: CampaignCentralRole
+
+  AssumeCapiPreviewRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: AssumeCapiPreviewRole
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Resource: !Ref CapiPreviewRole
+      Roles:
+      - !Ref CampaignCentralRole
 
   SSHSecurityGroup:
     Type: AWS::EC2::SecurityGroup

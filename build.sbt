@@ -22,6 +22,7 @@ lazy val dependencies = Seq(
   "com.amazonaws"                    % "aws-java-sdk"             % "1.11.248",
   "com.gu"                           %% "play-googleauth"         % "0.7.0",
   "com.gu"                           %% "content-api-client"      % "11.45",
+  "com.gu"                           %% "content-api-client-aws"  % "0.5",
   "com.squareup.okhttp3"             % "okhttp"                   % "3.9.1",
   "commons-io"                       % "commons-io"               % "2.6",
   "net.logstash.logback"             % "logstash-logback-encoder" % "4.11",
