@@ -1,12 +1,10 @@
-Campaign Central
-================
+# Campaign Central
 
-Install and Setup
-=================
+# Install and set up
 
-### nginx set up
+## Nginx set-up
 
-The Nginx setup uses the [dev-nginx](https://github.com/guardian/dev-nginx) tool.
+The Nginx set-up uses the [dev-nginx](https://github.com/guardian/dev-nginx) tool.
 
 In the `http { }` block of your nginx config file `/usr/local/etc/nginx/nginx.conf` make sure that the two following lines are present
 
@@ -15,7 +13,7 @@ include sites-enabled/*;
 server_names_hash_bucket_size 256;
 ```
 
-### configuration
+## Configuration
 
 Before you run for the first time you will need to run `scripts/setup.sh`.  This will install and compile all the frontend dependencies needed for the app (you may need to install npm before you can run this successfully). If any frontend dependencies are changed you should should re-run the setup script.
 
@@ -32,8 +30,7 @@ will be available at [https://campaign-central.local.dev-gutools.co.uk](https://
 
 By default if you change any frontend code, you will need to recompile the assets using `scripts/setup.sh` but there are alternatives:
 
-Client Side Development
-=======================
+# Client-side development
 
 We use webpack to compile the assets for this project. You have the option to run `scripts/setup.sh` after each change as mentioned above, or alternatively you can choose to use one of the alternative startup scripts provided
 
@@ -42,8 +39,7 @@ We use webpack to compile the assets for this project. You have the option to ru
 2. `scripts/client-dev.sh` This scripts starts a [webpack-dev-server](https://webpack.github.io/docs/webpack-dev-server.html)
 alongside the application which provides Hot Reloading. Changes you make to code should be immediately visible in the browser
 
-Server Side Development
-=======================
+# Server-side development
 
 The backend code used the standard scala play layout.
 
