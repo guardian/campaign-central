@@ -1,13 +1,14 @@
 var path = require('path');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
+  mode: 'development',
   devtool: 'source-map',
 
   module: {
     rules: [
       {
-        test:    /\.js$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -19,15 +20,15 @@ module.exports = {
                   uglify: true
                 }
               }], 'react'],
-            plugins: ['transform-object-assign','transform-class-properties']
+            plugins: ['transform-object-assign', 'transform-class-properties']
           }
         }
       },
       {
         test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [{
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
             loader: 'css-loader',
             options: {
               sourceMap: true
@@ -39,19 +40,17 @@ module.exports = {
               sourceMap: true
             }
           }]
-        })
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: {
+        use: [MiniCssExtractPlugin.loader,
+          {
             loader: 'css-loader',
             options: {
               sourceMap: true
             }
           }
-        })
+        ]
       },
       {
         test: /\.woff(2)?(\?v=[0-9].[0-9].[0-9])?$/,
@@ -88,6 +87,6 @@ module.exports = {
   },
 
   plugins: [
-    new ExtractTextPlugin('main.css')
+    new MiniCssExtractPlugin({filename: 'main.css'})
   ]
 };
