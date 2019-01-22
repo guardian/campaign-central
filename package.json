@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Tool for managing campaigns",
   "scripts": {
-    "build": "webpack -p ./public/app.js ./public/build/app.js --config ./public/build_config/webpack.prod.conf.js --bail",
-    "build-dev": "webpack ./public/app.js ./public/build/app.js --config ./public/build_config/webpack.dev.conf.js --watch",
+    "build": "webpack -p ./public/app.js -o ./public/build/app.js --config ./public/build_config/webpack.prod.conf.js --bail",
+    "build-dev": "webpack ./public/app.js -o ./public/build/app.js --config ./public/build_config/webpack.dev.conf.js --watch",
     "build-icons": "svg-sprite -w 12 -h 12 -v true --view-bust false --view-prefix .i-%s --view-dest . --vs ./public/images/icons.svg --vscss true --view-render-scss-template ./public/images/icons/scssTemplate.scss --view-render-scss-dest ./public/styles/_icons.scss  ./public/images/icons/*.svg",
     "client-dev": "node ./public/devserver.js"
   },
