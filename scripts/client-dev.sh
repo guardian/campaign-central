@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 printf "\n\rStarting Webpack Dev Server... \n\r\n\r"
-npm run client-dev &
+yarn run client-dev &
 clientDevPid=$!
 
 printf "\n\rStarting Play App... \n\r\n\r"
