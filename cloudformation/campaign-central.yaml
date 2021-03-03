@@ -142,24 +142,6 @@ Resources:
       Roles:
       - Ref: CampaignCentralRole
 
-  CampaignCentralGetTeamKeysPolicy:
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: CampaignCentralGetTeamKeysPolicy
-      PolicyDocument:
-        Statement:
-        - Effect: Allow
-          Action:
-          - s3:GetObject
-          Resource:
-          - arn:aws:s3:::github-public-keys/*
-        - Effect: Allow
-          Action:
-          - s3:ListBucket
-          Resource: arn:aws:s3:::github-public-keys
-      Roles:
-      - Ref: CampaignCentralRole
-
   CampaignCentralCloudwatchPolicy:
     Type: AWS::IAM::Policy
     Properties:
